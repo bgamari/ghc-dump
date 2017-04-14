@@ -13,6 +13,10 @@ data Unique = Unique !Char !Int
             deriving (Eq, Ord, Generic, Show)
 instance Serialise Unique
 
+data ExternalName = ExternalName !ModuleName !T.Text !Unique
+                  deriving (Eq, Ord, Generic, Show)
+instance Serialise ExternalName
+
 newtype BinderId = BinderId Unique
                  deriving (Eq, Ord, Serialise, Show)
 
@@ -50,7 +54,7 @@ data Type' bndr var
 instance (Serialise bndr, Serialise var) => Serialise (Type' bndr var)
 
 newtype ModuleName = ModuleName T.Text
-                   deriving (Serialise, Show)
+                   deriving (Eq, Ord, Serialise, Show)
 
 type Module = Module' Binder Binder
 type SModule = Module' SBinder BinderId
@@ -77,6 +81,7 @@ type Expr = Expr' Binder Binder
 
 data Expr' bndr var
     = EVar var
+    | EVarGlobal ExternalName
     | ELit
     | EApp (Expr' bndr var) [Expr' bndr var]
     | ETyLam bndr (Expr' bndr var)

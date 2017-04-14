@@ -7,9 +7,9 @@ import qualified Data.Text.Encoding as TE
 
 import Var (Var, varUnique, varType, isTyVar)
 import qualified Var
-import Module (moduleNameFS, moduleName)
-import Unique (Unique, unpkUnique)
-import Name (getOccName, occNameFS, OccName)
+import Module (ModuleName, moduleNameFS, moduleName)
+import Unique (Unique, getUnique, unpkUnique)
+import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
 #if MIN_VERSION_ghc(8,0,0)
 import qualified CoreStats
 #else
@@ -78,7 +78,12 @@ cvtTopBind (Rec bs) =
 cvtExpr :: CoreExpr -> Ast.SExpr
 cvtExpr expr =
   case expr of
-    Var x             -> EVar (cvtVar x)
+    Var x
+      | Just mod <- nameModule_maybe $ getName x
+                      -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName mod)
+                                                   (occNameToText $ getOccName x)
+                                                   (cvtUnique $ getUnique x)
+      | otherwise     -> EVar (cvtVar x)
     Lit l             -> ELit
     App {}            -> let (x, ys) = collectArgs expr
                          in EApp (cvtExpr x) (map cvtExpr ys)
@@ -99,8 +104,10 @@ cvtAlt (con, bs, e) = Alt T.empty (map cvtBinder bs) (cvtExpr e)
 
 cvtModule :: ModGuts -> Ast.SModule
 cvtModule guts = Ast.Module name (map cvtTopBind $ mg_binds guts)
-  where
-    name = Ast.ModuleName $ fastStringToText $ moduleNameFS $ Module.moduleName $ mg_module guts
+  where name = cvtModuleName $ Module.moduleName $ mg_module guts
+
+cvtModuleName :: Module.ModuleName -> Ast.ModuleName
+cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
 cvtType :: Type.Type -> Ast.SType
 cvtType t

@@ -49,7 +49,7 @@ insertBinders bs bm = foldl' (flip insertBinder) bm bs
 getBinder :: BinderMap -> BinderId -> Binder
 getBinder (BinderMap m) bid
   | Just b <- HM.lookup bid m = b
-  | otherwise                 = error "unknown binder"
+  | otherwise                 = error $ "unknown binder "++ show bid ++ ":\n" ++ show m
 
 -- "recon" == "reconstruct"
 
@@ -68,6 +68,7 @@ reconTopBinding (RecTopBinding bs) = RecTopBinding bs'
 
 reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
+reconExpr bm (EVarGlobal n)   = EVarGlobal n
 reconExpr bm ELit             = ELit
 reconExpr bm (EApp x ys)      = EApp (reconExpr bm x) (map (reconExpr bm) ys)
 reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
