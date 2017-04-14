@@ -54,17 +54,16 @@ getBinder (BinderMap m) bid
 -- "recon" == "reconstruct"
 
 reconModule :: SModule -> Module
-reconModule m = Module (moduleName m) (map reconTopBinding $ moduleBinds m)
+reconModule m = Module (moduleName m) binds
+  where
+    binds = map reconTopBinding $ moduleBinds m
+    bm = insertBinders (map (\(a,_,_) -> a) $ concatMap topBindings binds) emptyBinderMap
 
-reconTopBinding :: STopBinding -> TopBinding
-reconTopBinding (NonRecTopBinding b stats rhs) = NonRecTopBinding b' stats (reconExpr bm rhs)
-  where
-    b' = reconBinder bm b
-    bm = insertBinder b' emptyBinderMap
-reconTopBinding (RecTopBinding bs) = RecTopBinding bs'
-  where
-    bs' = map (\(a,stats,rhs) -> (reconBinder bm a, stats, reconExpr bm rhs)) bs
-    bm = insertBinders (map (\(a,_,_) -> a) bs') emptyBinderMap
+    reconTopBinding :: STopBinding -> TopBinding
+    reconTopBinding (NonRecTopBinding b stats rhs) = NonRecTopBinding b' stats (reconExpr bm rhs)
+      where b' = reconBinder bm b
+    reconTopBinding (RecTopBinding bs) = RecTopBinding bs'
+      where bs' = map (\(a,stats,rhs) -> (reconBinder bm a, stats, reconExpr bm rhs)) bs
 
 reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
