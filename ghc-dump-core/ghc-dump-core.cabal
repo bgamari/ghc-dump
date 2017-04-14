@@ -20,5 +20,5 @@ library
                        bytestring >= 0.10,
                        text >=1.2 && <1.3,
                        binary-serialise-cbor,
-                       ghc >= 7.10 && < 8.3
+                       ghc >= 7.10 && < 8.4
   default-language:    Haskell2010
