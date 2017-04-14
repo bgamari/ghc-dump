@@ -8,27 +8,29 @@ import GHC.Generics
 import Data.Binary.Serialise.CBOR as CBOR
 import qualified Data.Text as T
 
-import CoreSyn (AltCon)
-
 data Unique = Unique !Char !Int
-            deriving (Generic)
+            deriving (Generic, Show)
 instance Serialise Unique
 
 newtype BinderId = BinderId Unique
-                 deriving (Serialise)
+                 deriving (Serialise, Show)
 
 data Binder = Binder !T.Text !BinderId
-            deriving (Generic)
+            deriving (Generic, Show)
 instance Serialise Binder
 
-data TyCon = TyCon !T.Text !BinderId -- Hmm
-           deriving (Generic)
+data TyCon = TyCon !T.Text !Unique -- Hmm
+           deriving (Generic, Show)
 instance Serialise TyCon
 
 data TyBinder = NamedTyBinder Binder Type
               | AnonTyBinder Type
-              deriving (Generic)
+              deriving (Generic, Show)
 instance Serialise TyBinder
+
+tyBinderKind :: TyBinder -> Type
+tyBinderKind (NamedTyBinder _ k) = k
+tyBinderKind (AnonTyBinder k)    = k
 
 data Type = VarTy BinderId
           | FunTy Type Type
@@ -37,14 +39,16 @@ data Type = VarTy BinderId
           | ForAllTy TyBinder Type
           | LitTy
           | CoercionTy
-          deriving (Generic)
+          deriving (Generic, Show)
 instance Serialise Type
 
 newtype ModuleName = ModuleName T.Text
-                   deriving (Serialise)
+                   deriving (Serialise, Show)
 
-data Module = Module ModuleName [TopBinding]
-            deriving (Generic)
+data Module = Module { moduleName :: ModuleName
+                     , moduleBinds :: [TopBinding]
+                     }
+            deriving (Generic, Show)
 instance Serialise Module
 
 data Expr = EVar BinderId
@@ -56,16 +60,16 @@ data Expr = EVar BinderId
           | ECase Expr Binder [Alt]
           | EType Type
           | ECoercion
-          deriving (Generic)
+          deriving (Generic, Show)
 instance Serialise Expr
 
 data Alt = Alt T.Text [Binder] Expr
-         deriving (Generic)
+         deriving (Generic, Show)
 instance Serialise Alt
 
 data TopBinding = NonRecTopBinding Binder CoreStats Expr
                 | RecTopBinding [(Binder, CoreStats, Expr)]
-                deriving (Generic)
+                deriving (Generic, Show)
 instance Serialise TopBinding
 
 topBindings :: TopBinding -> [(Binder, CoreStats, Expr)]
@@ -79,6 +83,5 @@ data CoreStats
                 , cs_val_binds   :: !Int
                 , cs_join_binds  :: !Int
                 }
-    deriving (Generic)
+    deriving (Generic, Show)
 instance Serialise CoreStats
-

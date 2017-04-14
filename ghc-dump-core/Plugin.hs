@@ -18,7 +18,7 @@ install opts todo = do
 intersperseDumps :: [CoreToDo] -> [CoreToDo]
 intersperseDumps = go 0
   where
-    go n (todo : rest) = pass n : todo : intersperseDumps rest
+    go n (todo : rest) = pass n : todo : go (n+1) rest
     go n [] = [pass n]
 
     pass n = CoreDoPluginPass "DumpCore" (liftIO . dumpIn n)

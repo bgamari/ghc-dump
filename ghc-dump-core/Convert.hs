@@ -15,7 +15,7 @@ import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
 import TyCoRep (Type(..), TyBinder(..))
 import Type (splitFunTy_maybe)
-import TyCon (TyCon)
+import TyCon (TyCon, tyConUnique)
 
 import Ast
 
@@ -98,4 +98,4 @@ cvtTyBinder (Named v _) = NamedTyBinder (cvtBinder v) (cvtType $ varType v)
 cvtTyBinder (Anon t)    = AnonTyBinder (cvtType t)
 
 cvtTyCon :: TyCon.TyCon -> Ast.TyCon
-cvtTyCon tc = undefined
+cvtTyCon tc = TyCon (occNameToText $ getOccName tc) (cvtUnique $ tyConUnique tc)
