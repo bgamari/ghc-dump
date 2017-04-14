@@ -6,14 +6,23 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
 import Var (Var, varUnique, varType, isTyVar)
+import qualified Var
 import Module (moduleNameFS, moduleName)
 import Unique (Unique, unpkUnique)
 import Name (getOccName, occNameFS, OccName)
-import CoreStats (exprStats, CoreStats(..))
+#if MIN_VERSION_ghc(8,0,0)
+import qualified CoreStats
+#else
+import qualified CoreUtils as CoreStats
+#endif
 import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, collectArgs)
 import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
-import TyCoRep (Type(..), TyBinder(..))
+#if MIN_VERSION_ghc(8,0,0)
+import TyCoRep (Type(..), TyBinder(..)) as Type
+#else
+import TypeRep as Type (Type(..))
+#endif
 import Type (splitFunTy_maybe)
 import TyCon (TyCon, tyConUnique)
 
@@ -34,25 +43,35 @@ cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . varUnique
 
 cvtBinder :: Var -> Binder
-cvtBinder v = Binder (occNameToText $ getOccName v) (cvtVar v)
+cvtBinder v = Binder (occNameToText $ getOccName v) (cvtVar v) (cvtType $ varType v)
 
 cvtCoreStats :: CoreStats.CoreStats -> Ast.CoreStats
 cvtCoreStats stats =
     Ast.CoreStats
-      { cs_terms      = cs_tm stats
-      , cs_types      = cs_ty stats
-      , cs_coercions  = cs_co stats
+      { cs_terms      = CoreStats.cs_tm stats
+      , cs_types      = CoreStats.cs_ty stats
+      , cs_coercions  = CoreStats.cs_co stats
 #if MIN_VERSION_ghc(8,2,0)
-      , cs_val_binds  = cs_vb stats
-      , cs_join_binds = cs_jb stats
+      , cs_val_binds  = CoreStats.cs_vb stats
+      , cs_join_binds = CoreStats.cs_jb stats
 #else
       , cs_val_binds  = 0
       , cs_join_binds = 0
 #endif
       }
 
-cvtTopBind (NonRec b e) = NonRecTopBinding (cvtBinder b) (cvtCoreStats $ exprStats e) (cvtExpr e)
-cvtTopBind (Rec bs)     = RecTopBinding $ map to bs
+exprStats :: CoreExpr -> CoreStats.CoreStats
+#if MIN_VERSION_ghc(8,0,0)
+exprStats expr = CoreStats.exprStats
+#else
+-- exprStats wasn't exported in 7.10
+exprStats expr = CoreStats.CS 0 0 0
+#endif
+
+cvtTopBind (NonRec b e) =
+    NonRecTopBinding (cvtBinder b) (cvtCoreStats $ exprStats e) (cvtExpr e)
+cvtTopBind (Rec bs) =
+    RecTopBinding $ map to bs
   where to (b, e) = (cvtBinder b, cvtCoreStats $ exprStats e, cvtExpr e)
 
 cvtExpr :: CoreExpr -> Ast.Expr
@@ -80,22 +99,27 @@ cvtAlt (con, bs, e) = Alt T.empty (map cvtBinder bs) (cvtExpr e)
 cvtModule :: ModGuts -> Ast.Module
 cvtModule guts = Ast.Module name (map cvtTopBind $ mg_binds guts)
   where
-    name = Ast.ModuleName $ fastStringToText $ moduleNameFS $ moduleName $ mg_module guts
+    name = Ast.ModuleName $ fastStringToText $ moduleNameFS $ Module.moduleName $ mg_module guts
 
-cvtType :: TyCoRep.Type -> Ast.Type
+cvtType :: Type.Type -> Ast.Type
 cvtType t
   | Just (a,b) <- splitFunTy_maybe t = Ast.FunTy (cvtType a) (cvtType b)
-cvtType (TyCoRep.TyVarTy v)       = Ast.VarTy (cvtVar v)
-cvtType (TyCoRep.AppTy a b)       = Ast.AppTy (cvtType a) (cvtType b)
-cvtType (TyCoRep.TyConApp tc tys) = Ast.TyConApp (cvtTyCon tc) (map cvtType tys)
-cvtType (TyCoRep.ForAllTy b t)    = Ast.ForAllTy (cvtTyBinder b) (cvtType t)
-cvtType (TyCoRep.LitTy _)         = Ast.LitTy
-cvtType (TyCoRep.CastTy t _)      = cvtType t
-cvtType (TyCoRep.CoercionTy _)    = Ast.CoercionTy
-
-cvtTyBinder :: TyCoRep.TyBinder -> Ast.TyBinder
-cvtTyBinder (Named v _) = NamedTyBinder (cvtBinder v) (cvtType $ varType v)
-cvtTyBinder (Anon t)    = AnonTyBinder (cvtType t)
+cvtType (Type.TyVarTy v)       = Ast.VarTy (cvtVar v)
+cvtType (Type.AppTy a b)       = Ast.AppTy (cvtType a) (cvtType b)
+cvtType (Type.TyConApp tc tys) = Ast.TyConApp (cvtTyCon tc) (map cvtType tys)
+#if MIN_VERSION_ghc(8,2,0)
+cvtType (Type.ForAllTy (Var.TvBndr b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
+#elif MIN_VERSION_ghc(8,0,0)
+cvtType (Type.ForAllTy (Named b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
+cvtType (Type.ForAllTy (Anon _) t)    = cvtType t
+#else
+cvtType (Type.ForAllTy b t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
+#endif
+cvtType (Type.LitTy _)         = Ast.LitTy
+#if MIN_VERSION_ghc(8,0,0)
+cvtType (Type.CastTy t _)      = cvtType t
+cvtType (Type.CoercionTy _)    = Ast.CoercionTy
+#endif
 
 cvtTyCon :: TyCon.TyCon -> Ast.TyCon
 cvtTyCon tc = TyCon (occNameToText $ getOccName tc) (cvtUnique $ tyConUnique tc)

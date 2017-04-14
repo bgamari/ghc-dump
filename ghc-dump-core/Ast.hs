@@ -15,28 +15,19 @@ instance Serialise Unique
 newtype BinderId = BinderId Unique
                  deriving (Serialise, Show)
 
-data Binder = Binder !T.Text !BinderId
+data Binder = Binder !T.Text !BinderId Type
             deriving (Generic, Show)
 instance Serialise Binder
 
-data TyCon = TyCon !T.Text !Unique -- Hmm
+data TyCon = TyCon !T.Text !Unique
            deriving (Generic, Show)
 instance Serialise TyCon
-
-data TyBinder = NamedTyBinder Binder Type
-              | AnonTyBinder Type
-              deriving (Generic, Show)
-instance Serialise TyBinder
-
-tyBinderKind :: TyBinder -> Type
-tyBinderKind (NamedTyBinder _ k) = k
-tyBinderKind (AnonTyBinder k)    = k
 
 data Type = VarTy BinderId
           | FunTy Type Type
           | TyConApp TyCon [Type]
           | AppTy Type Type
-          | ForAllTy TyBinder Type
+          | ForAllTy Binder Type
           | LitTy
           | CoercionTy
           deriving (Generic, Show)

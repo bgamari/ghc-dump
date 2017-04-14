@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module Plugin where
 
 import qualified Data.ByteString.Lazy as BSL
@@ -12,7 +14,6 @@ plugin = defaultPlugin { installCoreToDos = install }
 
 install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
 install opts todo = do
-    reinitializeGlobals
     return (intersperseDumps todo)
 
 intersperseDumps :: [CoreToDo] -> [CoreToDo]
