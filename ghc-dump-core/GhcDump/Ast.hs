@@ -17,11 +17,11 @@ newtype BinderId = BinderId Unique
                  deriving (Eq, Ord, Serialise, Show)
 
 newtype SBinder = SBndr (Binder' SBinder BinderId)
-                deriving (Generic)
+                deriving (Generic, Show)
 instance Serialise SBinder
 
 newtype Binder = Bndr (Binder' Binder Binder)
-               deriving (Generic)
+               deriving (Generic, Show)
 instance Serialise Binder
 
 data Binder' bndr var = Binder { binderName :: !T.Text
@@ -34,8 +34,6 @@ instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 data TyCon = TyCon !T.Text !Unique
            deriving (Generic, Show)
 instance Serialise TyCon
-
-newtype Fix f = Fix { unFix :: f (Fix f) }
 
 type SType = Type' SBinder BinderId
 type Type = Type' Binder Binder
