@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveFunctor #-}
 
-module Ast where
+module GhcDump.Ast where
 
 import GHC.Generics
 

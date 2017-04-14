@@ -1,4 +1,4 @@
-module Util
+module GhcDump.Util
     ( -- * Convenient IO
       readFile
       -- * Manipulating Types
@@ -15,7 +15,7 @@ import qualified Data.HashMap.Lazy as HM
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Binary.Serialise.CBOR as CBOR
 
-import Ast
+import GhcDump.Ast
 
 readFile :: FilePath -> IO SModule
 readFile fname = CBOR.deserialise <$> BSL.readFile fname

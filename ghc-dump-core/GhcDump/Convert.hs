@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-module Convert where
+module GhcDump.Convert where
 
 import Data.Bifunctor
 import qualified Data.Text as T
@@ -26,7 +26,7 @@ import TypeRep as Type (Type(..))
 import Type (splitFunTy_maybe)
 import TyCon (TyCon, tyConUnique)
 
-import Ast
+import GhcDump.Ast as Ast
 
 fastStringToText :: FastString -> T.Text
 fastStringToText = TE.decodeUtf8 . fastStringToByteString
