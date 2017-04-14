@@ -2,9 +2,11 @@
 
 module GhcDump.Plugin where
 
+import Data.Maybe
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Binary.Serialise.CBOR as CBOR
 import GhcPlugins hiding (TB)
+import DynFlags (getDynFlags, dumpPrefix)
 import CoreMonad (CoreToDo(CoreDoPluginPass))
 
 import GhcDump.Convert
@@ -14,19 +16,21 @@ plugin = defaultPlugin { installCoreToDos = install }
 
 install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
 install opts todo = do
-    return (intersperseDumps todo)
+    dflags <- getDynFlags
+    let prefix = fromMaybe "dump" $ dumpPrefix dflags
+    return (intersperseDumps prefix todo)
 
-intersperseDumps :: [CoreToDo] -> [CoreToDo]
-intersperseDumps = go 0
+intersperseDumps :: String -> [CoreToDo] -> [CoreToDo]
+intersperseDumps dumpPrefix = go 0
   where
     go n (todo : rest) = pass n : todo : go (n+1) rest
     go n [] = [pass n]
 
-    pass n = CoreDoPluginPass "DumpCore" (liftIO . dumpIn n)
+    pass n = CoreDoPluginPass "DumpCore" (liftIO . dumpIn dumpPrefix n)
 
-dumpIn :: Int -> ModGuts -> IO ModGuts
-dumpIn n guts = do
+dumpIn :: String -> Int -> ModGuts -> IO ModGuts
+dumpIn dumpPrefix n guts = do
     putStr $ "Dumping "++show n++"... "
-    BSL.writeFile ("dump-"++show n++".cbor") $ CBOR.serialise (cvtModule guts)
+    BSL.writeFile (dumpPrefix++"pass-"++show n++".cbor") $ CBOR.serialise (cvtModule guts)
     putStrLn $ "done."
     return guts
