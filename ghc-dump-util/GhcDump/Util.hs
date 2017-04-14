@@ -1,6 +1,6 @@
 module GhcDump.Util
     ( -- * Convenient IO
-      readFile
+      readFile, readFile'
       -- * Manipulating Types
     , splitFunTys
     , splitForAlls
@@ -17,8 +17,11 @@ import qualified Data.Binary.Serialise.CBOR as CBOR
 
 import GhcDump.Ast
 
-readFile :: FilePath -> IO SModule
-readFile fname = CBOR.deserialise <$> BSL.readFile fname
+readFile' :: FilePath -> IO SModule
+readFile' fname = CBOR.deserialise <$> BSL.readFile fname
+
+readFile :: FilePath -> IO Module
+readFile fname = reconModule <$> readFile' fname
 
 splitFunTys :: Type' bndr var -> [Type' bndr var]
 splitFunTys = go []
@@ -90,9 +93,13 @@ reconBinder bm (SBndr b) =
     Bndr $ Binder (binderName b) (binderId b) (reconType bm $ binderType b)
 
 reconAlt :: BinderMap -> SAlt -> Alt
-reconAlt bm (Alt con bs rhs) =
-    let bs' = map (reconBinder bm) bs
-        bm' = insertBinders bs' bm
+reconAlt bm0 (Alt con bs rhs) =
+    let doBinders bm acc []       = (bm, reverse acc)
+        doBinders bm acc (b:rest) = doBinders bm' (b':acc) rest
+          where
+            b'  = reconBinder bm b
+            bm' = insertBinder b' bm
+        (bm', bs') = doBinders bm0 [] bs
     in Alt con bs' (reconExpr bm' rhs)
 
 reconType :: BinderMap -> SType -> Type
