@@ -96,7 +96,10 @@ instance (Serialise bndr, Serialise var) => Serialise (Expr' bndr var)
 type SAlt = Alt' SBinder BinderId
 type Alt = Alt' Binder Binder
 
-data Alt' bndr var = Alt T.Text [bndr] (Expr' bndr var)
+data Alt' bndr var = Alt { altTyCon   :: !T.Text
+                         , altBinders :: [bndr]
+                         , altRHS     :: Expr' bndr var
+                         }
                   deriving (Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Alt' bndr var)
 
