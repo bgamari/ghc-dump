@@ -15,11 +15,11 @@ import qualified CoreStats
 #else
 import qualified CoreUtils as CoreStats
 #endif
-import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, collectArgs)
+import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, collectArgs)
 import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
 #if MIN_VERSION_ghc(8,0,0)
-import TyCoRep (Type(..), TyBinder(..)) as Type
+import TyCoRep as Type (Type(..), TyBinder(..))
 #else
 import TypeRep as Type (Type(..))
 #endif
@@ -42,8 +42,8 @@ cvtUnique u =
 cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . varUnique
 
-cvtBinder :: Var -> Binder
-cvtBinder v = Binder (occNameToText $ getOccName v) (cvtVar v) (cvtType $ varType v)
+cvtBinder :: Var -> SBinder
+cvtBinder v = SBndr $ Binder (occNameToText $ getOccName v) (cvtVar v) (cvtType $ varType v)
 
 cvtCoreStats :: CoreStats.CoreStats -> Ast.CoreStats
 cvtCoreStats stats =
@@ -62,19 +62,20 @@ cvtCoreStats stats =
 
 exprStats :: CoreExpr -> CoreStats.CoreStats
 #if MIN_VERSION_ghc(8,0,0)
-exprStats expr = CoreStats.exprStats
+exprStats = CoreStats.exprStats
 #else
 -- exprStats wasn't exported in 7.10
 exprStats expr = CoreStats.CS 0 0 0
 #endif
 
+cvtTopBind :: CoreBind -> STopBinding
 cvtTopBind (NonRec b e) =
     NonRecTopBinding (cvtBinder b) (cvtCoreStats $ exprStats e) (cvtExpr e)
 cvtTopBind (Rec bs) =
     RecTopBinding $ map to bs
   where to (b, e) = (cvtBinder b, cvtCoreStats $ exprStats e, cvtExpr e)
 
-cvtExpr :: CoreExpr -> Ast.Expr
+cvtExpr :: CoreExpr -> Ast.SExpr
 cvtExpr expr =
   case expr of
     Var x             -> EVar (cvtVar x)
@@ -92,16 +93,16 @@ cvtExpr expr =
     Type t            -> EType $ cvtType t
     Coercion _        -> ECoercion
 
-cvtAlt :: CoreAlt -> Ast.Alt
+cvtAlt :: CoreAlt -> Ast.SAlt
 cvtAlt (con, bs, e) = Alt T.empty (map cvtBinder bs) (cvtExpr e)
 --(occNameToText $ getOccName con)
 
-cvtModule :: ModGuts -> Ast.Module
+cvtModule :: ModGuts -> Ast.SModule
 cvtModule guts = Ast.Module name (map cvtTopBind $ mg_binds guts)
   where
     name = Ast.ModuleName $ fastStringToText $ moduleNameFS $ Module.moduleName $ mg_module guts
 
-cvtType :: Type.Type -> Ast.Type
+cvtType :: Type.Type -> Ast.SType
 cvtType t
   | Just (a,b) <- splitFunTy_maybe t = Ast.FunTy (cvtType a) (cvtType b)
 cvtType (Type.TyVarTy v)       = Ast.VarTy (cvtVar v)
