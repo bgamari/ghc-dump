@@ -1,8 +1,11 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 import Data.List (sortBy)
 import Data.Monoid
 import Data.Ord
 import Options.Applicative
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (<>))
+import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 import Control.Monad
 
@@ -10,10 +13,28 @@ import GhcDump.Pretty
 import GhcDump.Util
 import GhcDump.Ast
 
+data Column a = Col { colWidth :: Int, colHeader :: String, colGet :: (a -> Doc) }
+
+type Table a = [Column a]
+
+renderTable :: forall a. Table a -> [a] -> Doc
+renderTable cols xs =
+         row (PP.bold . text . colHeader)
+    <$$> vcat [ row (flip colGet x) | x <- xs ]
+  where
+    row :: (Column a -> Doc) -> Doc
+    row toCell = go cols
+      where
+        go :: [Column a] -> Doc
+        go []           = PP.empty
+        go [col]        = toCell col
+        go (col : rest) = fillBreak (colWidth col) (toCell col) PP.<+> go rest
+
 modes :: Parser (IO ())
 modes = subparser
      $ mode "show" showMode (progDesc "print Core")
     <> mode "list-bindings" listBindingsMode (progDesc "list top-level bindings, their sizes, and types")
+    <> mode "summarize" summarizeMode (progDesc "summarize multiple dump files")
   where
     mode name f opts = command name (info (helper <*> f) opts)
 
@@ -41,23 +62,35 @@ modes = subparser
             --readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
             readSortField f           = fail $ "unknown sort field "++f
 
-            getBinder (b,_,_) = b
-            getStats (_,s,_) = s
-
         run sortBindings fname = do
             dump <- GhcDump.Util.readDump fname
-            let rows = vcat $ map bindingRow $ sortBindings $ moduleBindings dump
-                bindingRow (b, s, _) =
-                    row (pretty b) (pretty $ csTerms s) (pretty $ csTypes s)
-                        (pretty $ csCoercions s) (binderType $ unBndr b)
-                header = row (text "Name") (text "Terms") (text "Types") (text "Coer.") (text "Type")
-                row name terms types coercions ty =
-                    fillBreak 20 name
-                    <+> fillBreak 6 terms
-                    <+> fillBreak 6 types
-                    <+> fillBreak 6 coercions
-                    <+> pretty ty
-            print (header <$$> rows)
+            let table = [ Col 20 "Name"   (pretty . getBinder)
+                        , Col 6  "Terms"  (pretty . csTerms . getStats)
+                        , Col 6  "Types"  (pretty . csTypes . getStats)
+                        , Col 6  "Coerc." (pretty . csCoercions . getStats)
+                        , Col 300 "Type"  (pretty . binderType . unBndr . getBinder)
+                        ]
+            print $ renderTable table (sortBindings $ moduleBindings dump)
+
+    summarizeMode =
+        run <$> some dumpFile
+      where
+        run fnames = do
+            mods <- mapM (\fname -> do mod <- readDump fname
+                                       return (fname, mod)) fnames
+            let totalSize :: Module -> CoreStats
+                totalSize = foldMap getStats . moduleBindings
+            let table = [ Col 35 "Name" (text . fst)
+                        , Col 8  "Terms" (pretty . csTerms . totalSize . snd)
+                        , Col 8  "Types" (pretty . csTypes . totalSize . snd)
+                        , Col 8  "Coerc." (pretty . csCoercions . totalSize . snd)
+                        ]
+            print $ renderTable table mods
+
+
+getBinder (b,_,_) = b
+getStats (_,s,_) = s
+getRHS (_,_,e) = e
 
 main :: IO ()
 main = join $ execParser $ info (helper <*> modes) mempty
