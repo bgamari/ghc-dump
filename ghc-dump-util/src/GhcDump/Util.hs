@@ -88,8 +88,8 @@ reconModule m = Module (moduleName m) binds
 
 reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
-reconExpr bm (EVarGlobal n)   = EVarGlobal n
-reconExpr bm (ELit l)         = ELit l
+reconExpr _  (EVarGlobal n)   = EVarGlobal n
+reconExpr _  (ELit l)         = ELit l
 reconExpr bm (EApp x ys)      = EApp (reconExpr bm x) (map (reconExpr bm) ys)
 reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
                                     bm' = insertBinder b' bm
@@ -104,7 +104,7 @@ reconExpr bm (ECase x b alts) = let b' = reconBinder bm b
                                     bm' = insertBinder b' bm
                                 in ECase (reconExpr bm x) b' (map (reconAlt bm') alts)
 reconExpr bm (EType t)        = EType (reconType bm t)
-reconExpr bm ECoercion        = ECoercion
+reconExpr _  ECoercion        = ECoercion
 
 reconBinder :: BinderMap -> SBinder -> Binder
 reconBinder bm (SBndr b) =
@@ -112,13 +112,14 @@ reconBinder bm (SBndr b) =
 
 reconAlt :: BinderMap -> SAlt -> Alt
 reconAlt bm0 (Alt con bs rhs) =
-    let doBinders bm acc []       = (bm, reverse acc)
-        doBinders bm acc (b:rest) = doBinders bm' (b':acc) rest
-          where
-            b'  = reconBinder bm b
-            bm' = insertBinder b' bm
-        (bm', bs') = doBinders bm0 [] bs
+    let (bm', bs') = doBinders bm0 [] bs
     in Alt con bs' (reconExpr bm' rhs)
+  where
+    doBinders bm acc []       = (bm, reverse acc)
+    doBinders bm acc (b:rest) = doBinders bm' (b':acc) rest
+      where
+        b'  = reconBinder bm b
+        bm' = insertBinder b' bm
 
 reconType :: BinderMap -> SType -> Type
 reconType bm (VarTy v) = VarTy $ getBinder bm v
@@ -128,5 +129,5 @@ reconType bm (AppTy x y) = AppTy (reconType bm x) (reconType bm y)
 reconType bm (ForAllTy b x) = let b' = reconBinder bm b
                                   bm' = insertBinder b' bm
                               in ForAllTy b' (reconType bm' x)
-reconType bm LitTy = LitTy
-reconType bm CoercionTy = CoercionTy
+reconType _  LitTy = LitTy
+reconType _  CoercionTy = CoercionTy
