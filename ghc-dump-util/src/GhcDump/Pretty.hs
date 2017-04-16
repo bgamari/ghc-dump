@@ -30,11 +30,11 @@ instance Pretty Lit where
     pretty SomeLit = text "LIT"
 
 instance Pretty CoreStats where
-    pretty c = "SIZE"<>braces (hsep [ "terms="<>int (cs_terms c)
-                                    , "types="<>int (cs_types c)
-                                    , "cos="<>int (cs_coercions c)
-                                    , "vbinds="<>int (cs_val_binds c)
-                                    , "jbinds="<>int (cs_join_binds c)
+    pretty c = "SIZE"<>braces (hsep [ "terms="<>int (csTerms c)
+                                    , "types="<>int (csTypes c)
+                                    , "cos="<>int (csCoercions c)
+                                    , "vbinds="<>int (csValBinds c)
+                                    , "jbinds="<>int (csJoinBinds c)
                                     ])
 
 data TyPrec   -- See Note [Precedence in types] in TyCoRep.hs

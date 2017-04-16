@@ -49,15 +49,15 @@ cvtBinder v = SBndr $ Binder (occNameToText $ getOccName v) (cvtVar v) (cvtType 
 cvtCoreStats :: CoreStats.CoreStats -> Ast.CoreStats
 cvtCoreStats stats =
     Ast.CoreStats
-      { cs_terms      = CoreStats.cs_tm stats
-      , cs_types      = CoreStats.cs_ty stats
-      , cs_coercions  = CoreStats.cs_co stats
+      { csTerms     = CoreStats.cs_tm stats
+      , csTypes     = CoreStats.cs_ty stats
+      , csCoercions = CoreStats.cs_co stats
 #if MIN_VERSION_ghc(8,2,0)
-      , cs_val_binds  = CoreStats.cs_vb stats
-      , cs_join_binds = CoreStats.cs_jb stats
+      , csValBinds  = CoreStats.cs_vb stats
+      , csJoinBinds = CoreStats.cs_jb stats
 #else
-      , cs_val_binds  = 0
-      , cs_join_binds = 0
+      , csValBinds  = 0
+      , csJoinBinds = 0
 #endif
       }
 

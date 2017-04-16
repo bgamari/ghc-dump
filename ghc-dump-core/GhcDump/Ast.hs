@@ -130,11 +130,16 @@ topBindings (NonRecTopBinding a b c) = [(a,b,c)]
 topBindings (RecTopBinding bs) = bs
 
 data CoreStats
-    = CoreStats { cs_terms       :: !Int
-                , cs_types       :: !Int
-                , cs_coercions   :: !Int
-                , cs_val_binds   :: !Int
-                , cs_join_binds  :: !Int
+    = CoreStats { csTerms       :: !Int
+                , csTypes       :: !Int
+                , csCoercions   :: !Int
+                , csValBinds   :: !Int
+                , csJoinBinds  :: !Int
                 }
     deriving (Generic, Show)
 instance Serialise CoreStats
+
+instance Monoid CoreStats where
+    mempty = CoreStats 0 0 0 0 0
+    CoreStats a b c d e `mappend` CoreStats a' b' c' d' e' =
+        CoreStats (a+a') (b+b') (c+c') (d+d') (e+e')
