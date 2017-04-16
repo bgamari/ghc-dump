@@ -72,7 +72,9 @@ pprExpr' :: Bool -> Expr -> Doc
 pprExpr' _parens (EVar v)         = pretty v
 pprExpr' _parens (EVarGlobal v)   = pretty v
 pprExpr' _parens (ELit l)         = pretty l
-pprExpr' parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' True x) 2 (sep $ map (pprExpr' True) ys)
+pprExpr' parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' True x) 2 (sep $ map pprArg ys)
+  where pprArg (EType t) = char '@' <> pprType' TyOpPrec t
+        pprArg x         = pprExpr' True x
 pprExpr' parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
                                     in maybeParens parens
                                        $ hang' ("Λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' False x')
