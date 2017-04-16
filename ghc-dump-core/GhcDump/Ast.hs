@@ -13,7 +13,10 @@ data Unique = Unique !Char !Int
             deriving (Eq, Ord, Generic, Show)
 instance Serialise Unique
 
-data ExternalName = ExternalName !ModuleName !T.Text !Unique
+data ExternalName = ExternalName { externalModuleName :: !ModuleName
+                                 , externalName :: !T.Text
+                                 , externalUnique :: !Unique
+                                 }
                   deriving (Eq, Ord, Generic, Show)
 instance Serialise ExternalName
 
@@ -35,6 +38,10 @@ data Binder' bndr var = Binder { binderName :: !T.Text
                       deriving (Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 
+data Lit = SomeLit
+         deriving (Generic, Show)
+instance Serialise Lit
+
 data TyCon = TyCon !T.Text !Unique
            deriving (Generic, Show)
 instance Serialise TyCon
@@ -53,7 +60,7 @@ data Type' bndr var
     deriving (Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Type' bndr var)
 
-newtype ModuleName = ModuleName T.Text
+newtype ModuleName = ModuleName {getModuleName :: T.Text}
                    deriving (Eq, Ord, Serialise, Show)
 
 type Module = Module' Binder Binder
@@ -82,7 +89,7 @@ type Expr = Expr' Binder Binder
 data Expr' bndr var
     = EVar var
     | EVarGlobal ExternalName
-    | ELit
+    | ELit Lit
     | EApp (Expr' bndr var) [Expr' bndr var]
     | ETyLam bndr (Expr' bndr var)
     | ELam bndr (Expr' bndr var)
@@ -96,12 +103,18 @@ instance (Serialise bndr, Serialise var) => Serialise (Expr' bndr var)
 type SAlt = Alt' SBinder BinderId
 type Alt = Alt' Binder Binder
 
-data Alt' bndr var = Alt { altTyCon   :: !T.Text
+data Alt' bndr var = Alt { altCon     :: !AltCon
                          , altBinders :: [bndr]
                          , altRHS     :: Expr' bndr var
                          }
                   deriving (Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Alt' bndr var)
+
+data AltCon = AltDataCon !T.Text
+            | AltLit Lit
+            | AltDefault
+            deriving (Generic, Show)
+instance Serialise AltCon
 
 type STopBinding = TopBinding' SBinder BinderId
 type TopBinding = TopBinding' Binder Binder

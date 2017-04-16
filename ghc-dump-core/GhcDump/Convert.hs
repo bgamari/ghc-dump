@@ -5,6 +5,7 @@ import Data.Bifunctor
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
+import Literal (Literal(..))
 import Var (Var, varUnique, varType, isTyVar)
 import qualified Var
 import Module (ModuleName, moduleNameFS, moduleName)
@@ -15,7 +16,7 @@ import qualified CoreStats
 #else
 import qualified CoreUtils as CoreStats
 #endif
-import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, collectArgs)
+import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, collectArgs, AltCon(..))
 import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
 #if MIN_VERSION_ghc(8,0,0)
@@ -84,7 +85,7 @@ cvtExpr expr =
                                                    (occNameToText $ getOccName x)
                                                    (cvtUnique $ getUnique x)
       | otherwise     -> EVar (cvtVar x)
-    Lit l             -> ELit
+    Lit l             -> ELit (cvtLit l)
     App {}            -> let (x, ys) = collectArgs expr
                          in EApp (cvtExpr x) (map cvtExpr ys)
     Lam x e
@@ -99,8 +100,15 @@ cvtExpr expr =
     Coercion _        -> ECoercion
 
 cvtAlt :: CoreAlt -> Ast.SAlt
-cvtAlt (con, bs, e) = Alt T.empty (map cvtBinder bs) (cvtExpr e)
---(occNameToText $ getOccName con)
+cvtAlt (con, bs, e) = Alt con' (map cvtBinder bs) (cvtExpr e)
+  where
+    con' = case con of
+             DataAlt con -> Ast.AltDataCon $ occNameToText $ getOccName con
+             LitAlt l    -> Ast.AltLit $ cvtLit l
+             DEFAULT     -> Ast.AltDefault
+
+cvtLit :: Literal -> Ast.Lit
+cvtLit l = SomeLit -- TODO
 
 cvtModule :: ModGuts -> Ast.SModule
 cvtModule guts = Ast.Module name (map cvtTopBind $ mg_binds guts)
@@ -121,9 +129,9 @@ cvtType (Type.ForAllTy (Var.TvBndr b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType
 cvtType (Type.ForAllTy (Named b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
 cvtType (Type.ForAllTy (Anon _) t)    = cvtType t
 #else
-cvtType (Type.ForAllTy b t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
+cvtType (Type.ForAllTy b t)    = Ast.ForAllTy (cvtBinder b) (cvtType t)
 #endif
-cvtType (Type.LitTy _)         = Ast.LitTy
+cvtType (Type.LitTy l)         = Ast.LitTy
 #if MIN_VERSION_ghc(8,0,0)
 cvtType (Type.CastTy t _)      = cvtType t
 cvtType (Type.CoercionTy _)    = Ast.CoercionTy

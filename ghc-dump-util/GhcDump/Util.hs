@@ -71,7 +71,7 @@ reconModule m = Module (moduleName m) binds
 reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
 reconExpr bm (EVarGlobal n)   = EVarGlobal n
-reconExpr bm ELit             = ELit
+reconExpr bm (ELit l)         = ELit l
 reconExpr bm (EApp x ys)      = EApp (reconExpr bm x) (map (reconExpr bm) ys)
 reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
                                     bm' = insertBinder b' bm
