@@ -17,6 +17,7 @@ data ExternalName = ExternalName { externalModuleName :: !ModuleName
                                  , externalName :: !T.Text
                                  , externalUnique :: !Unique
                                  }
+                  | ForeignCall
                   deriving (Eq, Ord, Generic, Show)
 instance Serialise ExternalName
 

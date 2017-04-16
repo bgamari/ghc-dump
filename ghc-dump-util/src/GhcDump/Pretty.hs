@@ -12,7 +12,8 @@ import qualified Data.Text as T
 import Text.PrettyPrint.ANSI.Leijen
 
 instance Pretty ExternalName where
-    pretty n = pretty (externalModuleName n) <> "." <> text (T.unpack $ externalName n)
+    pretty n@ExternalName{} = pretty (externalModuleName n) <> "." <> text (T.unpack $ externalName n)
+    pretty ForeignCall = "<foreign>"
 
 instance Pretty ModuleName where
     pretty = text . T.unpack . getModuleName

@@ -7,6 +7,7 @@ import qualified Data.Text.Encoding as TE
 
 import Literal (Literal(..))
 import Var (Var, varUnique, varType, isTyVar)
+import Id (isFCallId)
 import qualified Var
 import Module (ModuleName, moduleNameFS, moduleName)
 import Unique (Unique, getUnique, unpkUnique)
@@ -80,6 +81,8 @@ cvtExpr :: CoreExpr -> Ast.SExpr
 cvtExpr expr =
   case expr of
     Var x
+        -- foreign calls are local but have no binding site
+      | isFCallId x   -> EVarGlobal ForeignCall
       | Just mod <- nameModule_maybe $ getName x
                       -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName mod)
                                                    (occNameToText $ getOccName x)
