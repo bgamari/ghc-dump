@@ -49,12 +49,12 @@ pprType = pprType' TopPrec
 
 pprType' :: TyPrec -> Type -> Doc
 pprType' _ (VarTy b)         = pretty b
-pprType' p t@(FunTy _ _)     = maybeParens (p < FunPrec) $ hsep $ punctuate "->" (map (pprType' FunPrec) (splitFunTys t))
+pprType' p t@(FunTy _ _)     = maybeParens (p >= FunPrec) $ hsep $ punctuate "->" (map (pprType' FunPrec) (splitFunTys t))
 pprType' p (TyConApp tc [])  = pretty tc
-pprType' p (TyConApp tc tys) = maybeParens (p < TyConPrec) $ pretty tc <+> hsep (map (pprType' TyConPrec) tys)
-pprType' p (AppTy a b)       = maybeParens (p < TyConPrec) $ pprType' TyConPrec a <+> pprType' TyConPrec b
-pprType' _ t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
-                               in parens $ "forall" <+> hsep (map pretty bs) <> "." <+> pretty t'
+pprType' p (TyConApp tc tys) = maybeParens (p >= TyConPrec) $ pretty tc <+> hsep (map (pprType' TyConPrec) tys)
+pprType' p (AppTy a b)       = maybeParens (p >= TyConPrec) $ pprType' TyConPrec a <+> pprType' TyConPrec b
+pprType' p t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
+                               in maybeParens (p >= TyOpPrec) $ "forall" <+> hsep (map pretty bs) <> "." <+> pretty t'
 pprType' _ LitTy             = "LIT"
 pprType' _ CoercionTy        = "Co"
 
@@ -73,7 +73,7 @@ pprExpr' _parens (EVar v)         = pretty v
 pprExpr' _parens (EVarGlobal v)   = pretty v
 pprExpr' _parens (ELit l)         = pretty l
 pprExpr' parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' True x) 2 (sep $ map pprArg ys)
-  where pprArg (EType t) = char '@' <> pprType' TyOpPrec t
+  where pprArg (EType t) = char '@' <> pprType' TyConPrec t
         pprArg x         = pprExpr' True x
 pprExpr' parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
                                     in maybeParens parens
