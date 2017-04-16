@@ -69,7 +69,8 @@ insertBinders bs bm = foldl' (flip insertBinder) bm bs
 getBinder :: BinderMap -> BinderId -> Binder
 getBinder (BinderMap m) bid
   | Just b <- HM.lookup bid m = b
-  | otherwise                 = error $ "unknown binder "++ show bid ++ ":\n" ++ show m
+  | otherwise                 = error $ "unknown binder "++ show bid ++ ":\nin scope:\n"
+                                        ++ unlines (map (\(bid',b) -> show bid' ++ "\t" ++ show b) (HM.toList m))
 
 -- "recon" == "reconstruct"
 
