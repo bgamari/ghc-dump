@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module GhcDump.Pretty where
+module GhcDump.Pretty
+    ( Pretty(..)
+    , module GhcDump.Pretty
+    ) where
 
 import GhcDump.Ast
 import GhcDump.Util
@@ -96,6 +99,13 @@ pprTopBinding tb =
         pretty b <+> dcolon <+> pprType (binderType b')
         <$$> comment (pretty s)
         <$$> pretty b <+> equals <+> align (pprExpr rhs)
+
+instance Pretty TopBinding where
+    pretty = pprTopBinding
+
+instance Pretty Module where
+    pretty m = text "module" <+> pretty (moduleName m) <+> "where"
+               <$$> vsep (map pprTopBinding $ moduleBinds m)
 
 comment :: Doc -> Doc
 comment x = "{-" <+> x <+> "-}"
