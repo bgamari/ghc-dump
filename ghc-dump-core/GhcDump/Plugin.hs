@@ -30,7 +30,5 @@ intersperseDumps dumpPrefix = go 0
 
 dumpIn :: String -> Int -> ModGuts -> IO ModGuts
 dumpIn dumpPrefix n guts = do
-    putStr $ "Dumping "++show n++"... "
     BSL.writeFile (dumpPrefix++"pass-"++show n++".cbor") $ CBOR.serialise (cvtModule guts)
-    putStrLn $ "done."
     return guts
