@@ -24,3 +24,11 @@ library
                        ansi-wl-pprint >= 0.6,
                        binary-serialise-cbor >=0.1 && <0.2
   default-language:    Haskell2010
+
+executable ghc-dump
+  main-is:             Main.hs
+  build-depends:       base < 5.0,
+                       ghc-dump-core >=0.1 && <0.2,
+                       ghc-dump-util,
+                       optparse-applicative >= 0.13
+  default-language:    Haskell2010
