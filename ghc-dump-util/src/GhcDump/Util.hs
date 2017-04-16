@@ -76,7 +76,7 @@ getBinder (BinderMap m) bid
 reconModule :: SModule -> Module
 reconModule m = Module (moduleName m) binds
   where
-    binds = map reconTopBinding $ moduleBinds m
+    binds = map reconTopBinding $ moduleTopBindings m
     bm = insertBinders (map (\(a,_,_) -> a) $ concatMap topBindings binds) emptyBinderMap
 
     reconTopBinding :: STopBinding -> TopBinding

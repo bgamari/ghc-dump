@@ -121,7 +121,7 @@ instance Pretty TopBinding where
 
 instance Pretty Module where
     pretty m = text "module" <+> pretty (moduleName m) <+> "where" <> line
-               <$$> vsep (map pprTopBinding $ moduleBinds m)
+               <$$> vsep (map pprTopBinding $ moduleTopBindings m)
 
 comment :: Doc -> Doc
 comment x = "{-" <+> x <+> "-}"

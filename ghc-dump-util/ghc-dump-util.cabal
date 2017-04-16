@@ -30,5 +30,6 @@ executable ghc-dump
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        ghc-dump-util,
+                       ansi-wl-pprint >= 0.6,
                        optparse-applicative >= 0.13
   default-language:    Haskell2010

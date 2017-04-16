@@ -23,11 +23,11 @@ instance Serialise ExternalName
 newtype BinderId = BinderId Unique
                  deriving (Eq, Ord, Serialise, Show)
 
-newtype SBinder = SBndr (Binder' SBinder BinderId)
+newtype SBinder = SBndr { unSBndr :: Binder' SBinder BinderId }
                 deriving (Generic, Show)
 instance Serialise SBinder
 
-newtype Binder = Bndr (Binder' Binder Binder)
+newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
                deriving (Generic, Show)
 instance Serialise Binder
 
@@ -68,10 +68,13 @@ type SModule = Module' SBinder BinderId
 
 data Module' bndr var
     = Module { moduleName :: ModuleName
-             , moduleBinds :: [TopBinding' bndr var]
+             , moduleTopBindings :: [TopBinding' bndr var]
              }
     deriving (Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Module' bndr var)
+
+moduleBindings :: Module' bndr var -> [(bndr, CoreStats, Expr' bndr var)]
+moduleBindings = concatMap topBindings . moduleTopBindings
 
 -- $binders
 --
