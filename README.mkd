@@ -1,0 +1,49 @@
+# ghc-dump: A tool for analysing GHC Core
+
+`ghc-dump` is a library, GHC plugin, and set of tools for analysing GHC's Core
+representation. The plugin is compatible with GHC 7.10 through 8.3, exporting a
+consistent (albeit somewhat lossy) representation across these versions. The AST
+is encoded as CBOR, which is small and easy to deserialise.
+
+## Dumping Core
+
+The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
+representation of the Core AST to file after every Core-to-Core pass. To use it,
+first install the `ghc-dump-core` package,
+```
+$ cabal install ghc-dump-core
+```
+And then invoke GHC with the `-fplugin GhcDump.Plugin` flag,
+```
+$ ghc -fplugin GhcDump.Plugin -O Test.hs
+[1 of 1] Compiling Main             ( Test.hs, Test.o )
+Linking Test ...
+$ ls
+Test               Test.pass-11.cbor  Test.pass-17.cbor  Test.pass-6.cbor
+Test.hi            Test.pass-12.cbor  Test.pass-1.cbor   Test.pass-7.cbor
+Test.hs            Test.pass-13.cbor  Test.pass-2.cbor   Test.pass-8.cbor
+Test.o             Test.pass-14.cbor  Test.pass-3.cbor   Test.pass-9.cbor
+Test.pass-0.cbor   Test.pass-15.cbor  Test.pass-4.cbor
+Test.pass-10.cbor  Test.pass-16.cbor  Test.pass-5.cbor
+```
+Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass. One
+can then load this into `ghci` for analysis,
+```
+$ ghci
+GHCi, version 8.3.20170413: http://www.haskell.org/ghc/  :? for help
+Loaded GHCi configuration from /home/ben/.ghci
+λ> import GhcDump.Repl as Dump
+λ> mod <- readDump "Test.pass-0.cbor"
+λ> pretty mod
+nsoln :: ((Int )-> (Int ))
+{- SIZE{terms=96 types=65 cos=0 vbinds=2 jbinds=0} -}
+nsoln = λ nq → let safe = λ x → λ d → λ ds → case ds of wild {
+...
+```
+
+Alternatively, the `ghc-dump` utility can be used to render the representation in human readable form,
+```
+$ ghc-dump show Test.pass-0.cbor
+
+```
+
