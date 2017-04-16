@@ -30,12 +30,14 @@ instance Pretty Lit where
     pretty SomeLit = text "LIT"
 
 instance Pretty CoreStats where
-    pretty c = "SIZE"<>braces (hsep [ "terms="<>int (csTerms c)
-                                    , "types="<>int (csTypes c)
-                                    , "cos="<>int (csCoercions c)
-                                    , "vbinds="<>int (csValBinds c)
-                                    , "jbinds="<>int (csJoinBinds c)
-                                    ])
+    pretty c =
+        "Core Size"
+        <>braces (hsep [ "terms="<>int (csTerms c)
+                       , "types="<>int (csTypes c)
+                       , "cos="<>int (csCoercions c)
+                       , "vbinds="<>int (csValBinds c)
+                       , "jbinds="<>int (csJoinBinds c)
+                       ])
 
 data TyPrec   -- See Note [Precedence in types] in TyCoRep.hs
   = TopPrec         -- No parens
@@ -90,7 +92,7 @@ pprExpr' parens  (ECase x b alts) = maybeParens parens
                                           , indent 2 $ vcat $ map pprAlt alts
                                           , "}"
                                           ]
-  where pprAlt (Alt con bndrs rhs) = hang' (pretty con <+> hsep (map pretty bndrs) <+> smallRArrow) 2 (pprExpr' False rhs)
+  where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map pretty bndrs) <+> smallRArrow) 2 (pprExpr' False rhs)
 pprExpr' parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType t
 pprExpr' parens  ECoercion        = "CO"
 
@@ -109,6 +111,7 @@ pprTopBinding tb =
         pretty b <+> dcolon <+> pprType (binderType b')
         <$$> comment (pretty s)
         <$$> pprBinding b rhs
+        <> line
 
 pprBinding :: Binder -> Expr -> Doc
 pprBinding b rhs = hang' (pretty b <+> equals) 2 (pprExpr rhs)
@@ -117,7 +120,7 @@ instance Pretty TopBinding where
     pretty = pprTopBinding
 
 instance Pretty Module where
-    pretty m = text "module" <+> pretty (moduleName m) <+> "where"
+    pretty m = text "module" <+> pretty (moduleName m) <+> "where" <> line
                <$$> vsep (map pprTopBinding $ moduleBinds m)
 
 comment :: Doc -> Doc
@@ -130,4 +133,4 @@ smallRArrow :: Doc
 smallRArrow = "→"
 
 hang' :: Doc -> Int -> Doc -> Doc
-hang' d1 n d2 = sep [d1, indent n d2]
+hang' d1 n d2 = hang n $ sep [d1, d2]
