@@ -1,9 +1,12 @@
 module GhcDump.Util
     ( -- * Convenient IO
       readDump, readDump'
-      -- * Manipulating Types
+      -- * Manipulating 'Type's
     , splitFunTys
     , splitForAlls
+      -- * Manipulating expressions
+    , collectBinders
+    , collectTyBinders
     ) where
 
 import Data.Foldable
@@ -34,6 +37,20 @@ splitForAlls = go []
   where
     go acc (ForAllTy b t) = go (b : acc) t
     go acc t              = (reverse acc, t)
+
+collectBinders :: Expr' bndr var -> ([bndr], Expr' bndr var)
+collectBinders = go []
+  where
+    go :: [bndr] -> Expr' bndr var -> ([bndr], Expr' bndr var)
+    go acc (ELam v x) = go (v : acc) x
+    go acc x          = (reverse acc, x)
+
+collectTyBinders :: Expr' bndr var -> ([bndr], Expr' bndr var)
+collectTyBinders = go []
+  where
+    go :: [bndr] -> Expr' bndr var -> ([bndr], Expr' bndr var)
+    go acc (ETyLam v x) = go (v : acc) x
+    go acc x            = (reverse acc, x)
 
 newtype BinderMap = BinderMap (HM.HashMap BinderId Binder)
 

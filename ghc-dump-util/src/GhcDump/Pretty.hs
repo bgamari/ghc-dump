@@ -50,10 +50,11 @@ pprType = pprType' TopPrec
 pprType' :: TyPrec -> Type -> Doc
 pprType' _ (VarTy b)         = pretty b
 pprType' p t@(FunTy _ _)     = maybeParens (p < FunPrec) $ hsep $ punctuate "->" (map (pprType' FunPrec) (splitFunTys t))
+pprType' p (TyConApp tc [])  = pretty tc
 pprType' p (TyConApp tc tys) = maybeParens (p < TyConPrec) $ pretty tc <+> hsep (map (pprType' TyConPrec) tys)
 pprType' p (AppTy a b)       = maybeParens (p < TyConPrec) $ pprType' TyConPrec a <+> pprType' TyConPrec b
 pprType' _ t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
-                              in parens $ "forall" <+> hsep (map pretty bs) <> "." <+> pretty t'
+                               in parens $ "forall" <+> hsep (map pretty bs) <> "." <+> pretty t'
 pprType' _ LitTy             = "LIT"
 pprType' _ CoercionTy        = "Co"
 
@@ -71,16 +72,23 @@ pprExpr' :: Bool -> Expr -> Doc
 pprExpr' _parens (EVar v)         = pretty v
 pprExpr' _parens (EVarGlobal v)   = pretty v
 pprExpr' _parens (ELit l)         = pretty l
-pprExpr' parens  (EApp x ys)      = maybeParens parens $ pprExpr' True x <+> sep (map (pprExpr' True) ys)
-pprExpr' parens  (ETyLam v x)     = maybeParens parens $ "Λ" <+> pretty v <+> smallRArrow <+> align (pprExpr' False x)
-pprExpr' parens  (ELam v x)       = maybeParens parens $ "λ" <+> pretty v <+> smallRArrow <+> align (pprExpr' False x)
-pprExpr' parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat (map pprBind xs))
+pprExpr' parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' True x) 2 (sep $ map (pprExpr' True) ys)
+pprExpr' parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
+                                    in maybeParens parens
+                                       $ hang' ("Λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' False x')
+pprExpr' parens  x@(ELam _ _)     = let (bs, x') = collectBinders x
+                                    in maybeParens parens
+                                       $ hang' ("λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' False x')
+pprExpr' parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat $ map (uncurry pprBinding) xs)
                                     <$$> "in" <+> align (pprExpr' False y)
   where pprBind (b, rhs) = pretty b <+> equals <+> align (pprExpr' False rhs)
-pprExpr' parens  (ECase x b alts) = maybeParens parens $ "case" <+> pprExpr' False x <+> "of" <+> pretty b <+> "{"
-                                    <$$> nest 2 (vsep $ map pprAlt alts)
-                                    <> "}"
-  where pprAlt (Alt con bndrs rhs) = pretty con <+> hsep (map pretty bndrs) <+> smallRArrow <+> align (pprExpr' False rhs)
+pprExpr' parens  (ECase x b alts) = maybeParens parens
+                                    $ sep [ sep [ "case" <+> pprExpr' False x
+                                                , "of" <+> pretty b <+> "{" ]
+                                          , indent 2 $ vcat $ map pprAlt alts
+                                          , "}"
+                                          ]
+  where pprAlt (Alt con bndrs rhs) = hang' (pretty con <+> hsep (map pretty bndrs) <+> smallRArrow) 2 (pprExpr' False rhs)
 pprExpr' parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType t
 pprExpr' parens  ECoercion        = "CO"
 
@@ -93,12 +101,15 @@ pprTopBinding :: TopBinding -> Doc
 pprTopBinding tb =
     case tb of
       NonRecTopBinding b s rhs -> pprTopBind (b,s,rhs)
-      RecTopBinding bs -> "rec" <+> braces (empty <$$> vsep (map pprTopBind bs))
+      RecTopBinding bs -> "rec" <+> braces (line <> vsep (map pprTopBind bs))
   where
     pprTopBind (b@(Bndr b'),s,rhs) =
         pretty b <+> dcolon <+> pprType (binderType b')
         <$$> comment (pretty s)
-        <$$> pretty b <+> equals <+> align (pprExpr rhs)
+        <$$> pprBinding b rhs
+
+pprBinding :: Binder -> Expr -> Doc
+pprBinding b rhs = hang' (pretty b <+> equals) 2 (pprExpr rhs)
 
 instance Pretty TopBinding where
     pretty = pprTopBinding
@@ -115,3 +126,6 @@ dcolon = "::"
 
 smallRArrow :: Doc
 smallRArrow = "→"
+
+hang' :: Doc -> Int -> Doc -> Doc
+hang' d1 n d2 = sep [d1, indent n d2]
