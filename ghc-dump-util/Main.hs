@@ -12,10 +12,10 @@ import GhcDump.Ast
 
 modes :: Parser (IO ())
 modes = subparser
-     $ mode "show" showMode
-    <> mode "list-bindings" listBindingsMode
+     $ mode "show" showMode (progDesc "print Core")
+    <> mode "list-bindings" listBindingsMode (progDesc "list top-level bindings, their sizes, and types")
   where
-    mode name f = command name (info (helper <*> f) mempty)
+    mode name f opts = command name (info (helper <*> f) opts)
 
     dumpFile :: Parser FilePath
     dumpFile = argument str (help "CBOR dump file")
