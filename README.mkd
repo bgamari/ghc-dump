@@ -5,7 +5,7 @@ representation. The plugin is compatible with GHC 7.10 through 8.3, exporting a
 consistent (albeit somewhat lossy) representation across these versions. The AST
 is encoded as CBOR, which is small and easy to deserialise.
 
-## Dumping Core
+## Dumping Core from compilation
 
 The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
 representation of the Core AST to file after every Core-to-Core pass. To use it,
@@ -26,8 +26,11 @@ Test.o             Test.pass-14.cbor  Test.pass-3.cbor   Test.pass-9.cbor
 Test.pass-0.cbor   Test.pass-15.cbor  Test.pass-4.cbor
 Test.pass-10.cbor  Test.pass-16.cbor  Test.pass-5.cbor
 ```
-Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass. One
-can then load this into `ghci` for analysis,
+Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass. 
+
+## Analysis in GHCi
+
+One can then load this into `ghci` for analysis,
 ```
 $ ghci
 GHCi, version 8.3.20170413: http://www.haskell.org/ghc/  :? for help
@@ -35,15 +38,34 @@ Loaded GHCi configuration from /home/ben/.ghci
 λ> import GhcDump.Repl as Dump
 λ> mod <- readDump "Test.pass-0.cbor"
 λ> pretty mod
-nsoln :: ((Int )-> (Int ))
-{- SIZE{terms=96 types=65 cos=0 vbinds=2 jbinds=0} -}
-nsoln = λ nq → let safe = λ x → λ d → λ ds → case ds of wild {
+module Main where
+
+nsoln :: Int-> Int
+{- Core Size{terms=98 types=66 cos=0 vbinds=0 jbinds=0} -}
+nsoln =
+  λ nq →
+    let safe =
+          λ x d ds →
+            case ds of wild {
+              [] → GHC.Types.True
+              : q l →
+                GHC.Classes.&&
 ...
 ```
 
-Alternatively, the `ghc-dump` utility can be used to render the representation in human readable form,
+## Analysis with CLI tool
+
+Alternatively, the `ghc-dump` utility can be used to render the representation
+in human readable form,
 ```
 $ ghc-dump show Test.pass-0.cbor
-
 ```
-
+You can conveniently summarize the top-level bindings of the program,
+```
+$ ghc-dump list-bindings --sort=terms Test.pass-0.cbor
+Name                 Terms  Types  Coerc. Type
+nsoln                98     66     0      Int-> Int
+main                 30     28     0      IO ()
+$trModule            5      0      0      Module
+main                 2      1      0      IO ()
+```
