@@ -24,18 +24,18 @@ newtype BinderId = BinderId Unique
                  deriving (Eq, Ord, Serialise, Show)
 
 newtype SBinder = SBndr { unSBndr :: Binder' SBinder BinderId }
-                deriving (Generic, Show)
+                deriving (Eq, Ord, Generic, Show)
 instance Serialise SBinder
 
 newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
-               deriving (Generic, Show)
+               deriving (Eq, Ord, Generic, Show)
 instance Serialise Binder
 
 data Binder' bndr var = Binder { binderName :: !T.Text
                                , binderId   :: !BinderId
                                , binderType :: Type' bndr var
                                }
-                      deriving (Generic, Show, Functor)
+                      deriving (Eq, Ord, Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 
 data Lit = SomeLit
@@ -43,7 +43,7 @@ data Lit = SomeLit
 instance Serialise Lit
 
 data TyCon = TyCon !T.Text !Unique
-           deriving (Generic, Show)
+           deriving (Eq, Ord, Generic, Show)
 instance Serialise TyCon
 
 type SType = Type' SBinder BinderId
@@ -57,7 +57,7 @@ data Type' bndr var
     | ForAllTy bndr (Type' bndr var)
     | LitTy
     | CoercionTy
-    deriving (Generic, Show, Functor)
+    deriving (Eq, Ord, Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Type' bndr var)
 
 newtype ModuleName = ModuleName {getModuleName :: T.Text}

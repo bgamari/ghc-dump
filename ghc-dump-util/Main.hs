@@ -39,7 +39,7 @@ modes = subparser
     mode name f opts = command name (info (helper <*> f) opts)
 
     dumpFile :: Parser FilePath
-    dumpFile = argument str (help "CBOR dump file")
+    dumpFile = argument str (metavar "DUMP FILE" <> help "CBOR dump file")
 
     showMode =
         run <$> dumpFile
@@ -59,7 +59,7 @@ modes = subparser
             readSortField "terms"     = return $ sortBy (flip $ comparing $ csTerms . getStats)
             readSortField "types"     = return $ sortBy (flip $ comparing $ csTypes . getStats)
             readSortField "coercions" = return $ sortBy (flip $ comparing $ csCoercions . getStats)
-            --readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
+            readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
             readSortField f           = fail $ "unknown sort field "++f
 
         run sortBindings fname = do
