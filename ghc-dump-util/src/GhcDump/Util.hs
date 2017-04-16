@@ -1,6 +1,6 @@
 module GhcDump.Util
     ( -- * Convenient IO
-      readFile, readFile'
+      readDump, readDump'
       -- * Manipulating Types
     , splitFunTys
     , splitForAlls
@@ -17,11 +17,11 @@ import qualified Data.Binary.Serialise.CBOR as CBOR
 
 import GhcDump.Ast
 
-readFile' :: FilePath -> IO SModule
-readFile' fname = CBOR.deserialise <$> BSL.readFile fname
+readDump' :: FilePath -> IO SModule
+readDump' fname = CBOR.deserialise <$> BSL.readFile fname
 
-readFile :: FilePath -> IO Module
-readFile fname = reconModule <$> readFile' fname
+readDump :: FilePath -> IO Module
+readDump fname = reconModule <$> readDump' fname
 
 splitFunTys :: Type' bndr var -> [Type' bndr var]
 splitFunTys = go []

@@ -14,6 +14,7 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     GhcDump.Repl, GhcDump.Util, GhcDump.Pretty
+  hs-source-dirs:      src
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        bytestring >=0.10 && <0.11,
