@@ -32,7 +32,7 @@ getBinder (BinderMap m) bid
 -- "recon" == "reconstruct"
 
 reconModule :: SModule -> Module
-reconModule m = Module (moduleName m) binds
+reconModule m = Module (moduleName m) (modulePhase m) binds
   where
     binds = map reconTopBinding $ moduleTopBindings m
     bm = insertBinders (map (\(a,_,_) -> a) $ concatMap topBindings binds) emptyBinderMap

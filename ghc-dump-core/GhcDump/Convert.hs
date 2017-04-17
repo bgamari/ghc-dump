@@ -113,8 +113,9 @@ cvtAlt (con, bs, e) = Alt con' (map cvtBinder bs) (cvtExpr e)
 cvtLit :: Literal -> Ast.Lit
 cvtLit l = SomeLit -- TODO
 
-cvtModule :: ModGuts -> Ast.SModule
-cvtModule guts = Ast.Module name (map cvtTopBind $ mg_binds guts)
+cvtModule :: String -> ModGuts -> Ast.SModule
+cvtModule phase guts =
+    Ast.Module name (T.pack phase) (map cvtTopBind $ mg_binds guts)
   where name = cvtModuleName $ Module.moduleName $ mg_module guts
 
 cvtModuleName :: Module.ModuleName -> Ast.ModuleName

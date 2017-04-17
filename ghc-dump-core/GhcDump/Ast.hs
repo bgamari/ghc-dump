@@ -68,7 +68,8 @@ type Module = Module' Binder Binder
 type SModule = Module' SBinder BinderId
 
 data Module' bndr var
-    = Module { moduleName :: ModuleName
+    = Module { moduleName        :: ModuleName
+             , modulePhase       :: T.Text
              , moduleTopBindings :: [TopBinding' bndr var]
              }
     deriving (Generic, Show)

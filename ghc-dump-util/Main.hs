@@ -84,6 +84,7 @@ modes = subparser
                         , Col 8  "Terms" (pretty . csTerms . totalSize . snd)
                         , Col 8  "Types" (pretty . csTypes . totalSize . snd)
                         , Col 8  "Coerc." (pretty . csCoercions . totalSize . snd)
+                        , Col 35 "Previous phase" (pretty . modulePhase . snd)
                         ]
             print $ renderTable table mods
 

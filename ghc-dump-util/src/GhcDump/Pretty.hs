@@ -11,6 +11,10 @@ import GhcDump.Util
 import qualified Data.Text as T
 import Text.PrettyPrint.ANSI.Leijen
 
+-- orphan
+instance Pretty T.Text where
+    pretty = text . T.unpack
+
 instance Pretty ExternalName where
     pretty n@ExternalName{} = pretty (externalModuleName n) <> "." <> text (T.unpack $ externalName n)
     pretty ForeignCall = "<foreign>"
