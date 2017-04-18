@@ -7,6 +7,7 @@ module GhcDump.Ast where
 import GHC.Generics
 
 import Data.Monoid
+import qualified Data.ByteString as BS
 import Data.Binary.Serialise.CBOR as CBOR
 import qualified Data.Text as T
 
@@ -90,7 +91,17 @@ data IdDetails = VanillaId
                deriving (Eq, Ord, Generic, Show)
 instance Serialise IdDetails
 
-data Lit = SomeLit
+data Lit = MachChar Char
+         | MachStr BS.ByteString
+         | MachNullAddr
+         | MachInt Integer
+         | MachInt64 Integer
+         | MachWord Integer
+         | MachWord64 Integer
+         | MachFloat Rational
+         | MachDouble Rational
+         | MachLabel T.Text
+         | LitInteger Integer
          deriving (Generic, Show)
 instance Serialise Lit
 

@@ -9,7 +9,10 @@ module GhcDump.Pretty
 
 import GhcDump.Ast
 import GhcDump.Util
+
+import Data.Ratio
 import qualified Data.Text as T
+import qualified Data.ByteString.Char8 as BS
 import Text.PrettyPrint.ANSI.Leijen
 
 data PrettyOpts = PrettyOpts { showUniques :: Bool
@@ -51,8 +54,21 @@ pprBinder opts b
 instance Pretty TyCon where
     pretty (TyCon t _) = text $ T.unpack t
 
+pprRational :: Rational -> Doc
+pprRational r = pretty (numerator r) <> "/" <> pretty (denominator r)
+
 instance Pretty Lit where
-    pretty SomeLit = text "LIT"
+    pretty (MachChar x) = "'" <> char x <> "'#"
+    pretty (MachStr x) = "\"" <> text (BS.unpack x) <> "\"#"
+    pretty MachNullAddr = "nullAddr#"
+    pretty (MachInt x) = pretty x <> "#"
+    pretty (MachInt64 x) = pretty x <> "#"
+    pretty (MachWord x) = pretty x <> "#"
+    pretty (MachWord64 x) = pretty x <> "##"
+    pretty (MachFloat x) = "FLOAT" <> parens (pprRational x)
+    pretty (MachDouble x) = "DOUBLE" <> parens (pprRational x)
+    pretty (MachLabel x) = "LABEL"<> parens (pretty x)
+    pretty (LitInteger x) = pretty x
 
 instance Pretty CoreStats where
     pretty c =

@@ -167,7 +167,19 @@ cvtAlt (con, bs, e) = Alt con' (map cvtBinder bs) (cvtExpr e)
              DEFAULT     -> Ast.AltDefault
 
 cvtLit :: Literal -> Ast.Lit
-cvtLit l = SomeLit -- TODO
+cvtLit l =
+    case l of
+      Literal.MachChar x -> Ast.MachChar x
+      Literal.MachStr x -> Ast.MachStr x
+      Literal.MachNullAddr -> Ast.MachNullAddr
+      Literal.MachInt x -> Ast.MachInt x
+      Literal.MachInt64 x -> Ast.MachInt64 x
+      Literal.MachWord x -> Ast.MachWord x
+      Literal.MachWord64 x -> Ast.MachWord64 x
+      Literal.MachFloat x -> Ast.MachFloat x
+      Literal.MachDouble x -> Ast.MachDouble x
+      Literal.MachLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
+      Literal.LitInteger x _ -> Ast.LitInteger x
 
 cvtModule :: String -> ModGuts -> Ast.SModule
 cvtModule phase guts =
