@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module GhcDump.Pretty
     ( Pretty(..)
@@ -10,6 +11,13 @@ import GhcDump.Ast
 import GhcDump.Util
 import qualified Data.Text as T
 import Text.PrettyPrint.ANSI.Leijen
+
+data PrettyOpts = PrettyOpts { showUniques :: Bool
+                             }
+
+defaultPrettyOpts :: PrettyOpts
+defaultPrettyOpts = PrettyOpts { showUniques = False
+                               }
 
 -- orphan
 instance Pretty T.Text where
@@ -23,10 +31,18 @@ instance Pretty ModuleName where
     pretty = text . T.unpack . getModuleName
 
 instance Pretty Unique where
-    pretty (Unique c n) = char c <> int n
+    pretty = text . show
+
+instance Pretty BinderId where
+    pretty (BinderId b) = pretty b
 
 instance Pretty Binder where
-    pretty (Bndr b) = text $ T.unpack (binderName b)
+    pretty = pprBinder defaultPrettyOpts
+
+pprBinder :: PrettyOpts -> Binder -> Doc
+pprBinder opts (Bndr b)
+  | showUniques opts = pretty (binderName b) <> "_" <> pretty (binderId b)
+  | otherwise        = pretty (binderName b)
 
 instance Pretty TyCon where
     pretty (TyCon t _) = text $ T.unpack t
@@ -51,82 +67,92 @@ data TyPrec   -- See Note [Precedence in types] in TyCoRep.hs
   | TyConPrec       -- Tycon args; no parens for atomic
   deriving( Eq, Ord )
 
-pprType :: Type -> Doc
-pprType = pprType' TopPrec
+pprType :: PrettyOpts -> Type -> Doc
+pprType opts = pprType' opts TopPrec
 
-pprType' :: TyPrec -> Type -> Doc
-pprType' _ (VarTy b)         = pretty b
-pprType' p t@(FunTy _ _)     = maybeParens (p >= FunPrec) $ hsep $ punctuate "->" (map (pprType' FunPrec) (splitFunTys t))
-pprType' p (TyConApp tc [])  = pretty tc
-pprType' p (TyConApp tc tys) = maybeParens (p >= TyConPrec) $ pretty tc <+> hsep (map (pprType' TyConPrec) tys)
-pprType' p (AppTy a b)       = maybeParens (p >= TyConPrec) $ pprType' TyConPrec a <+> pprType' TyConPrec b
-pprType' p t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
-                               in maybeParens (p >= TyOpPrec) $ "forall" <+> hsep (map pretty bs) <> "." <+> pretty t'
-pprType' _ LitTy             = "LIT"
-pprType' _ CoercionTy        = "Co"
+pprType' :: PrettyOpts -> TyPrec -> Type -> Doc
+pprType' opts _ (VarTy b)         = pprBinder opts b
+pprType' opts p t@(FunTy _ _)     = maybeParens (p >= FunPrec) $ hsep $ punctuate " ->" (map (pprType' opts FunPrec) (splitFunTys t))
+pprType' opts p (TyConApp tc [])  = pretty tc
+pprType' opts p (TyConApp tc tys) = maybeParens (p >= TyConPrec) $ pretty tc <+> hsep (map (pprType' opts TyConPrec) tys)
+pprType' opts p (AppTy a b)       = maybeParens (p >= TyConPrec) $ pprType' opts TyConPrec a <+> pprType' opts TyConPrec b
+pprType' opts p t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
+                                    in maybeParens (p >= TyOpPrec)
+                                       $ "forall" <+> hsep (map (pprBinder opts) bs) <> "." <+> pprType opts t'
+pprType' opts _ LitTy             = "LIT"
+pprType' opts _ CoercionTy        = "Co"
 
 maybeParens :: Bool -> Doc -> Doc
 maybeParens True  = parens
 maybeParens False = id
 
 instance Pretty Type where
-    pretty = pprType
+    pretty = pprType defaultPrettyOpts
 
-pprExpr :: Expr -> Doc
-pprExpr = pprExpr' False
+pprExpr :: PrettyOpts -> Expr -> Doc
+pprExpr opts = pprExpr' opts False
 
-pprExpr' :: Bool -> Expr -> Doc
-pprExpr' _parens (EVar v)         = pretty v
-pprExpr' _parens (EVarGlobal v)   = pretty v
-pprExpr' _parens (ELit l)         = pretty l
-pprExpr' parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' True x) 2 (sep $ map pprArg ys)
-  where pprArg (EType t) = char '@' <> pprType' TyConPrec t
-        pprArg x         = pprExpr' True x
-pprExpr' parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
-                                    in maybeParens parens
-                                       $ hang' ("Λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' False x')
-pprExpr' parens  x@(ELam _ _)     = let (bs, x') = collectBinders x
-                                    in maybeParens parens
-                                       $ hang' ("λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' False x')
-pprExpr' parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat $ map (uncurry pprBinding) xs)
-                                    <$$> "in" <+> align (pprExpr' False y)
-  where pprBind (b, rhs) = pretty b <+> equals <+> align (pprExpr' False rhs)
-pprExpr' parens  (ECase x b alts) = maybeParens parens
-                                    $ sep [ sep [ "case" <+> pprExpr' False x
-                                                , "of" <+> pretty b <+> "{" ]
-                                          , indent 2 $ vcat $ map pprAlt alts
-                                          , "}"
-                                          ]
-  where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map pretty bndrs) <+> smallRArrow) 2 (pprExpr' False rhs)
-pprExpr' parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType t
-pprExpr' parens  ECoercion        = "CO"
+pprExpr' :: PrettyOpts -> Bool -> Expr -> Doc
+pprExpr' opts _parens (EVar v)         = pretty v
+pprExpr' opts _parens (EVarGlobal v)   = pretty v
+pprExpr' opts _parens (ELit l)         = pretty l
+pprExpr' opts parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' opts True x) 2 (sep $ map pprArg ys)
+  where pprArg (EType t) = char '@' <> pprType' opts TyConPrec t
+        pprArg x         = pprExpr' opts True x
+pprExpr' opts parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
+                                         in maybeParens parens
+                                            $ hang' ("Λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' opts False x')
+pprExpr' opts parens  x@(ELam _ _)     = let (bs, x') = collectBinders x
+                                         in maybeParens parens
+                                            $ hang' ("λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' opts False x')
+pprExpr' opts parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat $ map (uncurry (pprBinding opts)) xs)
+                                         <$$> "in" <+> align (pprExpr' opts False y)
+  where pprBind (b, rhs) = pretty b <+> equals <+> align (pprExpr' opts False rhs)
+pprExpr' opts parens  (ECase x b alts) = maybeParens parens
+                                         $ sep [ sep [ "case" <+> pprExpr' opts False x
+                                                     , "of" <+> pretty b <+> "{" ]
+                                               , indent 2 $ vcat $ map pprAlt alts
+                                               , "}"
+                                               ]
+  where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map pretty bndrs) <+> smallRArrow) 2 (pprExpr' opts False rhs)
+pprExpr' opts parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType opts t
+pprExpr' opts parens  ECoercion        = "CO"
 
 instance Pretty AltCon where
     pretty (AltDataCon t) = text $ T.unpack t
     pretty (AltLit l) = pretty l
     pretty AltDefault = text "DEFAULT"
 
-pprTopBinding :: TopBinding -> Doc
-pprTopBinding tb =
+instance Pretty Expr where
+    pretty = pprExpr defaultPrettyOpts
+
+pprTopBinding :: PrettyOpts -> TopBinding -> Doc
+pprTopBinding opts tb =
     case tb of
       NonRecTopBinding b s rhs -> pprTopBind (b,s,rhs)
       RecTopBinding bs -> "rec" <+> braces (line <> vsep (map pprTopBind bs))
   where
     pprTopBind (b@(Bndr b'),s,rhs) =
-        pretty b <+> dcolon <+> pprType (binderType b')
+        pretty b <+> dcolon <+> pprType opts (binderType b')
         <$$> comment (pretty s)
-        <$$> pprBinding b rhs
+        <$$> pprBinding opts b rhs
         <> line
 
-pprBinding :: Binder -> Expr -> Doc
-pprBinding b rhs = hang' (pretty b <+> equals) 2 (pprExpr rhs)
+pprBinding :: PrettyOpts -> Binder -> Expr -> Doc
+pprBinding opts b rhs =
+    hang' (pretty b <+> equals) 2 (pprExpr opts rhs)
 
 instance Pretty TopBinding where
-    pretty = pprTopBinding
+    pretty = pprTopBinding defaultPrettyOpts
+
+pprModule :: PrettyOpts -> Module -> Doc
+pprModule opts m =
+    comment (pretty $ modulePhase m)
+    <$$> text "module" <+> pretty (moduleName m) <+> "where" <> line
+    <$$> vsep (map (pprTopBinding opts) (moduleTopBindings m))
 
 instance Pretty Module where
-    pretty m = text "module" <+> pretty (moduleName m) <+> "where" <> line
-               <$$> vsep (map pprTopBinding $ moduleTopBindings m)
+    pretty = pprModule defaultPrettyOpts
 
 comment :: Doc -> Doc
 comment x = "{-" <+> x <+> "-}"

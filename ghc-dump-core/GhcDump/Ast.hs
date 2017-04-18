@@ -9,9 +9,15 @@ import GHC.Generics
 import Data.Binary.Serialise.CBOR as CBOR
 import qualified Data.Text as T
 
+import Unique (mkUnique)
+
 data Unique = Unique !Char !Int
-            deriving (Eq, Ord, Generic, Show)
+            deriving (Eq, Ord, Generic)
 instance Serialise Unique
+
+-- | This is dependent upon GHC
+instance Show Unique where
+    show (Unique c n) = show $ mkUnique c n
 
 data ExternalName = ExternalName { externalModuleName :: !ModuleName
                                  , externalName :: !T.Text
