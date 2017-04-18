@@ -27,8 +27,8 @@ renderTable cols xs =
       where
         go :: [Column a] -> Doc
         go []           = PP.empty
-        go [col]        = toCell col
-        go (col : rest) = fillBreak (colWidth col) (toCell col) PP.<+> go rest
+        go [col]        = align $ toCell col
+        go (col : rest) = fillBreak (colWidth col) (align $ toCell col) PP.<+> go rest
 
 modes :: Parser (IO ())
 modes = subparser
