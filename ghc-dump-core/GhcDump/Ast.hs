@@ -54,6 +54,7 @@ instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 data IdInfo
     = IdInfo { idiArity         :: !Int
              , idiIsOneShot     :: Bool
+             , idiInlinePragma  :: !T.Text
              , idiOccInfo       :: OccInfo
              , idiStrictnessSig :: !T.Text
              , idiDemandSig     :: !T.Text

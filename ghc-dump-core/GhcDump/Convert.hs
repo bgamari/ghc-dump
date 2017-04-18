@@ -71,6 +71,7 @@ cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo
 cvtIdInfo i =
     IdInfo { idiArity         = IdInfo.arityInfo i
            , idiIsOneShot     = IdInfo.oneShotInfo i == IdInfo.OneShotLam
+           , idiInlinePragma  = cvtSDoc $ ppr $ IdInfo.inlinePragInfo i
            , idiOccInfo       = case IdInfo.occInfo i of
 #if MIN_VERSION_ghc(8,2,0)
                                   OccInfo.ManyOccs{} -> OccManyOccs

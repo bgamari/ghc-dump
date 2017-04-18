@@ -72,6 +72,7 @@ pprIdInfo opts i d
     doc = sep $ punctuate ", "
           $ [ pretty d
             , "arity=" <> pretty (idiArity i)
+            , "inline=" <> pretty (idiInlinePragma i)
             , "occ=" <> pretty (idiOccInfo i)
             , "str=" <> pretty (idiStrictnessSig i)
             , "dmd=" <> pretty (idiDemandSig i)
