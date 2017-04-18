@@ -133,14 +133,14 @@ pprTopBinding opts tb =
       RecTopBinding bs -> "rec" <+> braces (line <> vsep (map pprTopBind bs))
   where
     pprTopBind (b@(Bndr b'),s,rhs) =
-        pretty b <+> dcolon <+> pprType opts (binderType b')
+        pprBinder opts b <+> dcolon <+> pprType opts (binderType b')
         <$$> comment (pretty s)
         <$$> pprBinding opts b rhs
         <> line
 
 pprBinding :: PrettyOpts -> Binder -> Expr -> Doc
 pprBinding opts b rhs =
-    hang' (pretty b <+> equals) 2 (pprExpr opts rhs)
+    hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
 
 instance Pretty TopBinding where
     pretty = pprTopBinding defaultPrettyOpts
