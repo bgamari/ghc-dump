@@ -44,9 +44,9 @@ instance Pretty Binder where
     pretty = pprBinder defaultPrettyOpts
 
 pprBinder :: PrettyOpts -> Binder -> Doc
-pprBinder opts (Bndr b)
-  | showUniques opts = pretty (binderName b) <> "_" <> pretty (binderId b)
-  | otherwise        = pretty (binderName b)
+pprBinder opts b
+  | showUniques opts = pretty $ binderUniqueName b
+  | otherwise        = pretty $ binderName $ unBndr b
 
 instance Pretty TyCon where
     pretty (TyCon t _) = text $ T.unpack t

@@ -6,6 +6,7 @@ module GhcDump.Ast where
 
 import GHC.Generics
 
+import Data.Monoid
 import Data.Binary.Serialise.CBOR as CBOR
 import qualified Data.Text as T
 
@@ -37,6 +38,11 @@ instance Serialise SBinder
 newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
                deriving (Eq, Ord, Generic, Show)
 instance Serialise Binder
+
+binderUniqueName :: Binder -> T.Text
+binderUniqueName (Bndr b) =
+    binderName b <> T.pack "_" <> T.pack (show u)
+  where BinderId u = binderId b
 
 data Binder' bndr var = Binder { binderName   :: !T.Text
                                , binderId     :: !BinderId
