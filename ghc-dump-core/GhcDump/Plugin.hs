@@ -10,6 +10,7 @@ import DynFlags (getDynFlags, dumpPrefix)
 import ErrUtils (showPass)
 import CoreMonad (CoreToDo(CoreDoPluginPass))
 import Outputable
+import Text.Printf
 
 import GhcDump.Convert
 
@@ -33,7 +34,7 @@ intersperseDumps dflags = go 0 "desugar"
 dumpIn :: DynFlags -> Int -> String -> ModGuts -> IO ModGuts
 dumpIn dflags n phase guts = do
     let prefix = fromMaybe "dump" $ dumpPrefix dflags
-        fname = prefix++"pass-"++show n++".cbor"
+        fname = printf "%spass-%04u.cbor" prefix n
     showPass dflags $ "GhcDump: Dumping core to "++fname
     BSL.writeFile fname $ CBOR.serialise (cvtModule phase guts)
     return guts
