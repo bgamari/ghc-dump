@@ -6,9 +6,9 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
 import Literal (Literal(..))
-import Var (Var, varUnique, varType, isTyVar)
-import Id (isFCallId)
+import Var (Var)
 import qualified Var
+import Id (isFCallId)
 import Module (ModuleName, moduleNameFS, moduleName)
 import Unique (Unique, getUnique, unpkUnique)
 import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
@@ -50,7 +50,7 @@ cvtUnique u =
     in Ast.Unique a b
 
 cvtVar :: Var -> BinderId
-cvtVar = BinderId . cvtUnique . varUnique
+cvtVar = BinderId . cvtUnique . Var.varUnique
 
 cvtBinder :: Var -> SBinder
 cvtBinder v
@@ -125,7 +125,7 @@ exprStats :: CoreExpr -> CoreStats.CoreStats
 exprStats = CoreStats.exprStats
 #else
 -- exprStats wasn't exported in 7.10
-exprStats expr = CoreStats.CS 0 0 0
+exprStats _ = CoreStats.CS 0 0 0
 #endif
 
 cvtTopBind :: CoreBind -> STopBinding
@@ -141,8 +141,8 @@ cvtExpr expr =
     Var x
         -- foreign calls are local but have no binding site
       | isFCallId x   -> EVarGlobal ForeignCall
-      | Just mod <- nameModule_maybe $ getName x
-                      -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName mod)
+      | Just m <- nameModule_maybe $ getName x
+                      -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName m)
                                                    (occNameToText $ getOccName x)
                                                    (cvtUnique $ getUnique x)
       | otherwise     -> EVar (cvtVar x)
@@ -150,7 +150,7 @@ cvtExpr expr =
     App {}            -> let (x, ys) = collectArgs expr
                          in EApp (cvtExpr x) (map cvtExpr ys)
     Lam x e
-      | isTyVar x     -> ETyLam (cvtBinder x) (cvtExpr e)
+      | Var.isTyVar x -> ETyLam (cvtBinder x) (cvtExpr e)
       | otherwise     -> ELam (cvtBinder x) (cvtExpr e)
     Let (NonRec b e) body -> ELet [(cvtBinder b, cvtExpr e)] (cvtExpr body)
     Let (Rec bs) body -> ELet (map (bimap cvtBinder cvtExpr) bs) (cvtExpr body)
@@ -164,9 +164,9 @@ cvtAlt :: CoreAlt -> Ast.SAlt
 cvtAlt (con, bs, e) = Alt con' (map cvtBinder bs) (cvtExpr e)
   where
     con' = case con of
-             DataAlt con -> Ast.AltDataCon $ occNameToText $ getOccName con
-             LitAlt l    -> Ast.AltLit $ cvtLit l
-             DEFAULT     -> Ast.AltDefault
+             DataAlt altcon -> Ast.AltDataCon $ occNameToText $ getOccName altcon
+             LitAlt l       -> Ast.AltLit $ cvtLit l
+             DEFAULT        -> Ast.AltDefault
 
 cvtLit :: Literal -> Ast.Lit
 cvtLit l =
@@ -205,7 +205,7 @@ cvtType (Type.ForAllTy (Anon _) t)    = cvtType t
 #else
 cvtType (Type.ForAllTy b t)    = Ast.ForAllTy (cvtBinder b) (cvtType t)
 #endif
-cvtType (Type.LitTy l)         = Ast.LitTy
+cvtType (Type.LitTy _)         = Ast.LitTy
 #if MIN_VERSION_ghc(8,0,0)
 cvtType (Type.CastTy t _)      = cvtType t
 cvtType (Type.CoercionTy _)    = Ast.CoercionTy

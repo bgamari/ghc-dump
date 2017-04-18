@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     GhcDump.Convert, GhcDump.Ast, GhcDump.Plugin
   -- other-modules:       
+  ghc-options:         -Wall
   other-extensions:    GeneralizedNewtypeDeriving
   build-depends:       base >=4.8 && <4.11,
                        bytestring >= 0.10,

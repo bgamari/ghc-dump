@@ -6,10 +6,7 @@ import Data.Maybe
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Binary.Serialise.CBOR as CBOR
 import GhcPlugins hiding (TB)
-import DynFlags (getDynFlags, dumpPrefix)
 import ErrUtils (showPass)
-import CoreMonad (CoreToDo(CoreDoPluginPass))
-import Outputable
 import Text.Printf
 
 import GhcDump.Convert
@@ -18,7 +15,7 @@ plugin :: Plugin
 plugin = defaultPlugin { installCoreToDos = install }
 
 install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
-install opts todo = do
+install _opts todo = do
     dflags <- getDynFlags
     return (intersperseDumps dflags todo)
 
