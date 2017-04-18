@@ -130,20 +130,20 @@ pprExpr' opts parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' op
         pprArg x         = pprExpr' opts True x
 pprExpr' opts parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
                                          in maybeParens parens
-                                            $ hang' ("Λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' opts False x')
+                                            $ hang' ("Λ" <+> sep (map (pprBinder opts) bs) <+> smallRArrow) 2 (pprExpr' opts False x')
 pprExpr' opts parens  x@(ELam _ _)     = let (bs, x') = collectBinders x
                                          in maybeParens parens
-                                            $ hang' ("λ" <+> sep (map pretty bs) <+> smallRArrow) 2 (pprExpr' opts False x')
+                                            $ hang' ("λ" <+> sep (map (pprBinder opts) bs) <+> smallRArrow) 2 (pprExpr' opts False x')
 pprExpr' opts parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat $ map (uncurry (pprBinding opts)) xs)
                                          <$$> "in" <+> align (pprExpr' opts False y)
-  where pprBind (b, rhs) = pretty b <+> equals <+> align (pprExpr' opts False rhs)
+  where pprBind (b, rhs) = pprBinder opts b <+> equals <+> align (pprExpr' opts False rhs)
 pprExpr' opts parens  (ECase x b alts) = maybeParens parens
                                          $ sep [ sep [ "case" <+> pprExpr' opts False x
-                                                     , "of" <+> pretty b <+> "{" ]
+                                                     , "of" <+> pprBinder opts b <+> "{" ]
                                                , indent 2 $ vcat $ map pprAlt alts
                                                , "}"
                                                ]
-  where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map pretty bndrs) <+> smallRArrow) 2 (pprExpr' opts False rhs)
+  where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map (pprBinder opts) bndrs) <+> smallRArrow) 2 (pprExpr' opts False rhs)
 pprExpr' opts parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType opts t
 pprExpr' opts parens  ECoercion        = "CO"
 
