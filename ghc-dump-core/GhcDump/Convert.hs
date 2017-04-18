@@ -75,6 +75,8 @@ cvtIdInfo i =
            , idiOccInfo       = case IdInfo.occInfo i of
 #if MIN_VERSION_ghc(8,2,0)
                                   OccInfo.ManyOccs{} -> OccManyOccs
+#else
+                                  OccInfo.NoOccInfo  -> OccManyOccs
 #endif
                                   OccInfo.IAmDead    -> OccDead
                                   OccInfo.OneOcc{}   -> OccOneOcc
