@@ -65,7 +65,7 @@ reconExpr _  ECoercion        = ECoercion
 
 reconBinder :: BinderMap -> SBinder -> Binder
 reconBinder bm (SBndr b) =
-    Bndr $ Binder (binderName b) (binderId b) (reconType bm $ binderType b)
+    Bndr $ Binder (binderName b) (binderId b) (binderIdInfo b) (reconType bm $ binderType b)
 
 reconAlt :: BinderMap -> SAlt -> Alt
 reconAlt bm0 (Alt con bs rhs) =

@@ -38,13 +38,32 @@ newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
                deriving (Eq, Ord, Generic, Show)
 instance Serialise Binder
 
-data Binder' bndr var = Binder { binderName :: !T.Text
-                               , binderId   :: !BinderId
-                               , binderType :: Type' bndr var
+data Binder' bndr var = Binder { binderName   :: !T.Text
+                               , binderId     :: !BinderId
+                               , binderIdInfo :: IdInfo
+                               --, binderIdDetails :: IdDetails
+                               , binderType   :: Type' bndr var
                                }
                       deriving (Eq, Ord, Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 
+data IdInfo
+    = IdInfo { idiArity         :: !Int
+             , idiIsOneShot     :: Bool
+             , idiOccInfo       :: OccInfo
+             , idiStrictnessSig :: !T.Text
+             , idiDemandSig     :: !T.Text
+             , idiCallArity     :: !Int
+             }
+    deriving (Eq, Ord, Generic, Show)
+instance Serialise IdInfo
+
+data OccInfo = OccManyOccs -- | introduced in GHC 8.2
+             | OccDead
+             | OccOneOcc
+             | OccLoopBreaker { occStrongLoopBreaker :: Bool }
+    deriving (Eq, Ord, Generic, Show)
+instance Serialise OccInfo
 data Lit = SomeLit
          deriving (Generic, Show)
 instance Serialise Lit

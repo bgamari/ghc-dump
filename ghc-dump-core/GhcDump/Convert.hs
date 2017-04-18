@@ -12,6 +12,8 @@ import qualified Var
 import Module (ModuleName, moduleNameFS, moduleName)
 import Unique (Unique, getUnique, unpkUnique)
 import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
+import qualified IdInfo
+import qualified BasicTypes as OccInfo (OccInfo(..), isStrongLoopBreaker)
 #if MIN_VERSION_ghc(8,0,0)
 import qualified CoreStats
 #else
@@ -28,7 +30,13 @@ import TypeRep as Type (Type(..))
 import Type (splitFunTy_maybe)
 import TyCon (TyCon, tyConUnique)
 
+import Outputable (ppr, showSDoc, SDoc)
+import DynFlags (unsafeGlobalDynFlags)
+
 import GhcDump.Ast as Ast
+
+cvtSDoc :: SDoc -> T.Text
+cvtSDoc = T.pack . showSDoc unsafeGlobalDynFlags
 
 fastStringToText :: FastString -> T.Text
 fastStringToText = TE.decodeUtf8 . fastStringToByteString
@@ -45,7 +53,27 @@ cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . varUnique
 
 cvtBinder :: Var -> SBinder
-cvtBinder v = SBndr $ Binder (occNameToText $ getOccName v) (cvtVar v) (cvtType $ varType v)
+cvtBinder v =
+    SBndr $ Binder (occNameToText $ getOccName v)
+                   (cvtVar v)
+                   (cvtIdInfo $ Var.idInfo v)
+                   (cvtType $ Var.varType v)
+
+cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo
+cvtIdInfo i =
+    IdInfo { idiArity         = IdInfo.arityInfo i
+           , idiIsOneShot     = IdInfo.oneShotInfo i == IdInfo.OneShotLam
+           , idiOccInfo       = case IdInfo.occInfo i of
+#if MIN_VERSION_ghc(8,2,0)
+                                  OccInfo.ManyOccs{} -> OccManyOccs
+#endif
+                                  OccInfo.IAmDead    -> OccDead
+                                  OccInfo.OneOcc{}   -> OccOneOcc
+                                  oi@OccInfo.IAmALoopBreaker{} -> OccLoopBreaker (OccInfo.isStrongLoopBreaker oi)
+           , idiStrictnessSig = cvtSDoc $ ppr $ IdInfo.strictnessInfo i
+           , idiDemandSig     = cvtSDoc $ ppr $ IdInfo.demandInfo i
+           , idiCallArity     = IdInfo.callArityInfo i
+           }
 
 cvtCoreStats :: CoreStats.CoreStats -> Ast.CoreStats
 cvtCoreStats stats =
