@@ -13,10 +13,12 @@ import qualified Data.Text as T
 import Text.PrettyPrint.ANSI.Leijen
 
 data PrettyOpts = PrettyOpts { showUniques :: Bool
+                             , showIdInfo :: Bool
                              }
 
 defaultPrettyOpts :: PrettyOpts
 defaultPrettyOpts = PrettyOpts { showUniques = False
+                               , showIdInfo  = False
                                }
 
 -- orphan
@@ -59,6 +61,28 @@ instance Pretty CoreStats where
                        , "vbinds="<>int (csValBinds c)
                        , "jbinds="<>int (csJoinBinds c)
                        ])
+
+pprIdInfo :: PrettyOpts -> IdInfo -> IdDetails -> Doc
+pprIdInfo opts i d
+  | not $ showIdInfo opts = empty
+  | otherwise = encloseSep "{" "}" ", " $
+                [ pretty d
+                , "arity=" <> pretty (idiArity i)
+                , "occ=" <> pretty (idiOccInfo i)
+                , "str=" <> pretty (idiStrictnessSig i)
+                , "dmd=" <> pretty (idiDemandSig i)
+                , "call-arity=" <> pretty (idiCallArity i)
+                ] ++ (if idiIsOneShot i then ["one-shot"] else [])
+
+instance Pretty OccInfo where
+    pretty OccManyOccs = "Many"
+    pretty OccDead = "Dead"
+    pretty OccOneOcc = "One"
+    pretty (OccLoopBreaker strong) =
+        if strong then "Strong Loopbrk" else "Weak Loopbrk"
+
+instance Pretty IdDetails where
+    pretty = text . show
 
 data TyPrec   -- See Note [Precedence in types] in TyCoRep.hs
   = TopPrec         -- No parens
@@ -134,6 +158,7 @@ pprTopBinding opts tb =
   where
     pprTopBind (b@(Bndr b'),s,rhs) =
         pprBinder opts b <+> dcolon <+> pprType opts (binderType b')
+        <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
         <$$> comment (pretty s)
         <$$> pprBinding opts b rhs
         <> line
