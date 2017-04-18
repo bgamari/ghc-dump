@@ -189,10 +189,13 @@ pprTypeSig opts b@(Bndr b') =
     pprBinder opts b <+> dcolon <+> align (pprType opts (binderType b'))
 
 pprBinding :: PrettyOpts -> Binder -> Expr -> Doc
-pprBinding opts b@(Bndr b') rhs =
+pprBinding opts b@(Bndr b'@Binder{}) rhs =
     ppWhen (showLetTypes opts) (pprTypeSig opts b)
     <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
     <$$> hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
+pprBinding opts b@(Bndr TyBinder{}) rhs =
+    -- let-bound type variables: who knew?
+    hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
 
 instance Pretty TopBinding where
     pretty = pprTopBinding defaultPrettyOpts
