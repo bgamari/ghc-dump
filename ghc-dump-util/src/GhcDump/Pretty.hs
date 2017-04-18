@@ -100,7 +100,7 @@ pprType opts = pprType' opts TopPrec
 
 pprType' :: PrettyOpts -> TyPrec -> Type -> Doc
 pprType' opts _ (VarTy b)         = pprBinder opts b
-pprType' opts p t@(FunTy _ _)     = maybeParens (p >= FunPrec) $ hsep $ punctuate " ->" (map (pprType' opts FunPrec) (splitFunTys t))
+pprType' opts p t@(FunTy _ _)     = maybeParens (p >= FunPrec) $ sep $ punctuate " ->" (map (pprType' opts FunPrec) (splitFunTys t))
 pprType' opts p (TyConApp tc [])  = pretty tc
 pprType' opts p (TyConApp tc tys) = maybeParens (p >= TyConPrec) $ pretty tc <+> hsep (map (pprType' opts TyConPrec) tys)
 pprType' opts p (AppTy a b)       = maybeParens (p >= TyConPrec) $ pprType' opts TyConPrec a <+> pprType' opts TyConPrec b
@@ -161,15 +161,19 @@ pprTopBinding opts tb =
       RecTopBinding bs -> "rec" <+> braces (line <> vsep (map pprTopBind bs))
   where
     pprTopBind (b@(Bndr b'),s,rhs) =
-        pprBinder opts b <+> dcolon <+> pprType opts (binderType b')
+        pprTypeSig opts b
         <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
         <$$> comment (pretty s)
         <$$> hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
         <> line
 
+pprTypeSig :: PrettyOpts -> Binder -> Doc
+pprTypeSig opts b@(Bndr b') =
+    pprBinder opts b <+> dcolon <+> align (pprType opts (binderType b'))
+
 pprBinding :: PrettyOpts -> Binder -> Expr -> Doc
 pprBinding opts b@(Bndr b') rhs =
-    ppWhen (showLetTypes opts) (pprBinder opts b <+> dcolon <+> pprType opts (binderType b'))
+    ppWhen (showLetTypes opts) (pprTypeSig opts b)
     <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
     <$$> hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
 
