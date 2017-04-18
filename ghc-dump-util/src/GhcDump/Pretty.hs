@@ -67,14 +67,16 @@ instance Pretty CoreStats where
 pprIdInfo :: PrettyOpts -> IdInfo -> IdDetails -> Doc
 pprIdInfo opts i d
   | not $ showIdInfo opts = empty
-  | otherwise = encloseSep "{" "}" ", " $
-                [ pretty d
-                , "arity=" <> pretty (idiArity i)
-                , "occ=" <> pretty (idiOccInfo i)
-                , "str=" <> pretty (idiStrictnessSig i)
-                , "dmd=" <> pretty (idiDemandSig i)
-                , "call-arity=" <> pretty (idiCallArity i)
-                ] ++ (if idiIsOneShot i then ["one-shot"] else [])
+  | otherwise = comment $ "IdInfo:" <+> align doc
+  where
+    doc = sep $ punctuate ", "
+          $ [ pretty d
+            , "arity=" <> pretty (idiArity i)
+            , "occ=" <> pretty (idiOccInfo i)
+            , "str=" <> pretty (idiStrictnessSig i)
+            , "dmd=" <> pretty (idiDemandSig i)
+            , "call-arity=" <> pretty (idiCallArity i)
+            ] ++ (if idiIsOneShot i then ["one-shot"] else [])
 
 instance Pretty OccInfo where
     pretty OccManyOccs = "Many"
