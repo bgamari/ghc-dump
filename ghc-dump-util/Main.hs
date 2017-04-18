@@ -41,15 +41,20 @@ modes = subparser
     dumpFile :: Parser FilePath
     dumpFile = argument str (metavar "DUMP FILE" <> help "CBOR dump file")
 
+    prettyOpts :: Parser PrettyOpts
+    prettyOpts =
+        PrettyOpts
+          <$> switch (short 'u' <> long "show-uniques" <> help "Show binder uniques")
+
     showMode =
-        run <$> dumpFile
+        run <$> prettyOpts <*> dumpFile
       where
-        run fname = do
+        run opts fname = do
             dump <- GhcDump.Util.readDump fname
-            print $ pretty dump
+            print $ pprModule opts dump
 
     listBindingsMode =
-        run <$> sortField <*> dumpFile
+        run <$> sortField <*> prettyOpts <*> dumpFile
       where
         sortField =
             option (str >>= readSortField)
@@ -62,13 +67,13 @@ modes = subparser
             readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
             readSortField f           = fail $ "unknown sort field "++f
 
-        run sortBindings fname = do
+        run sortBindings opts fname = do
             dump <- GhcDump.Util.readDump fname
-            let table = [ Col 20 "Name"   (pretty . getBinder)
+            let table = [ Col 20 "Name"   (pprBinder opts . getBinder)
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
                         , Col 6  "Coerc." (pretty . csCoercions . getStats)
-                        , Col 300 "Type"  (pretty . binderType . unBndr . getBinder)
+                        , Col 300 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
             print $ renderTable table (sortBindings $ moduleBindings dump)
 
