@@ -14,11 +14,13 @@ import Text.PrettyPrint.ANSI.Leijen
 
 data PrettyOpts = PrettyOpts { showUniques :: Bool
                              , showIdInfo :: Bool
+                             , showLetTypes :: Bool
                              }
 
 defaultPrettyOpts :: PrettyOpts
 defaultPrettyOpts = PrettyOpts { showUniques = False
                                , showIdInfo  = False
+                               , showLetTypes  = False
                                }
 
 -- orphan
@@ -160,12 +162,14 @@ pprTopBinding opts tb =
         pprBinder opts b <+> dcolon <+> pprType opts (binderType b')
         <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
         <$$> comment (pretty s)
-        <$$> pprBinding opts b rhs
+        <$$> hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
         <> line
 
 pprBinding :: PrettyOpts -> Binder -> Expr -> Doc
-pprBinding opts b rhs =
-    hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
+pprBinding opts b@(Bndr b') rhs =
+    ppWhen (showLetTypes opts) (pprBinder opts b <+> dcolon <+> pprType opts (binderType b'))
+    <$$> pprIdInfo opts (binderIdInfo b') (binderIdDetails b')
+    <$$> hang' (pprBinder opts b <+> equals) 2 (pprExpr opts rhs)
 
 instance Pretty TopBinding where
     pretty = pprTopBinding defaultPrettyOpts
@@ -190,3 +194,7 @@ smallRArrow = "→"
 
 hang' :: Doc -> Int -> Doc -> Doc
 hang' d1 n d2 = hang n $ sep [d1, d2]
+
+ppWhen :: Bool -> Doc -> Doc
+ppWhen True x = x
+ppWhen False _ = empty

@@ -45,7 +45,8 @@ modes = subparser
     prettyOpts =
         PrettyOpts
           <$> switch (short 'u' <> long "show-uniques" <> help "Show binder uniques")
-          <*> switch (short 'i' <> long "show-idinfo" <> help "Show IdInfo")
+          <*> switch (short 'i' <> long "show-idinfo" <> help "Show IdInfo of bindings")
+          <*> switch (short 'T' <> long "show-let-types" <> help "Show type signatures for let-bound binders")
 
     showMode =
         run <$> prettyOpts <*> dumpFile
