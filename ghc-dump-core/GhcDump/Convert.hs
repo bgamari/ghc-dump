@@ -54,10 +54,12 @@ cvtVar = BinderId . cvtUnique . varUnique
 
 cvtBinder :: Var -> SBinder
 cvtBinder v =
-    SBndr $ Binder (occNameToText $ getOccName v)
-                   (cvtVar v)
-                   (cvtIdInfo $ Var.idInfo v)
-                   (cvtType $ Var.varType v)
+    SBndr $ Binder { binderName   = occNameToText $ getOccName v
+                   , binderId     = cvtVar v
+                   , binderIdInfo = cvtIdInfo $ Var.idInfo v
+                   , binderIdDetails = cvtIdDetails $ Var.idDetails v
+                   , binderType   = cvtType $ Var.varType v
+                   }
 
 cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo
 cvtIdInfo i =
@@ -74,6 +76,25 @@ cvtIdInfo i =
            , idiDemandSig     = cvtSDoc $ ppr $ IdInfo.demandInfo i
            , idiCallArity     = IdInfo.callArityInfo i
            }
+
+cvtIdDetails :: IdInfo.IdDetails -> Ast.IdDetails
+cvtIdDetails d =
+    case d of
+      IdInfo.VanillaId -> Ast.VanillaId
+      IdInfo.RecSelId{} -> Ast.RecSelId
+      IdInfo.DataConWorkId{} -> Ast.DataConWorkId
+      IdInfo.DataConWrapId{} -> Ast.DataConWrapId
+      IdInfo.ClassOpId{} -> Ast.ClassOpId
+      IdInfo.PrimOpId{} -> Ast.PrimOpId
+      IdInfo.FCallId{} -> error "This shouldn't happen"
+      IdInfo.TickBoxOpId{} -> Ast.TickBoxOpId
+      IdInfo.DFunId{} -> Ast.DFunId
+#if MIN_VERSION_ghc(8,0,0)
+      IdInfo.CoVarId{} -> Ast.CoVarId
+#endif
+#if MIN_VERSION_ghc(8,2,0)
+      IdInfo.JoinId n -> Ast.JoinId n
+#endif
 
 cvtCoreStats :: CoreStats.CoreStats -> Ast.CoreStats
 cvtCoreStats stats =

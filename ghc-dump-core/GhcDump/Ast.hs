@@ -41,7 +41,7 @@ instance Serialise Binder
 data Binder' bndr var = Binder { binderName   :: !T.Text
                                , binderId     :: !BinderId
                                , binderIdInfo :: IdInfo
-                               --, binderIdDetails :: IdDetails
+                               , binderIdDetails :: IdDetails
                                , binderType   :: Type' bndr var
                                }
                       deriving (Eq, Ord, Generic, Show, Functor)
@@ -64,6 +64,21 @@ data OccInfo = OccManyOccs -- | introduced in GHC 8.2
              | OccLoopBreaker { occStrongLoopBreaker :: Bool }
     deriving (Eq, Ord, Generic, Show)
 instance Serialise OccInfo
+
+data IdDetails = VanillaId
+               | RecSelId
+               | DataConWorkId
+               | DataConWrapId
+               | ClassOpId
+               | PrimOpId
+               -- | FCallId  (these are treated as ExternalNames since they have no binding site)
+               | TickBoxOpId
+               | DFunId
+               | CoVarId -- | introduced in GHC 8.0
+               | JoinId { joinIdArity :: !Int }
+               deriving (Eq, Ord, Generic, Show)
+instance Serialise IdDetails
+
 data Lit = SomeLit
          deriving (Generic, Show)
 instance Serialise Lit
