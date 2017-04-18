@@ -44,6 +44,10 @@ data Binder' bndr var = Binder { binderName   :: !T.Text
                                , binderIdDetails :: IdDetails
                                , binderType   :: Type' bndr var
                                }
+                      | TyBinder { binderName :: !T.Text
+                                 , binderId   :: !BinderId
+                                 , binderKind :: Type' bndr var
+                                 }
                       deriving (Eq, Ord, Generic, Show, Functor)
 instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 

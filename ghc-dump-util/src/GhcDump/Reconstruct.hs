@@ -64,8 +64,10 @@ reconExpr bm (EType t)        = EType (reconType bm t)
 reconExpr _  ECoercion        = ECoercion
 
 reconBinder :: BinderMap -> SBinder -> Binder
-reconBinder bm (SBndr b) =
+reconBinder bm (SBndr b@Binder{}) =
     Bndr $ b { binderType = reconType bm $ binderType b }
+reconBinder bm (SBndr b@TyBinder{}) =
+    Bndr $ b { binderKind = reconType bm $ binderKind b }
 
 reconAlt :: BinderMap -> SAlt -> Alt
 reconAlt bm0 (Alt con bs rhs) =

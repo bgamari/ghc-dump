@@ -53,13 +53,19 @@ cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . varUnique
 
 cvtBinder :: Var -> SBinder
-cvtBinder v =
+cvtBinder v
+  | Var.isId v =
     SBndr $ Binder { binderName   = occNameToText $ getOccName v
                    , binderId     = cvtVar v
                    , binderIdInfo = cvtIdInfo $ Var.idInfo v
                    , binderIdDetails = cvtIdDetails $ Var.idDetails v
                    , binderType   = cvtType $ Var.varType v
                    }
+  | otherwise =
+    SBndr $ TyBinder { binderName   = occNameToText $ getOccName v
+                     , binderId     = cvtVar v
+                     , binderKind   = cvtType $ Var.varType v
+                     }
 
 cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo
 cvtIdInfo i =
