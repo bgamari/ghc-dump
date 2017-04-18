@@ -10,6 +10,7 @@ copyright:           (c) 2017 Ben Gamari
 category:            Development
 build-type:          Simple
 extra-source-files:  ChangeLog.md
+tested-with:         GHC==7.10.3, GHC==8.0.2, GHC==8.1
 cabal-version:       >=1.10
 
 library
