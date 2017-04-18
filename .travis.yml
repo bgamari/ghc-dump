@@ -45,7 +45,9 @@ before_install:
 install:
  - cabal --version
  - echo "$(${HC} --version) [$(${HC} --print-project-git-commit-id 2> /dev/null || echo '?')]"
+ - cabal update
+ - git submodule update --init
 
 script:
  - cabal install --force-reinstalls binary-serialise-cbor/ ghc-dump-core/ ghc-dump-util/
- - cabal install --ghc-options="-fplugin=GhcDump.Plugin -package ghc-dump-core" vector
+ - cabal install --ghc-options="-fplugin=GhcDump.Plugin -package ghc-dump-core" accelerate
