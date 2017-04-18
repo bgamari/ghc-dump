@@ -6,6 +6,7 @@ import Data.Maybe
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Binary.Serialise.CBOR as CBOR
 import GhcPlugins hiding (TB)
+import CoreMonad (pprPassDetails)
 import ErrUtils (showPass)
 import Text.Printf
 
@@ -23,7 +24,7 @@ intersperseDumps :: DynFlags -> [CoreToDo] -> [CoreToDo]
 intersperseDumps dflags = go 0 "desugar"
   where
     go n phase (todo : rest) = pass n phase : todo : go (n+1) phase' rest
-      where phase' = showSDocDump dflags (ppr todo)
+      where phase' = showSDocDump dflags (ppr todo <> text ":" <+> pprPassDetails todo)
     go n phase [] = [pass n phase]
 
     pass n phase = CoreDoPluginPass "DumpCore" (liftIO . dumpIn dflags n phase)
