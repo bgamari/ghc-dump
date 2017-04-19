@@ -1,13 +1,18 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
+import Control.Monad
+import Data.Maybe
 import Data.List (sortBy)
 import Data.Monoid
 import Data.Ord
+
 import Options.Applicative
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (<>))
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
-import Control.Monad
+import Text.Regex.TDFA
+import Text.Regex.TDFA.Common (Regex)
+import Text.Regex.TDFA.Text
 
 import GhcDump.Pretty
 import GhcDump.Util
@@ -30,6 +35,21 @@ renderTable cols xs =
         go [col]        = align $ toCell col
         go (col : rest) = fillBreak (colWidth col) (align $ toCell col) PP.<+> go rest
 
+filterBindings :: Regex -> Module -> Module
+filterBindings re m =
+    m { moduleTopBindings = mapMaybe filterTopBinding $ moduleTopBindings m }
+  where
+    filterTopBinding b'@(NonRecTopBinding b _ _)
+      | nameMatches b  = Just b'
+      | otherwise      = Nothing
+    filterTopBinding (RecTopBinding bs)
+      | not $ null bs' = Just $ RecTopBinding bs'
+      | otherwise      = Nothing
+      where bs' = filter (\(b,_,_) -> nameMatches b) bs
+
+    nameMatches :: Binder -> Bool
+    nameMatches b = matchTest re (binderUniqueName b)
+
 modes :: Parser (IO ())
 modes = subparser
      $ mode "show" showMode (progDesc "print Core")
@@ -41,6 +61,12 @@ modes = subparser
     dumpFile :: Parser FilePath
     dumpFile = argument str (metavar "DUMP FILE" <> help "CBOR dump file")
 
+    filterCond :: Parser (Module -> Module)
+    filterCond =
+        fmap (maybe id filterBindings)
+        $ option (str >>= fmap Just . makeRegexM)
+                 (short 'f' <> long "filter" <> value Nothing <> help "filter bindings by name")
+
     prettyOpts :: Parser PrettyOpts
     prettyOpts =
         PrettyOpts
@@ -49,14 +75,14 @@ modes = subparser
           <*> switch (short 'T' <> long "show-let-types" <> help "Show type signatures for let-bound binders")
 
     showMode =
-        run <$> prettyOpts <*> dumpFile
+        run <$> filterCond <*> prettyOpts <*> dumpFile
       where
-        run opts fname = do
-            dump <- GhcDump.Util.readDump fname
+        run filterFn opts fname = do
+            dump <- filterFn <$> GhcDump.Util.readDump fname
             print $ pprModule opts dump
 
     listBindingsMode =
-        run <$> sortField <*> prettyOpts <*> dumpFile
+        run <$> filterCond <*> sortField <*> prettyOpts <*> dumpFile
       where
         sortField =
             option (str >>= readSortField)
@@ -69,8 +95,8 @@ modes = subparser
             readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
             readSortField f           = fail $ "unknown sort field "++f
 
-        run sortBindings opts fname = do
-            dump <- GhcDump.Util.readDump fname
+        run filterFn sortBindings opts fname = do
+            dump <- filterFn <$> GhcDump.Util.readDump fname
             let table = [ Col 20 "Name"   (pprBinder opts . getBinder)
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
