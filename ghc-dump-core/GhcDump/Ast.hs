@@ -157,7 +157,7 @@ data Expr' bndr var
     = EVar var
     | EVarGlobal ExternalName
     | ELit Lit
-    | EApp (Expr' bndr var) [Expr' bndr var]
+    | EApp (Expr' bndr var) (Expr' bndr var)
     | ETyLam bndr (Expr' bndr var)
     | ELam bndr (Expr' bndr var)
     | ELet [(bndr, Expr' bndr var)] (Expr' bndr var)

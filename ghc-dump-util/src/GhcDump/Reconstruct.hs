@@ -47,7 +47,7 @@ reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
 reconExpr _  (EVarGlobal n)   = EVarGlobal n
 reconExpr _  (ELit l)         = ELit l
-reconExpr bm (EApp x ys)      = EApp (reconExpr bm x) (map (reconExpr bm) ys)
+reconExpr bm (EApp x y)       = EApp (reconExpr bm x) (reconExpr bm y)
 reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
                                     bm' = insertBinder b' bm
                                 in ETyLam b' (reconExpr bm' x)

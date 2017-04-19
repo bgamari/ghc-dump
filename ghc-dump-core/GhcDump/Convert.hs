@@ -147,8 +147,7 @@ cvtExpr expr =
                                                    (cvtUnique $ getUnique x)
       | otherwise     -> EVar (cvtVar x)
     Lit l             -> ELit (cvtLit l)
-    App {}            -> let (x, ys) = collectArgs expr
-                         in EApp (cvtExpr x) (map cvtExpr ys)
+    App x y           -> EApp (cvtExpr x) (cvtExpr y)
     Lam x e
       | Var.isTyVar x -> ETyLam (cvtBinder x) (cvtExpr e)
       | otherwise     -> ELam (cvtBinder x) (cvtExpr e)

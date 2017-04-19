@@ -141,7 +141,8 @@ pprExpr' :: PrettyOpts -> Bool -> Expr -> Doc
 pprExpr' opts _parens (EVar v)         = pprBinder opts v
 pprExpr' opts _parens (EVarGlobal v)   = pretty v
 pprExpr' opts _parens (ELit l)         = pretty l
-pprExpr' opts parens  (EApp x ys)      = maybeParens parens $ hang' (pprExpr' opts True x) 2 (sep $ map pprArg ys)
+pprExpr' opts parens  e@(EApp{})       = let (x, ys) = collectArgs e
+                                         in maybeParens parens $ hang' (pprExpr' opts True x) 2 (sep $ map pprArg ys)
   where pprArg (EType t) = char '@' <> pprType' opts TyConPrec t
         pprArg x         = pprExpr' opts True x
 pprExpr' opts parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x

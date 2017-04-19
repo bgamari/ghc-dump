@@ -5,6 +5,7 @@ module GhcDump.Util
     , splitFunTys
     , splitForAlls
       -- * Manipulating expressions
+    , collectArgs
     , collectBinders
     , collectTyBinders
     ) where
@@ -48,3 +49,10 @@ collectTyBinders = go []
     go :: [bndr] -> Expr' bndr var -> ([bndr], Expr' bndr var)
     go acc (ETyLam v x) = go (v : acc) x
     go acc x            = (reverse acc, x)
+
+collectArgs :: Expr' bndr var -> (Expr' bndr var, [Expr' bndr var])
+collectArgs = go []
+  where
+    go :: [Expr' bndr var] -> Expr' bndr var -> (Expr' bndr var, [Expr' bndr var])
+    go acc (EApp x y) = go (y : acc) x
+    go acc x          = (x, acc)
