@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module GhcDump.Reconstruct (reconModule) where
 
 import Data.Foldable
@@ -65,9 +66,23 @@ reconExpr _  ECoercion        = ECoercion
 
 reconBinder :: BinderMap -> SBinder -> Binder
 reconBinder bm (SBndr b@Binder{}) =
-    Bndr $ b { binderType = reconType bm $ binderType b }
+    Bndr $ b { binderType = reconType bm $ binderType b
+             , binderIdInfo = reconIdInfo bm $ binderIdInfo b
+             }
 reconBinder bm (SBndr b@TyBinder{}) =
     Bndr $ b { binderKind = reconType bm $ binderKind b }
+
+reconIdInfo :: BinderMap -> IdInfo SBinder BinderId -> IdInfo Binder Binder
+reconIdInfo bm i =
+    i { idiUnfolding = reconUnfolding bm $ idiUnfolding i }
+
+reconUnfolding :: BinderMap -> Unfolding SBinder BinderId -> Unfolding Binder Binder
+reconUnfolding _  NoUnfolding = NoUnfolding
+reconUnfolding _  BootUnfolding = BootUnfolding
+reconUnfolding _  (OtherCon alts) = OtherCon alts
+reconUnfolding _  DFunUnfolding   = DFunUnfolding
+reconUnfolding bm CoreUnfolding{..} = CoreUnfolding { unfTemplate = reconExpr bm unfTemplate
+                                                    , .. }
 
 reconAlt :: BinderMap -> SAlt -> Alt
 reconAlt bm0 (Alt con bs rhs) =

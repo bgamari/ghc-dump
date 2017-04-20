@@ -1,7 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveFunctor #-}
-
 module GhcDump.Ast where
 
 import GHC.Generics
@@ -47,7 +45,7 @@ binderUniqueName (Bndr b) =
 
 data Binder' bndr var = Binder { binderName   :: !T.Text
                                , binderId     :: !BinderId
-                               , binderIdInfo :: IdInfo
+                               , binderIdInfo :: IdInfo bndr var
                                , binderIdDetails :: IdDetails
                                , binderType   :: Type' bndr var
                                }
@@ -55,12 +53,13 @@ data Binder' bndr var = Binder { binderName   :: !T.Text
                                  , binderId   :: !BinderId
                                  , binderKind :: Type' bndr var
                                  }
-                      deriving (Eq, Ord, Generic, Show, Functor)
+                      deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Binder' bndr var)
 
-data IdInfo
+data IdInfo bndr var
     = IdInfo { idiArity         :: !Int
              , idiIsOneShot     :: Bool
+             , idiUnfolding     :: Unfolding bndr var
              , idiInlinePragma  :: !T.Text
              , idiOccInfo       :: OccInfo
              , idiStrictnessSig :: !T.Text
@@ -68,7 +67,21 @@ data IdInfo
              , idiCallArity     :: !Int
              }
     deriving (Eq, Ord, Generic, Show)
-instance Serialise IdInfo
+instance (Serialise bndr, Serialise var) => Serialise (IdInfo bndr var)
+
+data Unfolding bndr var
+    = NoUnfolding
+    | BootUnfolding
+    | OtherCon [AltCon]
+    | DFunUnfolding
+    | CoreUnfolding { unfTemplate   :: Expr' bndr var
+                    , unfIsValue    :: Bool
+                    , unfIsConLike  :: Bool
+                    , unfIsWorkFree :: Bool
+                    , unfGuidance   :: T.Text
+                    }
+    deriving (Eq, Ord, Generic, Show)
+instance (Serialise bndr, Serialise var) => Serialise (Unfolding bndr var)
 
 data OccInfo = OccManyOccs -- | introduced in GHC 8.2
              | OccDead
@@ -102,7 +115,7 @@ data Lit = MachChar Char
          | MachDouble Rational
          | MachLabel T.Text
          | LitInteger Integer
-         deriving (Generic, Show)
+         deriving (Eq, Ord, Generic, Show)
 instance Serialise Lit
 
 data TyCon = TyCon !T.Text !Unique
@@ -120,7 +133,7 @@ data Type' bndr var
     | ForAllTy bndr (Type' bndr var)
     | LitTy
     | CoercionTy
-    deriving (Eq, Ord, Generic, Show, Functor)
+    deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Type' bndr var)
 
 newtype ModuleName = ModuleName {getModuleName :: T.Text}
@@ -164,7 +177,7 @@ data Expr' bndr var
     | ECase (Expr' bndr var) bndr [Alt' bndr var]
     | EType (Type' bndr var)
     | ECoercion
-    deriving (Generic, Show, Functor)
+    deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Expr' bndr var)
 
 type SAlt = Alt' SBinder BinderId
@@ -174,13 +187,13 @@ data Alt' bndr var = Alt { altCon     :: !AltCon
                          , altBinders :: [bndr]
                          , altRHS     :: Expr' bndr var
                          }
-                  deriving (Generic, Show, Functor)
+                  deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Alt' bndr var)
 
 data AltCon = AltDataCon !T.Text
             | AltLit Lit
             | AltDefault
-            deriving (Generic, Show)
+            deriving (Eq, Ord, Generic, Show)
 instance Serialise AltCon
 
 type STopBinding = TopBinding' SBinder BinderId
@@ -189,7 +202,7 @@ type TopBinding = TopBinding' Binder Binder
 data TopBinding' bndr var
     = NonRecTopBinding bndr CoreStats (Expr' bndr var)
     | RecTopBinding [(bndr, CoreStats, Expr' bndr var)]
-    deriving (Generic, Show, Functor)
+    deriving (Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (TopBinding' bndr var)
 
 topBindings :: TopBinding' bndr var -> [(bndr, CoreStats, Expr' bndr var)]
@@ -210,3 +223,14 @@ instance Monoid CoreStats where
     mempty = CoreStats 0 0 0 0 0
     CoreStats a b c d e `mappend` CoreStats a' b' c' d' e' =
         CoreStats (a+a') (b+b') (c+c') (d+d') (e+e')
+
+{-
+data Rule' bndr var
+    = Rule { ruleName :: T.Text
+           , ruleActivation :: Activation
+           , ruleFn :: Name
+           , ruleBinders :: [bndr]
+           , ruleRHS :: Expr' bndr var
+           , ruleAuto :: Bool
+           }
+-}

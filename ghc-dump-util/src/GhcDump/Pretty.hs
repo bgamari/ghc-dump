@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module GhcDump.Pretty
@@ -15,15 +16,17 @@ import qualified Data.Text as T
 import qualified Data.ByteString.Char8 as BS
 import Text.PrettyPrint.ANSI.Leijen
 
-data PrettyOpts = PrettyOpts { showUniques :: Bool
-                             , showIdInfo :: Bool
-                             , showLetTypes :: Bool
+data PrettyOpts = PrettyOpts { showUniques    :: Bool
+                             , showIdInfo     :: Bool
+                             , showLetTypes   :: Bool
+                             , showUnfoldings :: Bool
                              }
 
 defaultPrettyOpts :: PrettyOpts
-defaultPrettyOpts = PrettyOpts { showUniques = False
-                               , showIdInfo  = False
-                               , showLetTypes  = False
+defaultPrettyOpts = PrettyOpts { showUniques    = False
+                               , showIdInfo     = False
+                               , showLetTypes   = False
+                               , showUnfoldings = False
                                }
 
 -- orphan
@@ -80,7 +83,7 @@ instance Pretty CoreStats where
                        , "jbinds="<>int (csJoinBinds c)
                        ])
 
-pprIdInfo :: PrettyOpts -> IdInfo -> IdDetails -> Doc
+pprIdInfo :: PrettyOpts -> IdInfo Binder Binder -> IdDetails -> Doc
 pprIdInfo opts i d
   | not $ showIdInfo opts = empty
   | otherwise = comment $ "IdInfo:" <+> align doc
@@ -93,7 +96,23 @@ pprIdInfo opts i d
             , "str=" <> pretty (idiStrictnessSig i)
             , "dmd=" <> pretty (idiDemandSig i)
             , "call-arity=" <> pretty (idiCallArity i)
+            , "unfolding=" <> pprUnfolding opts (idiUnfolding i)
             ] ++ (if idiIsOneShot i then ["one-shot"] else [])
+
+pprUnfolding :: PrettyOpts -> Unfolding Binder Binder -> Doc
+pprUnfolding _    NoUnfolding = "NoUnfolding"
+pprUnfolding _    BootUnfolding = "BootUnfolding"
+pprUnfolding _    OtherCon{} = "OtherCon"
+pprUnfolding _    DFunUnfolding = "DFunUnfolding"
+pprUnfolding opts CoreUnfolding{..}
+  | showUnfoldings opts = "CoreUnf" <+>
+      sep [ "is-value=" <> pretty unfIsValue
+          , "con-like=" <> pretty unfIsConLike
+          , "work-free=" <> pretty unfIsWorkFree
+          , "guidance=" <> pretty unfGuidance
+          , "template=" <> pprExpr opts unfTemplate
+          ]
+  | otherwise = "CoreUnf{..}"
 
 instance Pretty OccInfo where
     pretty OccManyOccs = "Many"

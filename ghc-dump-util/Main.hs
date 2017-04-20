@@ -73,6 +73,7 @@ modes = subparser
           <$> switch (short 'u' <> long "show-uniques" <> help "Show binder uniques")
           <*> switch (short 'i' <> long "show-idinfo" <> help "Show IdInfo of bindings")
           <*> switch (short 'T' <> long "show-let-types" <> help "Show type signatures for let-bound binders")
+          <*> switch (short 'U' <> long "show-unfoldings" <> help "Show unfolding templates")
 
     showMode =
         run <$> filterCond <*> prettyOpts <*> dumpFile

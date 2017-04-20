@@ -19,7 +19,8 @@ import qualified CoreStats
 #else
 import qualified CoreUtils as CoreStats
 #endif
-import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, collectArgs, AltCon(..))
+import qualified CoreSyn
+import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
 import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
 #if MIN_VERSION_ghc(8,0,0)
@@ -67,10 +68,11 @@ cvtBinder v
                      , binderKind   = cvtType $ Var.varType v
                      }
 
-cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo
+cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo SBinder BinderId
 cvtIdInfo i =
     IdInfo { idiArity         = IdInfo.arityInfo i
            , idiIsOneShot     = IdInfo.oneShotInfo i == IdInfo.OneShotLam
+           , idiUnfolding     = cvtUnfolding $ IdInfo.unfoldingInfo i
            , idiInlinePragma  = cvtSDoc $ ppr $ IdInfo.inlinePragInfo i
            , idiOccInfo       = case IdInfo.occInfo i of
 #if MIN_VERSION_ghc(8,2,0)
@@ -85,6 +87,21 @@ cvtIdInfo i =
            , idiDemandSig     = cvtSDoc $ ppr $ IdInfo.demandInfo i
            , idiCallArity     = IdInfo.callArityInfo i
            }
+
+cvtUnfolding :: CoreSyn.Unfolding -> Ast.Unfolding SBinder BinderId
+cvtUnfolding CoreSyn.NoUnfolding = Ast.NoUnfolding
+#if MIN_VERSION_ghc(8,2,0)
+cvtUnfolding CoreSyn.BootUnfolding = Ast.BootUnfolding
+#endif
+cvtUnfolding (CoreSyn.OtherCon cons) = Ast.OtherCon (map cvtAltCon cons)
+cvtUnfolding (CoreSyn.DFunUnfolding{}) = Ast.DFunUnfolding
+cvtUnfolding u@(CoreSyn.CoreUnfolding{}) =
+    Ast.CoreUnfolding { unfTemplate   = cvtExpr $ CoreSyn.uf_tmpl u
+                      , unfIsValue    = CoreSyn.uf_is_value u
+                      , unfIsConLike  = CoreSyn.uf_is_conlike u
+                      , unfIsWorkFree = CoreSyn.uf_is_work_free u
+                      , unfGuidance   = cvtSDoc $ ppr $ CoreSyn.uf_guidance u
+                      }
 
 cvtIdDetails :: IdInfo.IdDetails -> Ast.IdDetails
 cvtIdDetails d =
@@ -139,7 +156,8 @@ cvtExpr :: CoreExpr -> Ast.SExpr
 cvtExpr expr =
   case expr of
     Var x
-        -- foreign calls are local but have no binding site
+        -- foreign calls are local but have no binding site.
+        -- TODO: use hasNoBinding here.
       | isFCallId x   -> EVarGlobal ForeignCall
       | Just m <- nameModule_maybe $ getName x
                       -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName m)
@@ -160,12 +178,12 @@ cvtExpr expr =
     Coercion _        -> ECoercion
 
 cvtAlt :: CoreAlt -> Ast.SAlt
-cvtAlt (con, bs, e) = Alt con' (map cvtBinder bs) (cvtExpr e)
-  where
-    con' = case con of
-             DataAlt altcon -> Ast.AltDataCon $ occNameToText $ getOccName altcon
-             LitAlt l       -> Ast.AltLit $ cvtLit l
-             DEFAULT        -> Ast.AltDefault
+cvtAlt (con, bs, e) = Alt (cvtAltCon con) (map cvtBinder bs) (cvtExpr e)
+
+cvtAltCon :: CoreSyn.AltCon -> Ast.AltCon
+cvtAltCon (DataAlt altcon) = Ast.AltDataCon $ occNameToText $ getOccName altcon
+cvtAltCon (LitAlt l)       = Ast.AltLit $ cvtLit l
+cvtAltCon DEFAULT          = Ast.AltDefault
 
 cvtLit :: Literal -> Ast.Lit
 cvtLit l =
