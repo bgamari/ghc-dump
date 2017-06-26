@@ -9,6 +9,7 @@ import GhcPlugins hiding (TB)
 import CoreMonad (pprPassDetails)
 import ErrUtils (showPass)
 import Text.Printf
+import System.FilePath
 
 import GhcDump.Convert
 
@@ -34,5 +35,6 @@ dumpIn dflags n phase guts = do
     let prefix = fromMaybe "dump" $ dumpPrefix dflags
         fname = printf "%spass-%04u.cbor" prefix n
     showPass dflags $ "GhcDump: Dumping core to "++fname
-    BSL.writeFile fname $ CBOR.serialise (cvtModule phase guts)
+    let in_dump_dir = maybe id (</>) (dumpDir dflags)
+    BSL.writeFile (in_dump_dir fname) $ CBOR.serialise (cvtModule phase guts)
     return guts
