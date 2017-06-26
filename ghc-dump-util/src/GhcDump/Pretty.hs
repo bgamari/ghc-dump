@@ -105,13 +105,13 @@ pprUnfolding _    BootUnfolding = "BootUnfolding"
 pprUnfolding _    OtherCon{} = "OtherCon"
 pprUnfolding _    DFunUnfolding = "DFunUnfolding"
 pprUnfolding opts CoreUnfolding{..}
-  | showUnfoldings opts = "CoreUnf" <+>
-      sep [ "is-value=" <> pretty unfIsValue
-          , "con-like=" <> pretty unfIsConLike
-          , "work-free=" <> pretty unfIsWorkFree
-          , "guidance=" <> pretty unfGuidance
-          , "template=" <> pprExpr opts unfTemplate
-          ]
+  | showUnfoldings opts = "CoreUnf" <> braces
+     (align $ sep [ "is-value=" <> pretty unfIsValue
+                  , "con-like=" <> pretty unfIsConLike
+                  , "work-free=" <> pretty unfIsWorkFree
+                  , "guidance=" <> pretty unfGuidance
+                  , "template=" <> pprExpr opts unfTemplate
+                  ])
   | otherwise = "CoreUnf{..}"
 
 instance Pretty OccInfo where
