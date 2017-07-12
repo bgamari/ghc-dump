@@ -64,7 +64,7 @@ modes = subparser
     filterCond :: Parser (Module -> Module)
     filterCond =
         fmap (maybe id filterBindings)
-        $ option (str >>= fmap Just . makeRegexM)
+        $ option ( (str :: ReadM String)  >>= fmap Just . makeRegexM)
                  (short 'f' <> long "filter" <> value Nothing <> help "filter bindings by name")
 
     prettyOpts :: Parser PrettyOpts

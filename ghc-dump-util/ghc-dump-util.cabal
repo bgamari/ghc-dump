@@ -33,5 +33,6 @@ executable ghc-dump
                        ansi-wl-pprint >= 0.6,
                        regex-tdfa >= 1.2,
                        regex-tdfa-text,
-                       optparse-applicative >= 0.13
+                       optparse-applicative >= 0.13,
+                       text >= 1.0
   default-language:    Haskell2010

@@ -9,11 +9,20 @@ is encoded as CBOR, which is small and easy to deserialise.
 
 The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
 representation of the Core AST to file after every Core-to-Core pass. To use it,
-first install the `ghc-dump-core` package,
+first install the `ghc-dump-core` package, which provides the plugin to capture
+Core dumps:
 ```
 $ cabal install ghc-dump-core
 ```
-And then invoke GHC with the `-fplugin GhcDump.Plugin` flag,
+
+Next, install the `ghc-dump-util` package, which provides utilities for analyzing
+the results:
+```
+$ cabal install ghc-dump-util
+```
+
+
+Then invoke GHC with the `-fplugin GhcDump.Plugin` flag,
 ```
 $ ghc -fplugin GhcDump.Plugin -O Test.hs
 [1 of 1] Compiling Main             ( Test.hs, Test.o )
