@@ -13,13 +13,13 @@ module GhcDump.Util
 import Prelude hiding (readFile)
 
 import qualified Data.ByteString.Lazy as BSL
-import qualified Data.Binary.Serialise.CBOR as CBOR
+import qualified Codec.Serialise as Ser
 
 import GhcDump.Ast
 import GhcDump.Reconstruct
 
 readDump' :: FilePath -> IO SModule
-readDump' fname = CBOR.deserialise <$> BSL.readFile fname
+readDump' fname = Ser.deserialise <$> BSL.readFile fname
 
 readDump :: FilePath -> IO Module
 readDump fname = reconModule <$> readDump' fname

@@ -15,13 +15,12 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     GhcDump.Convert, GhcDump.Ast, GhcDump.Plugin
-  -- other-modules:       
   ghc-options:         -Wall
   other-extensions:    GeneralizedNewtypeDeriving
   build-depends:       base >=4.8 && <4.11,
                        bytestring >= 0.10,
                        text >=1.2 && <1.3,
                        filepath,
-                       binary-serialise-cbor,
+                       serialise >= 0.1 && <0.2,
                        ghc >= 7.10 && < 8.4
   default-language:    Haskell2010

@@ -6,7 +6,7 @@ import GHC.Generics
 
 import Data.Monoid
 import qualified Data.ByteString as BS
-import Data.Binary.Serialise.CBOR as CBOR
+import Codec.Serialise
 import qualified Data.Text as T
 
 import Unique (mkUnique)

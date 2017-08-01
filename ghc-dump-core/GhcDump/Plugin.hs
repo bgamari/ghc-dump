@@ -4,7 +4,7 @@ module GhcDump.Plugin where
 
 import Data.Maybe
 import qualified Data.ByteString.Lazy as BSL
-import qualified Data.Binary.Serialise.CBOR as CBOR
+import qualified Codec.Serialise as Ser
 import GhcPlugins hiding (TB)
 import CoreMonad (pprPassDetails)
 import ErrUtils (showPass)
@@ -36,5 +36,5 @@ dumpIn dflags n phase guts = do
         fname = printf "%spass-%04u.cbor" prefix n
     showPass dflags $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
-    BSL.writeFile (in_dump_dir fname) $ CBOR.serialise (cvtModule phase guts)
+    BSL.writeFile (in_dump_dir fname) $ Ser.serialise (cvtModule phase guts)
     return guts

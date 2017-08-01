@@ -1,3 +1,0 @@
-[submodule "binary-serialise-cbor"]
-	path = binary-serialise-cbor
-	url = git://github.com/well-typed/binary-serialise-cbor

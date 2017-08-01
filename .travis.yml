@@ -49,5 +49,5 @@ install:
  - git submodule update --init
 
 script:
- - cabal install --force-reinstalls binary-serialise-cbor/ ghc-dump-core/ ghc-dump-util/
+ - cabal install --force-reinstalls ghc-dump-core/ ghc-dump-util/
  - cabal install --ghc-options="-fplugin=GhcDump.Plugin -package ghc-dump-core" accelerate

@@ -1,1 +1,1 @@
-packages: ./ghc-dump-core, ./ghc-dump-util, ./binary-serialise-cbor
+packages: ./ghc-dump-core, ./ghc-dump-util
