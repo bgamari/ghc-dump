@@ -15,9 +15,10 @@ $ cabal install ghc-dump-core
 ```
 And then invoke GHC with the `-fplugin GhcDump.Plugin` flag,
 ```
-$ ghc -fplugin GhcDump.Plugin -O Test.hs
+$ ghc -fplugin GhcDump.Plugin -dumpdir=dump -O Test.hs
 [1 of 1] Compiling Main             ( Test.hs, Test.o )
 Linking Test ...
+$ cd dump
 $ ls
 Test                 Test.pass-0011.cbor  Test.pass-0017.cbor  Test.pass-0006.cbor
 Test.hi              Test.pass-0012.cbor  Test.pass-0001.cbor  Test.pass-0007.cbor
