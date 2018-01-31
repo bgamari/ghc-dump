@@ -1,15 +1,16 @@
 # ghc-dump: A tool for analysing GHC Core
 
-`ghc-dump` is a library, GHC plugin, and set of tools for analysing GHC's Core
-representation. The plugin is compatible with GHC 7.10 through 8.3, exporting a
-consistent (albeit somewhat lossy) representation across these versions. The AST
-is encoded as CBOR, which is small and easy to deserialise.
+`ghc-dump` is a library, GHC plugin, and set of tools for recording and
+analysing GHC's Core representation. The plugin is compatible with GHC 7.10
+through 8.3, exporting a consistent (albeit somewhat lossy) representation
+across these versions. The AST is encoded as CBOR, which is small and easy to
+deserialise.
 
 ## Dumping Core from compilation
 
 The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
-representation of the Core AST to file after every Core-to-Core pass. To use it,
-first install the `ghc-dump-core` package,
+representation of the Core AST to a file after every Core-to-Core pass. To use
+it, first install the `ghc-dump-core` package,
 ```
 $ cabal install ghc-dump-core
 ```
@@ -27,7 +28,7 @@ Test.o               Test.pass-0014.cbor  Test.pass-0003.cbor  Test.pass-0009.cb
 Test.pass-0000.cbor  Test.pass-0015.cbor  Test.pass-0004.cbor
 Test.pass-0010.cbor  Test.pass-0016.cbor  Test.pass-0005.cbor
 ```
-Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass. 
+Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass.
 
 ## Analysis in GHCi
 
