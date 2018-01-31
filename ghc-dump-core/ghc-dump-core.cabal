@@ -23,7 +23,7 @@ description:
 license:             BSD3
 license-file:        LICENSE
 author:              Ben Gamari
-maintainer:          bgamari.foss@gmail.com
+maintainer:          ben@well-typed.com
 copyright:           (c) 2017 Ben Gamari
 category:            Development
 build-type:          Simple
