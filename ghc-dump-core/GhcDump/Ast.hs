@@ -4,12 +4,14 @@ module GhcDump.Ast where
 
 import GHC.Generics
 
-import Data.Monoid
+import Data.Monoid hiding ((<>))
+import Data.Semigroup as Sem
 import qualified Data.ByteString as BS
 import Codec.Serialise
 import qualified Data.Text as T
 
 import Unique (mkUnique)
+import Prelude
 
 data Unique = Unique !Char !Int
             deriving (Eq, Ord, Generic)
@@ -219,10 +221,13 @@ data CoreStats
     deriving (Generic, Show)
 instance Serialise CoreStats
 
+instance Sem.Semigroup CoreStats where
+    CoreStats a b c d e <> CoreStats a' b' c' d' e' =
+        CoreStats (a+a') (b+b') (c+c') (d+d') (e+e')
+
 instance Monoid CoreStats where
     mempty = CoreStats 0 0 0 0 0
-    CoreStats a b c d e `mappend` CoreStats a' b' c' d' e' =
-        CoreStats (a+a') (b+b') (c+c') (d+d') (e+e')
+    mappend = (<>)
 
 {-
 data Rule' bndr var

@@ -25,7 +25,7 @@ intersperseDumps :: DynFlags -> [CoreToDo] -> [CoreToDo]
 intersperseDumps dflags = go 0 "desugar"
   where
     go n phase (todo : rest) = pass n phase : todo : go (n+1) phase' rest
-      where phase' = showSDocDump dflags (ppr todo <> text ":" <+> pprPassDetails todo)
+      where phase' = showSDocDump dflags (ppr todo GhcPlugins.<> text ":" <+> pprPassDetails todo)
     go n phase [] = [pass n phase]
 
     pass n phase = CoreDoPluginPass "DumpCore" (liftIO . dumpIn dflags n phase)
