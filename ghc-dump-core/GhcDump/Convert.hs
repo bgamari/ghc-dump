@@ -6,6 +6,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
 import Literal (Literal(..))
+import qualified Literal
 import Var (Var)
 import qualified Var
 import Id (isFCallId)
@@ -195,14 +196,25 @@ cvtLit l =
       Literal.MachChar x -> Ast.MachChar x
       Literal.MachStr x -> Ast.MachStr x
       Literal.MachNullAddr -> Ast.MachNullAddr
+#if MIN_VERSION_ghc(8,6,0)
+      Literal.LitNumber numty n _ ->
+        case numty of
+          Literal.LitNumInt -> Ast.MachInt n
+          Literal.LitNumInt64 -> Ast.MachInt64 n
+          Literal.LitNumWord -> Ast.MachWord n
+          Literal.LitNumWord64 -> Ast.MachWord64 n
+          Literal.LitNumInteger -> Ast.LitInteger n
+          Literal.LitNumNatural -> Ast.LitNatural n
+#else
       Literal.MachInt x -> Ast.MachInt x
       Literal.MachInt64 x -> Ast.MachInt64 x
       Literal.MachWord x -> Ast.MachWord x
       Literal.MachWord64 x -> Ast.MachWord64 x
+      Literal.LitInteger x _ -> Ast.LitInteger x
+#endif
       Literal.MachFloat x -> Ast.MachFloat x
       Literal.MachDouble x -> Ast.MachDouble x
       Literal.MachLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
-      Literal.LitInteger x _ -> Ast.LitInteger x
 
 cvtModule :: String -> ModGuts -> Ast.SModule
 cvtModule phase guts =
