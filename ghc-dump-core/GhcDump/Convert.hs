@@ -23,12 +23,16 @@ import qualified CoreSyn
 import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
 import HscTypes (ModGuts(..))
 import FastString (FastString, fastStringToByteString)
-#if MIN_VERSION_ghc(8,0,0)
+#if MIN_VERSION_ghc(8,2,0)
+import TyCoRep as Type (Type(..))
+#elif MIN_VERSION_ghc(8,0,0)
 import TyCoRep as Type (Type(..), TyBinder(..))
 #else
 import TypeRep as Type (Type(..))
 #endif
+#if !(MIN_VERSION_ghc(8,2,0))
 import Type (splitFunTy_maybe)
+#endif
 import TyCon (TyCon, tyConUnique)
 
 import Outputable (ppr, showSDoc, SDoc)
