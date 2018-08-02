@@ -213,8 +213,12 @@ cvtModuleName :: Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
 cvtType :: Type.Type -> Ast.SType
+#if MIN_VERSION_ghc(8,2,0)
+cvtType (Type.FunTy a b) = Ast.FunTy (cvtType a) (cvtType b)
+#else
 cvtType t
   | Just (a,b) <- splitFunTy_maybe t = Ast.FunTy (cvtType a) (cvtType b)
+#endif
 cvtType (Type.TyVarTy v)       = Ast.VarTy (cvtVar v)
 cvtType (Type.AppTy a b)       = Ast.AppTy (cvtType a) (cvtType b)
 cvtType (Type.TyConApp tc tys) = Ast.TyConApp (cvtTyCon tc) (map cvtType tys)
