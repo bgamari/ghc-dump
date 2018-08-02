@@ -117,6 +117,7 @@ data Lit = MachChar Char
          | MachDouble Rational
          | MachLabel T.Text
          | LitInteger Integer
+         | LitNatural Integer
          deriving (Eq, Ord, Generic, Show)
 instance Serialise Lit
 
