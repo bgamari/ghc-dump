@@ -10,6 +10,7 @@ import CoreMonad (pprPassDetails)
 import ErrUtils (showPass)
 import Text.Printf
 import System.FilePath
+import System.Directory
 
 import GhcDump.Convert
 
@@ -36,5 +37,6 @@ dumpIn dflags n phase guts = do
         fname = printf "%spass-%04u.cbor" prefix n
     showPass dflags $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
+    createDirectoryIfMissing True $ takeDirectory $ in_dump_dir fname
     BSL.writeFile (in_dump_dir fname) $ Ser.serialise (cvtModule phase guts)
     return guts
