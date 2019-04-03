@@ -1,5 +1,5 @@
 name:                ghc-dump-core
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            An AST and compiler plugin for dumping GHC's Core representation.
 description:
   @ghc-dump@ is a library, GHC plugin, and set of tools for recording and
