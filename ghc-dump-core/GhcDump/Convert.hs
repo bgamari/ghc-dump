@@ -6,7 +6,9 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
 import Literal (Literal(..))
+#if MIN_VERSION_ghc(8,6,0)
 import qualified Literal
+#endif
 import Var (Var)
 import qualified Var
 import Id (isFCallId)
@@ -193,9 +195,22 @@ cvtAltCon DEFAULT          = Ast.AltDefault
 cvtLit :: Literal -> Ast.Lit
 cvtLit l =
     case l of
+#if MIN_VERSION_ghc(8,8,0)
+      Literal.LitChar x -> Ast.MachChar x
+      Literal.LitString x -> Ast.MachStr x
+      Literal.LitNullAddr -> Ast.MachNullAddr
+      Literal.LitFloat x -> Ast.MachFloat x
+      Literal.LitDouble x -> Ast.MachDouble x
+      Literal.LitLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
+      Literal.LitRubbish -> Ast.LitRubbish
+#else
       Literal.MachChar x -> Ast.MachChar x
       Literal.MachStr x -> Ast.MachStr x
       Literal.MachNullAddr -> Ast.MachNullAddr
+      Literal.MachFloat x -> Ast.MachFloat x
+      Literal.MachDouble x -> Ast.MachDouble x
+      Literal.MachLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
+#endif
 #if MIN_VERSION_ghc(8,6,0)
       Literal.LitNumber numty n _ ->
         case numty of
@@ -212,9 +227,6 @@ cvtLit l =
       Literal.MachWord64 x -> Ast.MachWord64 x
       Literal.LitInteger x _ -> Ast.LitInteger x
 #endif
-      Literal.MachFloat x -> Ast.MachFloat x
-      Literal.MachDouble x -> Ast.MachDouble x
-      Literal.MachLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
 
 cvtModule :: String -> ModGuts -> Ast.SModule
 cvtModule phase guts =
@@ -234,7 +246,9 @@ cvtType t
 cvtType (Type.TyVarTy v)       = Ast.VarTy (cvtVar v)
 cvtType (Type.AppTy a b)       = Ast.AppTy (cvtType a) (cvtType b)
 cvtType (Type.TyConApp tc tys) = Ast.TyConApp (cvtTyCon tc) (map cvtType tys)
-#if MIN_VERSION_ghc(8,2,0)
+#if MIN_VERSION_ghc(8,8,0)
+cvtType (Type.ForAllTy (Var.Bndr b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
+#elif MIN_VERSION_ghc(8,2,0)
 cvtType (Type.ForAllTy (Var.TvBndr b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)
 #elif MIN_VERSION_ghc(8,0,0)
 cvtType (Type.ForAllTy (Named b _) t) = Ast.ForAllTy (cvtBinder b) (cvtType t)

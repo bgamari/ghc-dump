@@ -118,6 +118,7 @@ data Lit = MachChar Char
          | MachLabel T.Text
          | LitInteger Integer
          | LitNatural Integer
+         | LitRubbish
          deriving (Eq, Ord, Generic, Show)
 instance Serialise Lit
 
