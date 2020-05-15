@@ -12,7 +12,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 import Text.Regex.TDFA
 import Text.Regex.TDFA.Common (Regex)
-import Text.Regex.TDFA.Text
+import Text.Regex.TDFA.Text ()
 
 import GhcDump.Pretty
 import GhcDump.Util

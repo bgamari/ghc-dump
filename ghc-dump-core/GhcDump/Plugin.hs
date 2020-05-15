@@ -6,7 +6,9 @@ import Data.Maybe
 import qualified Data.ByteString.Lazy as BSL
 import qualified Codec.Serialise as Ser
 import GhcPlugins hiding (TB)
+#if !MIN_VERSION_ghc(8,8,0)
 import CoreMonad (pprPassDetails)
+#endif
 import ErrUtils (showPass)
 import Text.Printf
 import System.FilePath
