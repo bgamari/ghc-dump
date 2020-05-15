@@ -25,7 +25,8 @@ import qualified CoreUtils as CoreStats
 import qualified CoreSyn
 import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
 import HscTypes (ModGuts(..))
-import FastString (FastString, fastStringToByteString)
+import FastString (FastString)
+import qualified FastString
 #if MIN_VERSION_ghc(8,2,0)
 import TyCoRep as Type (Type(..))
 #elif MIN_VERSION_ghc(8,0,0)
@@ -47,7 +48,12 @@ cvtSDoc :: SDoc -> T.Text
 cvtSDoc = T.pack . showSDoc unsafeGlobalDynFlags
 
 fastStringToText :: FastString -> T.Text
-fastStringToText = TE.decodeUtf8 . fastStringToByteString
+fastStringToText = TE.decodeUtf8
+#if MIN_VERSION_ghc(8,10,0)
+  . FastString.bytesFS
+#else
+  . FastString.fastStringToByteString
+#endif
 
 occNameToText :: OccName -> T.Text
 occNameToText = fastStringToText . occNameFS
@@ -237,7 +243,9 @@ cvtModuleName :: Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
 cvtType :: Type.Type -> Ast.SType
-#if MIN_VERSION_ghc(8,2,0)
+#if MIN_VERSION_ghc(8,10,0)
+cvtType (Type.FunTy _flag a b) = Ast.FunTy (cvtType a) (cvtType b)
+#elif MIN_VERSION_ghc(8,2,0)
 cvtType (Type.FunTy a b) = Ast.FunTy (cvtType a) (cvtType b)
 #else
 cvtType t
