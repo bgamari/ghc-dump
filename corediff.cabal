@@ -84,7 +84,8 @@ executable corediff
                        corediff,
                        ghc-dump-core >=0.1.1.0,
                        serialise >=0.2.3.0,
-                       bytestring >=0.10.9.0
+                       bytestring >=0.10.9.0,
+                       text >=1.2.4.0
 
   -- Directories containing source files.
   hs-source-dirs:      app
