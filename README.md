@@ -41,5 +41,20 @@ Compare two passes or two completely different files:
 corediff demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
 ```
 
+## Challenges
+
+### Generic programming
+
+### Mutually recursive type family
+
+A Core expression always has the type `Expr' bndr var` (in `ghc-dump-core`; it's just `Expr` in GHC).
+Unlike in section 2 of [An efficient algorithm for type-safe structural diffing][3] (AEATSD), `Expr'`s do not only contain nested `Expr'`s, but also `Type'`s and `Alt'`s.
+In order to implement the algorithm as shown in the paper, we need to define a "change" type for each of those nested types.
+This means that we need keep track of several different types of subtrees when searching two expressions for values that appear in both of them:
+Common sub-`Expr'`s, sub-`Alt'`s, etc.
+
+The paper doesn't need to solve this problem since it uses a generics library to work on types.
+
 [1]: https://hackage.haskell.org/package/ghc-dump-core
 [2]: https://github.com/pbrinkmeier/ghc-dump
+[3]: https://dl.acm.org/doi/10.1145/3341717
