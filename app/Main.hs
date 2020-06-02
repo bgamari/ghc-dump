@@ -18,15 +18,18 @@ main' [binding, pathA, pathB] = do
   modA <- readModFile pathA
   modB <- readModFile pathB
 
-  let Just (_, _, exprA) = lookupBinding binding modA
-  let Just (_, _, exprB) = lookupBinding binding modB
+  let Just (bndrA, _, exprA) = lookupBinding binding modA
+  let Just (bndrB, _, exprB) = lookupBinding binding modB
 
-  print exprA
-  print exprB
+  {-
+  putStrLn $ "Binder of " ++ binding ++ " in " ++ pathA ++ ":"
+  print bndrA
+  putStrLn $ "Binder of " ++ binding ++ " in " ++ pathB ++ ":"
+  print bndrB
+  -}
 
-  -- let patch = diffCore exprA exprB
-
-  -- print patch
+  let patch = diffCore exprA exprB
+  print patch
 
 main' _      = putStrLn "Incorrect number of arguments, aborting."
 
