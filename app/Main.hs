@@ -8,7 +8,7 @@ import qualified Data.Text as T
 import GhcDump.Ast
 import System.Environment (getArgs)
 
-import CoreDiff.Diff (diffCore)
+import CoreDiff.Diff (strExpr, diffExpr)
 
 main :: IO ()
 main = main' =<< getArgs
@@ -28,21 +28,13 @@ main' [binding, pathA, pathB] = do
   print bndrB
   -}
 
-  let patch = diffCore exprA exprB
+  let patch = diffExpr (strExpr exprA) (strExpr exprB)
   print patch
 
-main' _      = putStrLn "Incorrect number of arguments, aborting."
+main' _ = putStrLn "Incorrect number of arguments, aborting."
 
 readModFile :: FilePath -> IO SModule
 readModFile path = deserialise <$> BSL.readFile path
-
-printMod :: SModule -> IO ()
-printMod mod = do
-  putStrLn $ "module " ++ (T.unpack $ showModName $ moduleName mod) ++ "[" ++ (T.unpack $ modulePhase mod) ++  "] where"
-  mapM_ print $ moduleTopBindings mod
-
-  where
-    showModName = getModuleName
 
 lookupBinding :: String -> SModule -> Maybe (SBinder, CoreStats, SExpr)
 lookupBinding binding mod = find go $ moduleBindings mod
