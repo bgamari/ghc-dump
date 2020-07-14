@@ -8,7 +8,7 @@ import qualified Data.Text as T
 import GhcDump.Ast
 import System.Environment (getArgs)
 
-import CoreDiff.Diff (strExpr, diffExpr)
+import CoreDiff.Diff
 
 main :: IO ()
 main = main' =<< getArgs
@@ -18,8 +18,8 @@ main' [binding, pathA, pathB] = do
   modA <- readModFile pathA
   modB <- readModFile pathB
 
-  let Just (bndrA, _, exprA) = lookupBinding binding modA
-  let Just (bndrB, _, exprB) = lookupBinding binding modB
+  let Just (bndrA, _statsA, exprA) = lookupBinding binding modA
+  let Just (bndrB, _statsB, exprB) = lookupBinding binding modB
 
   {-
   putStrLn $ "Binder of " ++ binding ++ " in " ++ pathA ++ ":"
@@ -28,8 +28,14 @@ main' [binding, pathA, pathB] = do
   print bndrB
   -}
 
-  let patch = diffExpr (strExpr exprA) (strExpr exprB)
-  print patch
+  putStrLn $ "Binding A (" ++ T.unpack (modulePhase modA) ++ "):"
+  print (bndrA, exprA)
+
+  putStrLn $ "Binding B (" ++ T.unpack (modulePhase modB) ++ "):"
+  print (bndrB, exprB)
+
+  putStrLn "Change:"
+  print $ changeBinding (bndrA, exprA) (bndrB, exprB)
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
