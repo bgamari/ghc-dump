@@ -9,6 +9,7 @@ import GhcDump.Ast
 import System.Environment (getArgs)
 
 import CoreDiff.Diff
+import CoreDiff.PrettyPrint
 
 main :: IO ()
 main = main' =<< getArgs
@@ -35,7 +36,8 @@ main' [binding, pathA, pathB] = do
   print (bndrB, exprB)
 
   putStrLn "Change:"
-  print $ changeBinding (bndrA, exprA) (bndrB, exprB)
+  let chg = changeBinding (bndrA, exprA) (bndrB, exprB)
+  print chg
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 

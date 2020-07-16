@@ -44,6 +44,8 @@ data TypeC metavar
   deriving (Show)
 -}
 
+newtype ChangeBinding = ChangeBinding (BindingC Int, BindingC Int)
+
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
   , exprWcs :: SExpr -> Maybe Int
@@ -54,11 +56,9 @@ data BndrC metavar
   | BndrHole metavar
   deriving (Show)
 
-changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> (BindingC Int, BindingC Int)
+changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> ChangeBinding
 changeBinding bndgA@(bndrA, exprA) bndgB@(bndrB, exprB) =
-  ( BindingC (extractBndr o bndrA) (extractExpr o exprA)
-  , BindingC (extractBndr o bndrB) (extractExpr o exprB)
-  )
+  ChangeBinding (BindingC (extractBndr o bndrA) (extractExpr o exprA), BindingC (extractBndr o bndrB) (extractExpr o exprB))
   where
     o = oracles bndgA bndgB
 
