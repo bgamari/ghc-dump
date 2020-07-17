@@ -105,11 +105,11 @@ oracles bndgA bndgB = Oracles
     findCommon p lhs rhs s =
       findIndex (== s) $ intersect (p lhs) (p rhs)
 
-    binders (bndr, expr) = [bndr] ++ concatMap go (exprs expr)
+    binders (bndr, expr) = bndr : concatMap go (exprs expr)
       where go (ETyLam bndr _)         = [bndr]
             go (ELam bndr _)           = [bndr]
             go (ELet bindings _)       = map fst bindings
-            go (ECase _ caseBndr alts) = [caseBndr] ++ concatMap altBinders alts
+            go (ECase _ caseBndr alts) = caseBndr : concatMap altBinders alts
             go _                       = []
 
     bindings bndg@(_, expr) = [bndg] ++ concatMap go (exprs expr)
