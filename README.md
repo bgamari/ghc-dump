@@ -25,6 +25,12 @@ git clone https://github.com/pbrinkmeier/corediff
 cabal v1-install -w ${ghc up to 8.11} --allow-newer
 ```
 
+## Tests
+
+There are no automatic unit or integration tests yet.
+I'm planning to write some.
+Until then, you can use the commands described in "Usage" to see if the program works.
+
 ## Usage
 
 Dump GHC Core programs using `ghc-dump-core`, e.g.:
@@ -35,17 +41,17 @@ Dump GHC Core programs using `ghc-dump-core`, e.g.:
 $GHC -fplugin GhcDump.Plugin demos/Maths.hs
 ```
 
-Compare two passes or two completely different files:
+Compare two passes or two completely different files in the top-level binding `square`:
 
 ```bash
-corediff demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
+corediff square demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
 ```
 
 ## Challenges
 
 ### Generic programming
 
-### Mutually recursive type family
+### A variety of nested types
 
 A Core expression always has the type `Expr' bndr var` (in `ghc-dump-core`; it's just `Expr` in GHC).
 Unlike in section 2 of [An efficient algorithm for type-safe structural diffing][3] (AEATSD), `Expr'`s do not only contain nested `Expr'`s, but also `Type'`s and `Alt'`s.
