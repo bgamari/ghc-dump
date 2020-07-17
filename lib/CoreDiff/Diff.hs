@@ -53,11 +53,13 @@ data TypeC metavar
   deriving (Show)
 -}
 
+type Holey t = t Int Int Int Int
+
 -- These are newtypes instead of types so we can write instances nicely later on
-newtype ChangeBinding = ChangeBinding (BindingC Int Int Int Int, BindingC Int Int Int Int)
-newtype ChangeExpr = ChangeExpr (ExprC Int Int Int Int, ExprC Int Int Int Int)
-newtype ChangeBndr = ChangeBndr (BndrC Int Int Int Int, BndrC Int Int Int Int)
-newtype ChangeAlt = ChangeAlt (AltC Int Int Int Int, AltC Int Int Int Int)
+newtype ChangeBinding = ChangeBinding (Holey BindingC, Holey BindingC)
+newtype ChangeExpr = ChangeExpr (Holey ExprC, Holey ExprC)
+newtype ChangeBndr = ChangeBndr (Holey BndrC, Holey BndrC)
+newtype ChangeAlt = ChangeAlt (Holey AltC, Holey AltC)
 
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
@@ -73,19 +75,19 @@ changeBinding bndgA bndgB =
     o = oracles bndgA bndgB
 
 -- TODO: rewrite these three using `maybe`
-extractBinding :: Oracles -> (SBinder, SExpr) -> BindingC Int Int Int Int
+extractBinding :: Oracles -> (SBinder, SExpr) -> Holey BindingC
 extractBinding o bndg@(bndr, expr) =
   case bindingWcs o bndg of
     Nothing -> BindingC (extractBndr o bndr) (extractExpr o expr)
     Just hole -> BindingHole hole
 
-extractBndr :: Oracles -> SBinder -> BndrC Int Int Int Int
+extractBndr :: Oracles -> SBinder -> Holey BndrC
 extractBndr o bndr =
   case bndrWcs o bndr of
     Nothing -> BndrC bndr
     Just hole -> BndrHole hole
 
-extractExpr :: Oracles -> SExpr -> ExprC Int Int Int Int
+extractExpr :: Oracles -> SExpr -> Holey ExprC
 extractExpr o expr =
   case exprWcs o expr of
     Just hole -> ExprHole hole
@@ -102,7 +104,7 @@ extractExpr o expr =
     peel (EType t) = ETypeC t
     peel ECoercion = ECoercionC
 
-extractAlt :: Oracles -> SAlt -> AltC Int Int Int Int
+extractAlt :: Oracles -> SAlt -> Holey AltC
 extractAlt o alt@(Alt con bndrs rhs) =
   case altWcs o alt of
     Just hole -> AltHole hole
@@ -145,7 +147,7 @@ oracles bndgA bndgB = Oracles
             go _                = []
 
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
-gcpBinding :: BindingC Int Int Int Int -> BindingC Int Int Int Int -> BindingC ChangeBinding ChangeExpr ChangeBndr ChangeAlt
+gcpBinding :: Holey BindingC -> Holey BindingC -> BindingC ChangeBinding ChangeExpr ChangeBndr ChangeAlt
 gcpBinding (BindingC bndr expr) (BindingC bndr' expr') =
   BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
 gcpBinding a b =
