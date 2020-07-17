@@ -9,7 +9,7 @@ import qualified Data.Text as T
 
 import CoreDiff.Diff
 
-prettyPrint :: Show mv => BindingC mv -> String
+prettyPrint :: Show mv => BindingC mv mv mv -> String
 prettyPrint (BindingC bndr expr) =
   intercalate "\n" $
     [ prettyPrintBndr True bndr
@@ -47,7 +47,7 @@ prettyPrintBndrInfo (BndrC (SBndr bndr)) = "[" ++ intercalate ", " (catMaybes in
       | test      = Just payload
       | otherwise = Nothing
 
-prettyPrintBndr :: Show mv => Bool -> BndrC mv -> String
+prettyPrintBndr :: Show mv => Bool -> BndrC mv mv mv -> String
 prettyPrintBndr displayType (BndrC bndr) = showBndr displayType bndr
 
 prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
@@ -59,7 +59,7 @@ showBndr displayType (SBndr bndr) =
         optType = if displayType then " :: " ++ prettyPrintType (binderType bndr)
                                  else ""
 
-prettyPrintExpr :: Show mv => ExprC mv -> String
+prettyPrintExpr :: Show mv => ExprC mv mv mv -> String
 prettyPrintExpr (EVarC bndrId) = show bndrId
 prettyPrintExpr (EVarGlobalC extName) = prettyPrintExtName extName
 prettyPrintExpr (ELitC lit) = show lit
