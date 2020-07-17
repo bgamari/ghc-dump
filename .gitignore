@@ -3,3 +3,4 @@
 *.o
 dist
 dist-newstyle
+*.swp
