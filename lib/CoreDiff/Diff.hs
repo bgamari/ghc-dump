@@ -4,41 +4,40 @@ import Data.List
 import GhcDump.Ast
 import qualified Data.Text as T
 
-type MetaVar = Int
-
 -- each kind of diff-able structure needs
 -- * a corresponding context type
 -- * a type of metavariable
-data BindingC bindingMv exprMv bndrMv
-  = BindingC (BndrC bindingMv exprMv bndrMv) (ExprC bindingMv exprMv bndrMv)
+data BindingC bindingMv exprMv bndrMv altMv
+  = BindingC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
   | BindingHole bindingMv
   deriving (Show)
 
-data ExprC bindingMv exprMv bndrMv
+data ExprC bindingMv exprMv bndrMv altMv
   = EVarC BinderId
   | EVarGlobalC ExternalName
   | ELitC Lit
-  | EAppC (ExprC bindingMv exprMv bndrMv) (ExprC bindingMv exprMv bndrMv)
-  | ETyLamC (BndrC bindingMv exprMv bndrMv) (ExprC bindingMv exprMv bndrMv)
-  | ELamC (BndrC bindingMv exprMv bndrMv) (ExprC bindingMv exprMv bndrMv)
-  | ELetC [BindingC bindingMv exprMv bndrMv] (ExprC bindingMv exprMv bndrMv)
-  | ECaseC (ExprC bindingMv exprMv bndrMv) (BndrC bindingMv exprMv bndrMv) [AltC bindingMv exprMv bndrMv]
+  | EAppC (ExprC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
+  | ETyLamC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
+  | ELamC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
+  | ELetC [BindingC bindingMv exprMv bndrMv altMv] (ExprC bindingMv exprMv bndrMv altMv)
+  | ECaseC (ExprC bindingMv exprMv bndrMv altMv) (BndrC bindingMv exprMv bndrMv altMv) [AltC bindingMv exprMv bndrMv altMv]
   | ETypeC SType
   | ECoercionC
   | ExprHole exprMv
   deriving (Show)
 
-data BndrC bindingMv exprMv bndrMv
+data BndrC bindingMv exprMv bndrMv altMv
   = BndrC SBinder
   | BndrHole bndrMv
   deriving (Show)
 
--- case alternatives are not diff-able by themselves (yet)
-data AltC bindingMv exprMv bndrMv = AltC
-  { altCCon :: AltCon
-  , altCBinders :: [BndrC bindingMv exprMv bndrMv]
-  , altCRHS :: ExprC bindingMv exprMv bndrMv
-  }
+data AltC bindingMv exprMv bndrMv altMv
+  = AltC
+    { altCCon :: AltCon
+    , altCBinders :: [BndrC bindingMv exprMv bndrMv altMv]
+    , altCRHS :: ExprC bindingMv exprMv bndrMv altMv
+    }
+  | AltHole altMv
   deriving (Show)
 
 {-
@@ -55,14 +54,16 @@ data TypeC metavar
 -}
 
 -- These are newtypes instead of types so we can write instances nicely later on
-newtype ChangeBinding = ChangeBinding (BindingC Int Int Int, BindingC Int Int Int)
-newtype ChangeExpr = ChangeExpr (ExprC Int Int Int, ExprC Int Int Int)
-newtype ChangeBndr = ChangeBndr (BndrC Int Int Int, BndrC Int Int Int)
+newtype ChangeBinding = ChangeBinding (BindingC Int Int Int Int, BindingC Int Int Int Int)
+newtype ChangeExpr = ChangeExpr (ExprC Int Int Int Int, ExprC Int Int Int Int)
+newtype ChangeBndr = ChangeBndr (BndrC Int Int Int Int, BndrC Int Int Int Int)
+newtype ChangeAlt = ChangeAlt (AltC Int Int Int Int, AltC Int Int Int Int)
 
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
   , bindingWcs :: (SBinder, SExpr) -> Maybe Int
   , exprWcs :: SExpr -> Maybe Int
+  , altWcs :: SAlt -> Maybe Int
   }
 
 changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> ChangeBinding
@@ -72,19 +73,19 @@ changeBinding bndgA bndgB =
     o = oracles bndgA bndgB
 
 -- TODO: rewrite these three using `maybe`
-extractBinding :: Oracles -> (SBinder, SExpr) -> BindingC Int Int Int
+extractBinding :: Oracles -> (SBinder, SExpr) -> BindingC Int Int Int Int
 extractBinding o bndg@(bndr, expr) =
   case bindingWcs o bndg of
     Nothing -> BindingC (extractBndr o bndr) (extractExpr o expr)
     Just hole -> BindingHole hole
 
-extractBndr :: Oracles -> SBinder -> BndrC Int Int Int
+extractBndr :: Oracles -> SBinder -> BndrC Int Int Int Int
 extractBndr o bndr =
   case bndrWcs o bndr of
     Nothing -> BndrC bndr
     Just hole -> BndrHole hole
 
-extractExpr :: Oracles -> SExpr -> ExprC Int Int Int
+extractExpr :: Oracles -> SExpr -> ExprC Int Int Int Int
 extractExpr o expr =
   case exprWcs o expr of
     Just hole -> ExprHole hole
@@ -96,17 +97,25 @@ extractExpr o expr =
     peel (EApp f x) = EAppC (extractExpr o f) (extractExpr o x)
     peel (ETyLam p b) = ETyLamC (extractBndr o p) (extractExpr o b)
     peel (ELam p b) = ELamC (extractBndr o p) (extractExpr o b)
-    peel (ELet bindings expr) = ELetC (map go bindings) (extractExpr o expr)
-      where go (bndr, expr') = BindingC (extractBndr o bndr) (extractExpr o expr') -- TODO: extractBinding
-    peel (ECase match bndr alts) = ECaseC (extractExpr o match) (extractBndr o bndr) (map go alts)
-      where go alt = AltC (altCon alt) (map (extractBndr o) $ altBinders alt) (extractExpr o $ altRHS alt) -- TODO: extractAlt
+    peel (ELet bindings expr) = ELetC (map (extractBinding o) bindings) (extractExpr o expr)
+    peel (ECase match bndr alts) = ECaseC (extractExpr o match) (extractBndr o bndr) (map (extractAlt o) alts)
     peel (EType t) = ETypeC t
     peel ECoercion = ECoercionC
+
+extractAlt :: Oracles -> SAlt -> AltC Int Int Int Int
+extractAlt o alt@(Alt con bndrs rhs) =
+  case altWcs o alt of
+    Just hole -> AltHole hole
+    Nothing -> AltC
+      con
+      (map (extractBndr o) bndrs)
+      (extractExpr o rhs)
 
 oracles bndgA bndgB = Oracles
   { bndrWcs = findCommon binders bndgA bndgB
   , bindingWcs = findCommon bindings bndgA bndgB
   , exprWcs = findCommon (exprs . snd) bndgA bndgB
+  , altWcs = findCommon alts bndgA bndgB
   }
   where
     findCommon p lhs rhs s =
@@ -131,8 +140,12 @@ oracles bndgA bndgB = Oracles
             subExprs (ECase match _ alts) = exprs match ++ concatMap (exprs . altRHS) alts
             subExprs _                    = []
 
+    alts (_, expr) = concatMap go (exprs expr)
+      where go (ECase _ _ alts) = alts
+            go _                = []
+
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
-gcpBinding :: BindingC Int Int Int -> BindingC Int Int Int -> BindingC ChangeBinding ChangeExpr ChangeBndr
+gcpBinding :: BindingC Int Int Int Int -> BindingC Int Int Int Int -> BindingC ChangeBinding ChangeExpr ChangeBndr ChangeAlt
 gcpBinding (BindingC bndr expr) (BindingC bndr' expr') =
   BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
 gcpBinding a b =
@@ -168,4 +181,6 @@ gcpExpr ECoercionC ECoercionC = ECoercionC
 gcpExpr a b = ExprHole $ ChangeExpr (a, b)
 
 -- TODO
-gcpAlt = error "Lazy programmer"
+gcpAlt (AltC con bndrs rhs) (AltC con' bndrs' rhs')
+  | con == con' = AltC con (zipWith gcpBndr bndrs bndrs') (gcpExpr rhs rhs')
+gcpAlt a b = AltHole $ ChangeAlt (a, b)

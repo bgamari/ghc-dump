@@ -94,7 +94,10 @@ prettyPrintExpr (ETypeC ty) = prettyPrintType ty
 prettyPrintExpr ECoercionC = error "unimplemented"
 prettyPrintExpr (ExprHole hole) = "#" ++ show hole
 
-prettyPrintAlt = undefined
+prettyPrintAlt (AltC con binders rhs) =
+  intercalate " " (show con : map (prettyPrintBndr True) binders) ++" ->\n" ++ indent 2 (prettyPrintExpr rhs)
+  
+prettyPrintAlt (AltHole hole) = "#" ++ show hole
 
 prettyPrintType (VarTy bndrId) = show bndrId
 prettyPrintType (FunTy lhs rhs) =
@@ -122,6 +125,9 @@ instance Show ChangeBndr where
 
 instance Show ChangeExpr where
   show (ChangeExpr (lhs, rhs)) = showChange (prettyPrintExpr lhs) (prettyPrintExpr rhs)
+
+instance Show ChangeAlt where
+  show (ChangeAlt (lhs, rhs)) = showChange (prettyPrintAlt lhs) (prettyPrintAlt rhs)
 
 -- TODO: use Show term/PrettyPrint term or something
 showChange :: String -> String -> String
