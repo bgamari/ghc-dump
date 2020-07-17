@@ -55,7 +55,6 @@ data TypeC metavar
 
 type Holey t = t Int Int Int Int
 
--- newtype makes it possible to define instances without language pragmas
 newtype Change t = Change (Holey t, Holey t)
 
 type Diff t = t (Change BindingC) (Change ExprC) (Change BndrC) (Change AltC)
