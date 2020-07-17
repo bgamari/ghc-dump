@@ -40,7 +40,7 @@ main' [binding, pathA, pathB] = do
   print chg
 
   putStrLn "GCP:"
-  let ChangeBinding (lhs, rhs) = chg
+  let Change (lhs, rhs) = chg
   let gcp = gcpBinding lhs rhs
   putStrLn $ prettyPrint gcp
 

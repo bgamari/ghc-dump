@@ -55,11 +55,10 @@ data TypeC metavar
 
 type Holey t = t Int Int Int Int
 
--- These are newtypes instead of types so we can write instances nicely later on
-newtype ChangeBinding = ChangeBinding (Holey BindingC, Holey BindingC)
-newtype ChangeExpr = ChangeExpr (Holey ExprC, Holey ExprC)
-newtype ChangeBndr = ChangeBndr (Holey BndrC, Holey BndrC)
-newtype ChangeAlt = ChangeAlt (Holey AltC, Holey AltC)
+-- newtype makes it possible to define instances without language pragmas
+newtype Change t = Change (Holey t, Holey t)
+
+type Diff t = t (Change BindingC) (Change ExprC) (Change BndrC) (Change AltC)
 
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
@@ -68,9 +67,9 @@ data Oracles = Oracles
   , altWcs :: SAlt -> Maybe Int
   }
 
-changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> ChangeBinding
+changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> Change BindingC
 changeBinding bndgA bndgB =
-  ChangeBinding (extractBinding o bndgA, extractBinding o bndgB)
+  Change (extractBinding o bndgA, extractBinding o bndgB)
   where
     o = oracles bndgA bndgB
 
@@ -147,16 +146,16 @@ oracles bndgA bndgB = Oracles
             go _                = []
 
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
-gcpBinding :: Holey BindingC -> Holey BindingC -> BindingC ChangeBinding ChangeExpr ChangeBndr ChangeAlt
+gcpBinding :: Holey BindingC -> Holey BindingC -> Diff BindingC
 gcpBinding (BindingC bndr expr) (BindingC bndr' expr') =
   BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
 gcpBinding a b =
-  BindingHole $ ChangeBinding (a, b)
+  BindingHole $ Change (a, b)
 
 gcpBndr (BndrC bndr) (BndrC bndr')
   | bndr == bndr' = BndrC bndr 
 gcpBndr a b =
-  BndrHole $ ChangeBndr (a, b)
+  BndrHole $ Change (a, b)
 
 -- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
 -- But for now we're gonna stay explicit.
@@ -180,9 +179,9 @@ gcpExpr (ECaseC match bndr alts) (ECaseC match' bndr' alts')
 gcpExpr (ETypeC ty) (ETypeC ty')
   | ty == ty' = ETypeC ty
 gcpExpr ECoercionC ECoercionC = ECoercionC
-gcpExpr a b = ExprHole $ ChangeExpr (a, b)
+gcpExpr a b = ExprHole $ Change (a, b)
 
 -- TODO
 gcpAlt (AltC con bndrs rhs) (AltC con' bndrs' rhs')
   | con == con' = AltC con (zipWith gcpBndr bndrs bndrs') (gcpExpr rhs rhs')
-gcpAlt a b = AltHole $ ChangeAlt (a, b)
+gcpAlt a b = AltHole $ Change (a, b)

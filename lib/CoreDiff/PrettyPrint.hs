@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module CoreDiff.PrettyPrint where
 
@@ -116,18 +117,18 @@ prettyPrintType (ForAllTy bndr ty) = "forall {" ++ showBndr False bndr ++ "}." +
 prettyPrintType LitTy = error "unimplemented"
 prettyPrintType CoercionTy = error "unimplemented"
 
-instance Show ChangeBinding where
-  show (ChangeBinding (lhs, rhs)) = showChange (prettyPrint lhs) (prettyPrint rhs)
+instance Show (Change BindingC) where
+  show (Change (lhs, rhs)) = showChange (prettyPrint lhs) (prettyPrint rhs)
 
 -- TODO: do we need to display types here?
-instance Show ChangeBndr where
-  show (ChangeBndr (lhs, rhs)) = showChange (prettyPrintBndr True lhs) (prettyPrintBndr True rhs)
+instance Show (Change BndrC) where
+  show (Change (lhs, rhs)) = showChange (prettyPrintBndr True lhs) (prettyPrintBndr True rhs)
 
-instance Show ChangeExpr where
-  show (ChangeExpr (lhs, rhs)) = showChange (prettyPrintExpr lhs) (prettyPrintExpr rhs)
+instance Show (Change ExprC) where
+  show (Change (lhs, rhs)) = showChange (prettyPrintExpr lhs) (prettyPrintExpr rhs)
 
-instance Show ChangeAlt where
-  show (ChangeAlt (lhs, rhs)) = showChange (prettyPrintAlt lhs) (prettyPrintAlt rhs)
+instance Show (Change AltC) where
+  show (Change (lhs, rhs)) = showChange (prettyPrintAlt lhs) (prettyPrintAlt rhs)
 
 -- TODO: use Show term/PrettyPrint term or something
 showChange :: String -> String -> String
