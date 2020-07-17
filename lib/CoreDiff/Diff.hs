@@ -8,6 +8,7 @@ type MetaVar = Int
 
 data BindingC metavar
   = BindingC (BndrC metavar) (ExprC metavar)
+  | BindingHole metavar
   deriving (Show)
 
 data ExprC metavar
@@ -48,6 +49,7 @@ newtype ChangeBinding = ChangeBinding (BindingC Int, BindingC Int)
 
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
+  , bindingWcs :: (SBinder, SExpr) -> Maybe Int
   , exprWcs :: SExpr -> Maybe Int
   }
 
@@ -57,10 +59,17 @@ data BndrC metavar
   deriving (Show)
 
 changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> ChangeBinding
-changeBinding bndgA@(bndrA, exprA) bndgB@(bndrB, exprB) =
-  ChangeBinding (BindingC (extractBndr o bndrA) (extractExpr o exprA), BindingC (extractBndr o bndrB) (extractExpr o exprB))
+changeBinding bndgA bndgB =
+  ChangeBinding (extractBinding o bndgA, extractBinding o bndgB)
   where
     o = oracles bndgA bndgB
+
+-- TODO: rewrite these three using `maybe`
+extractBinding :: Oracles -> (SBinder, SExpr) -> BindingC Int
+extractBinding o bndg@(bndr, expr) =
+  case bindingWcs o bndg of
+    Nothing -> BindingC (extractBndr o bndr) (extractExpr o expr)
+    Just hole -> BindingHole hole
 
 extractBndr :: Oracles -> SBinder -> BndrC Int
 extractBndr o bndr =
@@ -88,16 +97,24 @@ extractExpr o expr =
     peel ECoercion = ECoercionC
 
 oracles bndgA bndgB = Oracles
-  { bndrWcs = \bndr -> findIndex (== bndr) $ intersect (binders bndgA) (binders bndgB)
-  , exprWcs = \expr -> findIndex (== expr) $ intersect (exprs $ snd bndgA) (exprs $ snd bndgB)
+  { bndrWcs = findCommon binders bndgA bndgB
+  , bindingWcs = findCommon bindings bndgA bndgB
+  , exprWcs = findCommon (exprs . snd) bndgA bndgB
   }
   where
+    findCommon p lhs rhs s =
+      findIndex (== s) $ intersect (p lhs) (p rhs)
+
     binders (bndr, expr) = [bndr] ++ concatMap go (exprs expr)
       where go (ETyLam bndr _)         = [bndr]
             go (ELam bndr _)           = [bndr]
             go (ELet bindings _)       = map fst bindings
             go (ECase _ caseBndr alts) = [caseBndr] ++ concatMap altBinders alts
             go _                       = []
+
+    bindings bndg@(_, expr) = [bndg] ++ concatMap go (exprs expr)
+      where go (ELet bindings _) = bindings
+            go _                 = []
 
     exprs e = [e] ++ subExprs e
       where subExprs (EApp f x)           = exprs f ++ exprs x

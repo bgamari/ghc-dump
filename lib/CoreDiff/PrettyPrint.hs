@@ -1,5 +1,8 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module CoreDiff.PrettyPrint where
 
+import Data.Maybe
 import Data.List
 import GhcDump.Ast
 import qualified Data.Text as T
@@ -9,21 +12,52 @@ import CoreDiff.Diff
 prettyPrint :: Show mv => BindingC mv -> String
 prettyPrint (BindingC bndr expr) =
   intercalate "\n" $
-    [ prettyPrintBndrInfo bndr
-    , prettyPrintBndr True bndr
+    [ prettyPrintBndr True bndr
+    , prettyPrintBndrInfo bndr
     , prettyPrintBndr False bndr ++ " ="
     , indent 2 (prettyPrintExpr expr)
     ]
+prettyPrint (BindingHole hole) = "#" ++ show hole
 
-prettyPrintBndrInfo _ = "<BinderInfo placeholder>" -- TODO
+-- TODO: look at GhcDump/Convert.hs to achieve close-to-original output
+prettyPrintBndrInfo (BndrC (SBndr bndr)) = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
+  where
+    infos =
+      [ arity
+      , strictness
+      , occurences
+      ]
+
+    arity =
+      if idiArity bInfo == 0
+      then Nothing
+      else Just $ "Arity=" ++ show (idiArity bInfo)
+
+    strictness =
+      toMaybe (idiStrictnessSig bInfo /= "") ("Str=" ++ T.unpack (idiStrictnessSig bInfo))
+
+    occurences = Just $ "Occ=" ++ show' (idiOccInfo bInfo)
+      where show' OccManyOccs        = "Many"
+            show' OccDead            = "Dead"
+            show' OccOneOcc          = "Once"
+            show' (OccLoopBreaker _) = "LoopBreaker" -- TODO: show strong/weak loopbreaker (?)
+
+    bInfo = binderIdInfo bndr
+    toMaybe test payload
+      | test      = Just payload
+      | otherwise = Nothing
 
 prettyPrintBndr :: Show mv => Bool -> BndrC mv -> String
-prettyPrintBndr displayType (BndrC (SBndr bndr)) =
+prettyPrintBndr displayType (BndrC bndr) = showBndr displayType bndr
+
+prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
+
+showBndr :: Bool -> SBinder -> String
+showBndr displayType (SBndr bndr) =
   T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optType
   where showBndrId (BinderId bndrId) = show bndrId
         optType = if displayType then " :: " ++ prettyPrintType (binderType bndr)
                                  else ""
-prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
 
 prettyPrintExpr :: Show mv => ExprC mv -> String
 prettyPrintExpr (EVarC bndrId) = show bndrId
@@ -61,7 +95,7 @@ prettyPrintType (TyConApp (TyCon tcName _tcUnique) args) =
                                   else " " ++ intercalate "\n" (map go args)
     go arg = "(" ++ prettyPrintType arg ++ ")"
 prettyPrintType (AppTy _ _) = error "unimplemented"
-prettyPrintType (ForAllTy _ _) = error "unimplemented"
+prettyPrintType (ForAllTy bndr ty) = "forall {" ++ showBndr False bndr ++ "}." ++ prettyPrintType ty
 prettyPrintType LitTy = error "unimplemented"
 prettyPrintType CoercionTy = error "unimplemented"
 
