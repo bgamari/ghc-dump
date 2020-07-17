@@ -54,7 +54,10 @@ data TypeC metavar
   deriving (Show)
 -}
 
+-- These are newtypes instead of types so we can write instances nicely later on
 newtype ChangeBinding = ChangeBinding (BindingC Int Int Int, BindingC Int Int Int)
+newtype ChangeExpr = ChangeExpr (ExprC Int Int Int, ExprC Int Int Int)
+newtype ChangeBndr = ChangeBndr (BndrC Int Int Int, BndrC Int Int Int)
 
 data Oracles = Oracles
   { bndrWcs :: SBinder -> Maybe Int
@@ -127,3 +130,42 @@ oracles bndgA bndgB = Oracles
             subExprs (ELet bindings expr) = concatMap (exprs . snd) bindings ++ exprs expr
             subExprs (ECase match _ alts) = exprs match ++ concatMap (exprs . altRHS) alts
             subExprs _                    = []
+
+-- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
+gcpBinding :: BindingC Int Int Int -> BindingC Int Int Int -> BindingC ChangeBinding ChangeExpr ChangeBndr
+gcpBinding (BindingC bndr expr) (BindingC bndr' expr') =
+  BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
+gcpBinding a b =
+  BindingHole $ ChangeBinding (a, b)
+
+gcpBndr (BndrC bndr) (BndrC bndr')
+  | bndr == bndr' = BndrC bndr 
+gcpBndr a b =
+  BndrHole $ ChangeBndr (a, b)
+
+-- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
+-- But for now we're gonna stay explicit.
+gcpExpr (EVarC var) (EVarC var')
+  | var == var' = EVarC var
+gcpExpr (EVarGlobalC extName) (EVarGlobalC extName')
+  | extName == extName' = EVarGlobalC extName
+gcpExpr (ELitC lit) (ELitC lit')
+  | lit == lit' = ELitC lit
+gcpExpr (EAppC f x) (EAppC f' x') =
+  EAppC (gcpExpr f f') (gcpExpr x x')
+gcpExpr (ETyLamC p b) (ETyLamC p' b') =
+  ETyLamC (gcpBndr p p') (gcpExpr b b')
+gcpExpr (ELamC p b) (ELamC p' b') =
+  ELamC (gcpBndr p p') (gcpExpr b b')
+gcpExpr (ELetC bindings expr) (ELetC bindings' expr')
+  | length bindings == length bindings' = ELetC (zipWith gcpBinding bindings bindings') (gcpExpr expr expr')
+gcpExpr (ECaseC match bndr alts) (ECaseC match' bndr' alts')
+  | length alts == length alts' =
+    ECaseC (gcpExpr match match') (gcpBndr bndr bndr') (zipWith gcpAlt alts alts')
+gcpExpr (ETypeC ty) (ETypeC ty')
+  | ty == ty' = ETypeC ty
+gcpExpr ECoercionC ECoercionC = ECoercionC
+gcpExpr a b = ExprHole $ ChangeExpr (a, b)
+
+-- TODO
+gcpAlt = error "Lazy programmer"

@@ -9,18 +9,18 @@ import qualified Data.Text as T
 
 import CoreDiff.Diff
 
-prettyPrint :: Show mv => BindingC mv mv mv -> String
+-- prettyPrint :: Show mv => BindingC mv mv mv -> String
 prettyPrint (BindingC bndr expr) =
   intercalate "\n" $
     [ prettyPrintBndr True bndr
-    , prettyPrintBndrInfo bndr
-    , prettyPrintBndr False bndr ++ " ="
+    -- , prettyPrintBndr False bndr ++ " ="
+    , "* ="
     , indent 2 (prettyPrintExpr expr)
     ]
 prettyPrint (BindingHole hole) = "#" ++ show hole
 
 -- TODO: look at GhcDump/Convert.hs to achieve close-to-original output
-prettyPrintBndrInfo (BndrC (SBndr bndr)) = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
+prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
   where
     infos =
       [ arity
@@ -42,13 +42,27 @@ prettyPrintBndrInfo (BndrC (SBndr bndr)) = "[" ++ intercalate ", " (catMaybes in
             show' OccOneOcc          = "Once"
             show' (OccLoopBreaker _) = "LoopBreaker" -- TODO: show strong/weak loopbreaker (?)
 
+    unfolding =
+      toMaybe (idiUnfolding bInfo /= NoUnfolding) ("Unf=" ++ showUnfolding (idiUnfolding bInfo))
+      where
+        showUnfolding unf@(CoreUnfolding {}) = "Unf{" ++ intercalate ", " unfInfos ++ "}"
+          where
+            unfInfos =
+              [ "Value=" ++ show (unfIsValue unf)
+              , "ConLike=" ++ show (unfIsConLike unf)
+              , "WorkFree=" ++ show (unfIsWorkFree unf)
+              , "Guidance=" ++ T.unpack (unfGuidance unf)
+              ]
+        showUnfolding e = error $ show e
+
     bInfo = binderIdInfo bndr
     toMaybe test payload
       | test      = Just payload
       | otherwise = Nothing
 
-prettyPrintBndr :: Show mv => Bool -> BndrC mv mv mv -> String
+-- prettyPrintBndr :: Show mv => Bool -> BndrC mv mv mv -> String
 prettyPrintBndr displayType (BndrC bndr) = showBndr displayType bndr
+prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
 
 prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
 
@@ -56,10 +70,10 @@ showBndr :: Bool -> SBinder -> String
 showBndr displayType (SBndr bndr) =
   T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optType
   where showBndrId (BinderId bndrId) = show bndrId
-        optType = if displayType then " :: " ++ prettyPrintType (binderType bndr)
+        optType = if displayType then " " ++ prettyPrintBndrInfo bndr ++ " :: " ++ prettyPrintType (binderType bndr)
                                  else ""
 
-prettyPrintExpr :: Show mv => ExprC mv mv mv -> String
+-- prettyPrintExpr :: Show mv => ExprC mv mv mv -> String
 prettyPrintExpr (EVarC bndrId) = show bndrId
 prettyPrintExpr (EVarGlobalC extName) = prettyPrintExtName extName
 prettyPrintExpr (ELitC lit) = show lit
@@ -100,12 +114,24 @@ prettyPrintType LitTy = error "unimplemented"
 prettyPrintType CoercionTy = error "unimplemented"
 
 instance Show ChangeBinding where
-  show (ChangeBinding (lhs, rhs)) =
-    "(" ++ red (prettyPrint lhs) ++ "/" ++ green (prettyPrint rhs) ++ ")"
-    where red = ansiColor 31
-          green = ansiColor 32
-          ansiColor code str =
-            "\ESC[" ++ show code ++ "m" ++ str ++ "\ESC[0m"
+  show (ChangeBinding (lhs, rhs)) = showChange (prettyPrint lhs) (prettyPrint rhs)
+
+-- TODO: do we need to display types here?
+instance Show ChangeBndr where
+  show (ChangeBndr (lhs, rhs)) = showChange (prettyPrintBndr True lhs) (prettyPrintBndr True rhs)
+
+instance Show ChangeExpr where
+  show (ChangeExpr (lhs, rhs)) = showChange (prettyPrintExpr lhs) (prettyPrintExpr rhs)
+
+-- TODO: use Show term/PrettyPrint term or something
+showChange :: String -> String -> String
+showChange lhs rhs
+  | lhs == rhs = lhs
+  | otherwise = "(" ++ red lhs ++ "/" ++ green rhs ++ ")"
+  where red = ansiColor 31
+        green = ansiColor 32
+        ansiColor code str =
+          "\ESC[" ++ show code ++ "m" ++ str ++ "\ESC[0m"
 
 -- terminals
 

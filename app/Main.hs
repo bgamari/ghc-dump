@@ -39,6 +39,11 @@ main' [binding, pathA, pathB] = do
   let chg = changeBinding (bndrA, exprA) (bndrB, exprB)
   print chg
 
+  putStrLn "GCP:"
+  let ChangeBinding (lhs, rhs) = chg
+  let gcp = gcpBinding lhs rhs
+  putStrLn $ prettyPrint gcp
+
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
 readModFile :: FilePath -> IO SModule
