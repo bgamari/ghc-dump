@@ -13,7 +13,7 @@ data BindingC bindingMv exprMv bndrMv altMv
   deriving (Show)
 
 data ExprC bindingMv exprMv bndrMv altMv
-  = EVarC BinderId
+  = EVarC (BndrC bindingMv exprMv bndrMv altMv)
   | EVarGlobalC ExternalName
   | ELitC Lit
   | EAppC (ExprC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
@@ -21,13 +21,13 @@ data ExprC bindingMv exprMv bndrMv altMv
   | ELamC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
   | ELetC [BindingC bindingMv exprMv bndrMv altMv] (ExprC bindingMv exprMv bndrMv altMv)
   | ECaseC (ExprC bindingMv exprMv bndrMv altMv) (BndrC bindingMv exprMv bndrMv altMv) [AltC bindingMv exprMv bndrMv altMv]
-  | ETypeC SType
+  | ETypeC Type
   | ECoercionC
   | ExprHole exprMv
   deriving (Show)
 
 data BndrC bindingMv exprMv bndrMv altMv
-  = BndrC SBinder
+  = BndrC Binder
   | BndrHole bndrMv
   deriving (Show)
 
@@ -42,7 +42,7 @@ data AltC bindingMv exprMv bndrMv altMv
 
 {-
 data TypeC metavar
-  = VarTyC BinderId
+  = VarTyC (BndrC metavar)
   | FunTyC (TypeC metavar) (TypeC metavar)
   | TyConAppC TyCon [TypeC metavar]
   | AppTyC (TypeC metavar) (TypeC metavar)
@@ -60,38 +60,38 @@ newtype Change t = Change (Holey t, Holey t)
 type Diff t = t (Change BindingC) (Change ExprC) (Change BndrC) (Change AltC)
 
 data Oracles = Oracles
-  { bndrWcs :: SBinder -> Maybe Int
-  , bindingWcs :: (SBinder, SExpr) -> Maybe Int
-  , exprWcs :: SExpr -> Maybe Int
-  , altWcs :: SAlt -> Maybe Int
+  { bndrWcs :: Binder -> Maybe Int
+  , bindingWcs :: (Binder, Expr) -> Maybe Int
+  , exprWcs :: Expr -> Maybe Int
+  , altWcs :: Alt -> Maybe Int
   }
 
-changeBinding :: (SBinder, SExpr) -> (SBinder, SExpr) -> Change BindingC
+changeBinding :: (Binder, Expr) -> (Binder, Expr) -> Change BindingC
 changeBinding bndgA bndgB =
   Change (extractBinding o bndgA, extractBinding o bndgB)
   where
     o = oracles bndgA bndgB
 
 -- TODO: rewrite these three using `maybe`
-extractBinding :: Oracles -> (SBinder, SExpr) -> Holey BindingC
+extractBinding :: Oracles -> (Binder, Expr) -> Holey BindingC
 extractBinding o bndg@(bndr, expr) =
   case bindingWcs o bndg of
     Nothing -> BindingC (extractBndr o bndr) (extractExpr o expr)
     Just hole -> BindingHole hole
 
-extractBndr :: Oracles -> SBinder -> Holey BndrC
+extractBndr :: Oracles -> Binder -> Holey BndrC
 extractBndr o bndr =
   case bndrWcs o bndr of
     Nothing -> BndrC bndr
     Just hole -> BndrHole hole
 
-extractExpr :: Oracles -> SExpr -> Holey ExprC
+extractExpr :: Oracles -> Expr -> Holey ExprC
 extractExpr o expr =
   case exprWcs o expr of
     Just hole -> ExprHole hole
     Nothing -> peel expr
   where
-    peel (EVar v) = EVarC v
+    peel (EVar v) = EVarC (extractBndr o v)
     peel (EVarGlobal v) = EVarGlobalC v
     peel (ELit lit) = ELitC lit
     peel (EApp f x) = EAppC (extractExpr o f) (extractExpr o x)
@@ -102,7 +102,7 @@ extractExpr o expr =
     peel (EType t) = ETypeC t
     peel ECoercion = ECoercionC
 
-extractAlt :: Oracles -> SAlt -> Holey AltC
+extractAlt :: Oracles -> Alt -> Holey AltC
 extractAlt o alt@(Alt con bndrs rhs) =
   case altWcs o alt of
     Just hole -> AltHole hole
@@ -122,7 +122,8 @@ oracles bndgA bndgB = Oracles
       findIndex (== s) $ intersect (p lhs) (p rhs)
 
     binders (bndr, expr) = bndr : concatMap go (exprs expr)
-      where go (ETyLam bndr _)         = [bndr]
+      where go (EVar bndr)             = [bndr]
+            go (ETyLam bndr _)         = [bndr]
             go (ELam bndr _)           = [bndr]
             go (ELet bindings _)       = map fst bindings
             go (ECase _ caseBndr alts) = caseBndr : concatMap altBinders alts
@@ -158,8 +159,7 @@ gcpBndr a b =
 
 -- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
 -- But for now we're gonna stay explicit.
-gcpExpr (EVarC var) (EVarC var')
-  | var == var' = EVarC var
+gcpExpr (EVarC var) (EVarC var') = EVarC $ gcpBndr var var'
 gcpExpr (EVarGlobalC extName) (EVarGlobalC extName')
   | extName == extName' = EVarGlobalC extName
 gcpExpr (ELitC lit) (ELitC lit')

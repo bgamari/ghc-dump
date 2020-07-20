@@ -40,7 +40,7 @@ main' [binding, pathA, pathB] = do
   let (bndrB', exprB') = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
   putStrLn "Change:"
-  let chg = changeBinding (bndrA, exprA) (bndrB, exprB)
+  let chg = changeBinding (bndrA', exprA') (bndrB', exprB')
   print chg
 
   putStrLn "GCP:"
