@@ -51,7 +51,8 @@ build-type:          Simple
 library
   -- Modules exported by the library.
   exposed-modules:     CoreDiff.Diff,
-                       CoreDiff.PrettyPrint
+                       CoreDiff.PrettyPrint,
+                       CoreDiff.Preprocess
 
   -- Modules included in this library but not exported.
   -- other-modules:

@@ -9,6 +9,7 @@ import GhcDump.Ast
 import System.Environment (getArgs)
 
 import CoreDiff.Diff
+import CoreDiff.Preprocess
 import CoreDiff.PrettyPrint
 
 main :: IO ()
@@ -34,6 +35,9 @@ main' [binding, pathA, pathB] = do
 
   putStrLn $ "Binding B (" ++ T.unpack (modulePhase modB) ++ "):"
   print (bndrB, exprB)
+
+  let (bndrA', exprA') = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
+  let (bndrB', exprB') = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
   putStrLn "Change:"
   let chg = changeBinding (bndrA, exprA) (bndrB, exprB)
