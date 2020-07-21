@@ -65,17 +65,15 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
 prettyPrintBndr displayType (BndrC bndr) = showBndr displayType bndr
 prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
 
-prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
-
-showBndr :: Bool -> SBinder -> String
-showBndr displayType (SBndr bndr) =
+showBndr :: Bool -> Binder -> String
+showBndr displayType (Bndr bndr) =
   T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optType
   where showBndrId (BinderId bndrId) = show bndrId
         optType = if displayType then " " ++ prettyPrintBndrInfo bndr ++ " :: " ++ prettyPrintType (binderType bndr)
                                  else ""
 
 -- prettyPrintExpr :: Show mv => ExprC mv mv mv -> String
-prettyPrintExpr (EVarC bndrId) = show bndrId
+prettyPrintExpr (EVarC bndr) = prettyPrintBndr False bndr
 prettyPrintExpr (EVarGlobalC extName) = prettyPrintExtName extName
 prettyPrintExpr (ELitC lit) = show lit
 prettyPrintExpr (EAppC f x) = -- TODO: Type applications
@@ -100,7 +98,7 @@ prettyPrintAlt (AltC con binders rhs) =
   
 prettyPrintAlt (AltHole hole) = "#" ++ show hole
 
-prettyPrintType (VarTy bndrId) = show bndrId
+prettyPrintType (VarTy bndr) = showBndr False bndr
 prettyPrintType (FunTy lhs rhs) =
   parensIf (isFunTy lhs) (prettyPrintType lhs) ++ " -> " ++ parensIf (not $ isFunTy rhs) (prettyPrintType rhs)
   where
