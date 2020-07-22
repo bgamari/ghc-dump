@@ -36,15 +36,10 @@ main' [binding, pathA, pathB] = do
   putStrLn $ "Binding B (" ++ T.unpack (modulePhase modB) ++ "):"
   print (bndrB, exprB)
 
-  let (bndrA', exprA') = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
-  let (bndrB', exprB') = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
-
-  putStrLn "Change:"
-  let chg = changeBinding (bndrA', exprA') (bndrB', exprB')
-  print chg
+  let lhs = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
+  let rhs = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
   putStrLn "GCP:"
-  let Change (lhs, rhs) = chg
   let gcp = gcpBinding lhs rhs
   putStrLn $ prettyPrint gcp
 

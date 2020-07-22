@@ -53,134 +53,48 @@ data TypeC metavar
   deriving (Show)
 -}
 
-type Holey t = t Int Int Int Int
+newtype Change t = Change (t, t)
 
-newtype Change t = Change (Holey t, Holey t)
-
-type Diff t = t (Change BindingC) (Change ExprC) (Change BndrC) (Change AltC)
-
-data Oracles = Oracles
-  { bndrWcs :: Binder -> Maybe Int
-  , bindingWcs :: (Binder, Expr) -> Maybe Int
-  , exprWcs :: Expr -> Maybe Int
-  , altWcs :: Alt -> Maybe Int
-  }
-
-changeBinding :: (Binder, Expr) -> (Binder, Expr) -> Change BindingC
-changeBinding bndgA bndgB =
-  Change (extractBinding o bndgA, extractBinding o bndgB)
-  where
-    o = oracles bndgA bndgB
-
--- TODO: rewrite these three using `maybe`
-extractBinding :: Oracles -> (Binder, Expr) -> Holey BindingC
-extractBinding o bndg@(bndr, expr) =
-  case bindingWcs o bndg of
-    Nothing -> BindingC (extractBndr o bndr) (extractExpr o expr)
-    Just hole -> BindingHole hole
-
-extractBndr :: Oracles -> Binder -> Holey BndrC
-extractBndr o bndr =
-  case bndrWcs o bndr of
-    Nothing -> BndrC bndr
-    Just hole -> BndrHole hole
-
-extractExpr :: Oracles -> Expr -> Holey ExprC
-extractExpr o expr =
-  case exprWcs o expr of
-    Just hole -> ExprHole hole
-    Nothing -> peel expr
-  where
-    peel (EVar v) = EVarC (extractBndr o v)
-    peel (EVarGlobal v) = EVarGlobalC v
-    peel (ELit lit) = ELitC lit
-    peel (EApp f x) = EAppC (extractExpr o f) (extractExpr o x)
-    peel (ETyLam p b) = ETyLamC (extractBndr o p) (extractExpr o b)
-    peel (ELam p b) = ELamC (extractBndr o p) (extractExpr o b)
-    peel (ELet bindings expr) = ELetC (map (extractBinding o) bindings) (extractExpr o expr)
-    peel (ECase match bndr alts) = ECaseC (extractExpr o match) (extractBndr o bndr) (map (extractAlt o) alts)
-    peel (EType t) = ETypeC t
-    peel ECoercion = ECoercionC
-
-extractAlt :: Oracles -> Alt -> Holey AltC
-extractAlt o alt@(Alt con bndrs rhs) =
-  case altWcs o alt of
-    Just hole -> AltHole hole
-    Nothing -> AltC
-      con
-      (map (extractBndr o) bndrs)
-      (extractExpr o rhs)
-
-oracles bndgA bndgB = Oracles
-  { bndrWcs = findCommon binders bndgA bndgB
-  , bindingWcs = findCommon bindings bndgA bndgB
-  , exprWcs = findCommon (exprs . snd) bndgA bndgB
-  , altWcs = findCommon alts bndgA bndgB
-  }
-  where
-    findCommon p lhs rhs s =
-      findIndex (== s) $ intersect (p lhs) (p rhs)
-
-    binders (bndr, expr) = bndr : concatMap go (exprs expr)
-      where go (EVar bndr)             = [bndr]
-            go (ETyLam bndr _)         = [bndr]
-            go (ELam bndr _)           = [bndr]
-            go (ELet bindings _)       = map fst bindings
-            go (ECase _ caseBndr alts) = caseBndr : concatMap altBinders alts
-            go _                       = []
-
-    bindings bndg@(_, expr) = [bndg] ++ concatMap go (exprs expr)
-      where go (ELet bindings _) = bindings
-            go _                 = []
-
-    exprs e = [e] ++ subExprs e
-      where subExprs (EApp f x)           = exprs f ++ exprs x
-            subExprs (ETyLam _ b)         = exprs b
-            subExprs (ELam _ b)           = exprs b
-            subExprs (ELet bindings expr) = concatMap (exprs . snd) bindings ++ exprs expr
-            subExprs (ECase match _ alts) = exprs match ++ concatMap (exprs . altRHS) alts
-            subExprs _                    = []
-
-    alts (_, expr) = concatMap go (exprs expr)
-      where go (ECase _ _ alts) = alts
-            go _                = []
+type Diff t = t (Change (Binder, Expr)) (Change Expr) (Change Binder) (Change Alt)
 
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
-gcpBinding :: Holey BindingC -> Holey BindingC -> Diff BindingC
-gcpBinding (BindingC bndr expr) (BindingC bndr' expr') =
+gcpBinding :: (Binder, Expr) -> (Binder, Expr) -> Diff BindingC
+gcpBinding (bndr, expr) (bndr', expr') =
   BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
+{-
 gcpBinding a b =
   BindingHole $ Change (a, b)
+-}
 
-gcpBndr (BndrC bndr) (BndrC bndr')
+gcpBndr bndr bndr'
   | bndr == bndr' = BndrC bndr 
 gcpBndr a b =
   BndrHole $ Change (a, b)
 
 -- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
 -- But for now we're gonna stay explicit.
-gcpExpr (EVarC var) (EVarC var') = EVarC $ gcpBndr var var'
-gcpExpr (EVarGlobalC extName) (EVarGlobalC extName')
+gcpExpr (EVar var) (EVar var') = EVarC $ gcpBndr var var'
+gcpExpr (EVarGlobal extName) (EVarGlobal extName')
   | extName == extName' = EVarGlobalC extName
-gcpExpr (ELitC lit) (ELitC lit')
+gcpExpr (ELit lit) (ELit lit')
   | lit == lit' = ELitC lit
-gcpExpr (EAppC f x) (EAppC f' x') =
+gcpExpr (EApp f x) (EApp f' x') =
   EAppC (gcpExpr f f') (gcpExpr x x')
-gcpExpr (ETyLamC p b) (ETyLamC p' b') =
+gcpExpr (ETyLam p b) (ETyLam p' b') =
   ETyLamC (gcpBndr p p') (gcpExpr b b')
-gcpExpr (ELamC p b) (ELamC p' b') =
+gcpExpr (ELam p b) (ELam p' b') =
   ELamC (gcpBndr p p') (gcpExpr b b')
-gcpExpr (ELetC bindings expr) (ELetC bindings' expr')
+gcpExpr (ELet bindings expr) (ELet bindings' expr')
   | length bindings == length bindings' = ELetC (zipWith gcpBinding bindings bindings') (gcpExpr expr expr')
-gcpExpr (ECaseC match bndr alts) (ECaseC match' bndr' alts')
+gcpExpr (ECase match bndr alts) (ECase match' bndr' alts')
   | length alts == length alts' =
     ECaseC (gcpExpr match match') (gcpBndr bndr bndr') (zipWith gcpAlt alts alts')
-gcpExpr (ETypeC ty) (ETypeC ty')
+gcpExpr (EType ty) (EType ty')
   | ty == ty' = ETypeC ty
-gcpExpr ECoercionC ECoercionC = ECoercionC
+gcpExpr ECoercion ECoercion = ECoercionC
 gcpExpr a b = ExprHole $ Change (a, b)
 
 -- TODO
-gcpAlt (AltC con bndrs rhs) (AltC con' bndrs' rhs')
+gcpAlt (Alt con bndrs rhs) (Alt con' bndrs' rhs')
   | con == con' = AltC con (zipWith gcpBndr bndrs bndrs') (gcpExpr rhs rhs')
 gcpAlt a b = AltHole $ Change (a, b)

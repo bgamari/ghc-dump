@@ -3,6 +3,7 @@
 
 module CoreDiff.PrettyPrint where
 
+import Unsafe.Coerce
 import Data.Maybe
 import Data.List
 import GhcDump.Ast
@@ -115,9 +116,28 @@ prettyPrintType (ForAllTy bndr ty) = "forall {" ++ showBndr False bndr ++ "}." +
 prettyPrintType LitTy = error "unimplemented"
 prettyPrintType CoercionTy = error "unimplemented"
 
-instance Show (Change BindingC) where
-  show (Change (lhs, rhs)) = showChange (prettyPrint lhs) (prettyPrint rhs)
+instance Show (Change (Binder, Expr)) where
+  show (Change (lhs, rhs)) = showChange (pprBndg lhs) (pprBndg rhs)
+  -- show (lhs, rhs) = showChange (prettyPrint lhs) (prettyPrint rhs)
+instance Show (Change Expr) where
+  show (Change (lhs, rhs)) = showChange (pprExpr lhs) (pprExpr rhs)
+instance Show (Change Binder) where
+  show (Change (lhs, rhs)) = showChange (pprBndr lhs) (pprBndr rhs)
+instance Show (Change Alt) where
+  show (Change (lhs, rhs)) = showChange (show lhs) (show rhs)
 
+pprBndg :: (Binder, Expr) -> String
+pprBndg (bndr, expr) = prettyPrint $ BindingC bndr' expr'
+  where bndr' = unsafeCoerce bndr :: BndrC () () () ()
+        expr' = unsafeCoerce expr :: ExprC () () () ()
+
+pprExpr :: Expr -> String
+pprExpr expr = prettyPrintExpr (unsafeCoerce expr :: ExprC () () () ())
+
+pprBndr :: Binder -> String
+pprBndr bndr = prettyPrintBndr True (BndrC bndr :: BndrC () () () ())
+
+{-
 -- TODO: do we need to display types here?
 instance Show (Change BndrC) where
   show (Change (lhs, rhs)) = showChange (prettyPrintBndr True lhs) (prettyPrintBndr True rhs)
@@ -127,6 +147,7 @@ instance Show (Change ExprC) where
 
 instance Show (Change AltC) where
   show (Change (lhs, rhs)) = showChange (prettyPrintAlt lhs) (prettyPrintAlt rhs)
+-}
 
 -- TODO: use Show term/PrettyPrint term or something
 showChange :: String -> String -> String
