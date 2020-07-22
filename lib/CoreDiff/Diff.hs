@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module CoreDiff.Diff where
 
 import Data.List
@@ -60,20 +62,28 @@ type Diff t = t (Change (Binder, Expr)) (Change Expr) (Change Binder) (Change Al
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
 gcpBinding :: (Binder, Expr) -> (Binder, Expr) -> Diff BindingC
 gcpBinding (bndr, expr) (bndr', expr') =
-  BindingC (gcpBndr bndr bndr') (gcpExpr expr expr')
+  BindingC (gcpBndr Complete bndr bndr') (gcpExpr expr expr')
 {-
 gcpBinding a b =
   BindingHole $ Change (a, b)
 -}
 
-gcpBndr bndr bndr'
+data BndrCmp = NameOnly | Complete
+
+gcpBndr Complete bndr bndr'
   | bndr == bndr' = BndrC bndr 
-gcpBndr a b =
+gcpBndr NameOnly bndr bndr'
+  | bndrName bndr == bndrName bndr' = BndrC bndr
+  where
+    bndrName :: Binder -> T.Text
+    bndrName (Bndr bndr) = binderName bndr <> "_" <> unBinderId (binderId bndr)
+    unBinderId (BinderId uniq) = T.pack $ show uniq
+gcpBndr _ a b =
   BndrHole $ Change (a, b)
 
 -- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
 -- But for now we're gonna stay explicit.
-gcpExpr (EVar var) (EVar var') = EVarC $ gcpBndr var var'
+gcpExpr (EVar var) (EVar var') = EVarC $ gcpBndr NameOnly var var'
 gcpExpr (EVarGlobal extName) (EVarGlobal extName')
   | extName == extName' = EVarGlobalC extName
 gcpExpr (ELit lit) (ELit lit')
@@ -81,14 +91,14 @@ gcpExpr (ELit lit) (ELit lit')
 gcpExpr (EApp f x) (EApp f' x') =
   EAppC (gcpExpr f f') (gcpExpr x x')
 gcpExpr (ETyLam p b) (ETyLam p' b') =
-  ETyLamC (gcpBndr p p') (gcpExpr b b')
+  ETyLamC (gcpBndr Complete p p') (gcpExpr b b')
 gcpExpr (ELam p b) (ELam p' b') =
-  ELamC (gcpBndr p p') (gcpExpr b b')
+  ELamC (gcpBndr Complete p p') (gcpExpr b b')
 gcpExpr (ELet bindings expr) (ELet bindings' expr')
   | length bindings == length bindings' = ELetC (zipWith gcpBinding bindings bindings') (gcpExpr expr expr')
 gcpExpr (ECase match bndr alts) (ECase match' bndr' alts')
   | length alts == length alts' =
-    ECaseC (gcpExpr match match') (gcpBndr bndr bndr') (zipWith gcpAlt alts alts')
+    ECaseC (gcpExpr match match') (gcpBndr Complete bndr bndr') (zipWith gcpAlt alts alts')
 gcpExpr (EType ty) (EType ty')
   | ty == ty' = ETypeC ty
 gcpExpr ECoercion ECoercion = ECoercionC
@@ -96,5 +106,5 @@ gcpExpr a b = ExprHole $ Change (a, b)
 
 -- TODO
 gcpAlt (Alt con bndrs rhs) (Alt con' bndrs' rhs')
-  | con == con' = AltC con (zipWith gcpBndr bndrs bndrs') (gcpExpr rhs rhs')
+  | con == con' = AltC con (zipWith (gcpBndr Complete) bndrs bndrs') (gcpExpr rhs rhs')
 gcpAlt a b = AltHole $ Change (a, b)

@@ -41,7 +41,7 @@ main' [binding, pathA, pathB] = do
 
   putStrLn "GCP:"
   let gcp = gcpBinding lhs rhs
-  putStrLn $ prettyPrint gcp
+  putStrLn $ ppr TopLevel gcp
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 

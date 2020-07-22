@@ -11,15 +11,133 @@ import qualified Data.Text as T
 
 import CoreDiff.Diff
 
--- prettyPrint :: Show mv => BindingC mv mv mv -> String
-prettyPrint (BindingC bndr expr) =
-  intercalate "\n" $
-    [ prettyPrintBndr True bndr
-    -- , prettyPrintBndr False bndr ++ " ="
-    , "* ="
-    , indent 2 (prettyPrintExpr expr)
-    ]
-prettyPrint (BindingHole hole) = "#" ++ show hole
+data PprContext
+  = TopLevel
+  | Variable
+  | ApplicationL
+  | ApplicationR
+  | LambdaParam
+  | LambdaBody
+  | Type
+  | Let -- bindings in a let expr
+  | LetExpr -- the expr in a let expr
+  | CaseMatch
+  | CaseAlt
+  deriving (Eq)
+
+class PrettyPrint t where
+  ppr :: PprContext -> t -> String
+
+instance PrettyPrint (Diff BindingC) where
+  -- TODO: better distinction between toplevel and let binders
+  ppr ctx (BindingC bndr expr) =
+    intercalate "\n" $
+      [ ppr ctx bndr
+      , "* ="
+      , indent 2 $ ppr ctx expr
+      ]
+  -- TODO: BindingHole
+
+instance PrettyPrint (Diff BndrC) where
+  -- TODO: distinguish between toplevel, inline, let, etc. binders
+  ppr ctx (BndrC bndr) = ifp (ctx == CaseAlt) parens $ ppr ctx bndr
+  ppr ctx (BndrHole bndrChg) = ppr ctx bndrChg
+  -- TODO: BndrHole
+
+instance PrettyPrint (Diff ExprC) where
+  ppr ctx (EVarC bndr) = ppr Variable bndr
+
+  ppr ctx (EVarGlobalC extName) = extName'
+    where
+      extName' = T.unpack (getModuleName $ externalModuleName extName) ++ "." ++ T.unpack (externalName extName)
+
+  -- TODO: better show here
+  ppr _ (ELitC lit) = show lit
+
+  -- TODO: type applications
+  ppr ctx (EAppC f x) =
+    ifp (ctx == ApplicationR) parens $
+      ppr ApplicationL f ++ " " ++ ppr ApplicationR x
+
+  ppr ctx (ETyLamC param body) = pprLambda ctx "@" param body
+  ppr ctx (ELamC param body) = pprLambda ctx "" param body
+
+  ppr ctx (ELetC bindings expr) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
+    "let\n" ++ indent 2 (intercalate "\n" $ map (ppr Let) bindings) ++ "\nin\n" ++ indent 2 (ppr LetExpr expr)
+
+  -- TODO: display binder if it appears in any alt
+  ppr ctx (ECaseC match _bndr alts) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
+    "case " ++ ppr CaseMatch match ++ " of\n" ++ indent 2 (intercalate "\n" $ map (ppr CaseAlt) alts)
+
+  -- TODO: make these two prettier
+  ppr ctx (ETypeC ty) = prettyPrintType ty
+
+  ppr _ ECoercionC = error "unimplemented"
+
+  ppr ctx (ExprHole exprChg) = ppr ctx exprChg
+
+instance PrettyPrint (Diff AltC) where
+  ppr ctx (AltC con bndrs rhs) =
+    showAltCon con bndrs ++ " ->\n" ++ indent 2 (ppr CaseAlt rhs)
+
+
+instance PrettyPrint Binder where
+  ppr ctx (Bndr bndr) =
+    T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optInfo
+    where showBndrId (BinderId bndrId) = show bndrId
+          optInfo = if ctx == Variable
+                    then ""
+                    else " " ++ prettyPrintBndrInfo bndr ++ " :: " ++ prettyPrintType (binderType bndr)
+
+-- TODO: this is almost exactly the same as the instance for Diff ExprC
+-- TODO: Do we want to be able to edit them seperately or should the somehow be unified?
+instance PrettyPrint Expr where
+  ppr ctx (EVar bndr) = ppr Variable bndr
+
+  ppr ctx (EVarGlobal extName) = extName'
+    where
+      extName' = T.unpack (getModuleName $ externalModuleName extName) ++ "." ++ T.unpack (externalName extName)
+
+  -- TODO: better show here
+  ppr _ (ELit lit) = show lit
+
+  -- TODO: type applications
+  ppr ctx (EApp f x) =
+    ifp (ctx == ApplicationR) parens $
+      ppr ApplicationL f ++ " " ++ ppr ApplicationR x
+
+  ppr ctx (ETyLam param body) = pprLambda ctx "@" param body
+  ppr ctx (ELam param body) = pprLambda ctx "" param body
+
+  ppr ctx (ELet bindings expr) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
+    "let\n" ++ indent 2 (intercalate "\n" $ map (ppr Let) bindings) ++ "\nin\n" ++ indent 2 (ppr LetExpr expr)
+
+  -- TODO: display binder if it appears in any alt
+  ppr ctx (ECase match _bndr alts) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
+    "case " ++ ppr CaseMatch match ++ " of\n" ++ indent 2 (intercalate "\n" $ map (ppr CaseAlt) alts)
+
+  ppr ctx (EType ty) = prettyPrintType ty
+
+  ppr _ ECoercion = error "unimplemented"
+
+
+instance PrettyPrint (Binder, Expr) where
+  -- TODO: better distinction between toplevel and let binders
+  ppr ctx (bndr, expr) =
+    intercalate "\n" $
+      [ ppr ctx bndr
+      , "* ="
+      , indent 2 $ ppr ctx expr
+      ]
+
+instance PrettyPrint Alt where
+  ppr ctx (Alt con bndrs rhs) =
+    showAltCon con bndrs ++ " ->\n" ++ indent 2 (ppr CaseAlt rhs)
+
+-- TODO: replace by more specific instances, e.g. Change Binder
+-- TODO: alternatively, char-by-char classical diff
+instance PrettyPrint t => PrettyPrint (Change t) where
+  ppr ctx (Change (lhs, rhs)) = showChange (ppr ctx lhs) (ppr ctx rhs)
 
 -- TODO: look at GhcDump/Convert.hs to achieve close-to-original output
 prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
@@ -27,7 +145,9 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
     infos =
       [ arity
       , strictness
+      , demand
       , occurences
+      , unfolding
       ]
 
     arity =
@@ -38,6 +158,9 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
     strictness =
       toMaybe (idiStrictnessSig bInfo /= "") ("Str=" ++ T.unpack (idiStrictnessSig bInfo))
 
+    demand =
+      toMaybe (idiDemandSig bInfo /= "") ("Dmd=" ++ T.unpack (idiDemandSig bInfo))
+
     occurences = Just $ "Occ=" ++ show' (idiOccInfo bInfo)
       where show' OccManyOccs        = "Many"
             show' OccDead            = "Dead"
@@ -47,6 +170,9 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
     unfolding =
       toMaybe (idiUnfolding bInfo /= NoUnfolding) ("Unf=" ++ showUnfolding (idiUnfolding bInfo))
       where
+        showUnfolding (BootUnfolding) = "BootUnfolding"
+        showUnfolding (OtherCon _) = "OtherCon"
+        showUnfolding (DFunUnfolding) = "OtherCon"
         showUnfolding unf@(CoreUnfolding {}) = "Unf{" ++ intercalate ", " unfInfos ++ "}"
           where
             unfInfos =
@@ -55,53 +181,15 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
               , "WorkFree=" ++ show (unfIsWorkFree unf)
               , "Guidance=" ++ T.unpack (unfGuidance unf)
               ]
-        showUnfolding e = error $ show e
 
     bInfo = binderIdInfo bndr
     toMaybe test payload
       | test      = Just payload
       | otherwise = Nothing
 
--- prettyPrintBndr :: Show mv => Bool -> BndrC mv mv mv -> String
-prettyPrintBndr displayType (BndrC bndr) = showBndr displayType bndr
-prettyPrintBndr _ (BndrHole hole) = "#" ++ show hole
-
-showBndr :: Bool -> Binder -> String
-showBndr displayType (Bndr bndr) =
-  T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optType
-  where showBndrId (BinderId bndrId) = show bndrId
-        optType = if displayType then " " ++ prettyPrintBndrInfo bndr ++ " :: " ++ prettyPrintType (binderType bndr)
-                                 else ""
-
--- prettyPrintExpr :: Show mv => ExprC mv mv mv -> String
-prettyPrintExpr (EVarC bndr) = prettyPrintBndr False bndr
-prettyPrintExpr (EVarGlobalC extName) = prettyPrintExtName extName
-prettyPrintExpr (ELitC lit) = show lit
-prettyPrintExpr (EAppC f x) = -- TODO: Type applications
-  parensIf (not $ isApp f) (prettyPrintExpr f) ++ " " ++ parensIf (isApp x) (prettyPrintExpr x)
-  where
-    isApp (EAppC _ _) = True
-    isApp _           = False
-prettyPrintExpr (ETyLamC param body) =
-  "\\@" ++ prettyPrintBndr False param ++ " ->\n" ++ indent 2 (prettyPrintExpr body)
-prettyPrintExpr (ELamC param body) =
-  "\\" ++ prettyPrintBndr True param ++ " ->\n" ++ indent 2 (prettyPrintExpr body)
-prettyPrintExpr (ELetC bindings expr) =
-  "let\n" ++ indent 2 (intercalate "\n" $ map prettyPrint bindings) ++ "\nin\n" ++ prettyPrintExpr expr
-prettyPrintExpr (ECaseC match _ alts) =
-  "case " ++ prettyPrintExpr match ++ " of\n" ++ indent 2 (intercalate "\n" $ map prettyPrintAlt alts)
-prettyPrintExpr (ETypeC ty) = prettyPrintType ty
-prettyPrintExpr ECoercionC = error "unimplemented"
-prettyPrintExpr (ExprHole hole) = "#" ++ show hole
-
-prettyPrintAlt (AltC con binders rhs) =
-  intercalate " " (show con : map (prettyPrintBndr True) binders) ++" ->\n" ++ indent 2 (prettyPrintExpr rhs)
-  
-prettyPrintAlt (AltHole hole) = "#" ++ show hole
-
-prettyPrintType (VarTy bndr) = showBndr False bndr
+prettyPrintType (VarTy bndr) = ppr Variable bndr
 prettyPrintType (FunTy lhs rhs) =
-  parensIf (isFunTy lhs) (prettyPrintType lhs) ++ " -> " ++ parensIf (not $ isFunTy rhs) (prettyPrintType rhs)
+  ifp (isFunTy lhs) parens $ (prettyPrintType lhs) ++ " -> " ++ ifp (not $ isFunTy rhs) parens (prettyPrintType rhs)
   where
     isFunTy (FunTy _ _) = True
     isFunTy _           = False
@@ -112,57 +200,18 @@ prettyPrintType (TyConApp (TyCon tcName _tcUnique) args) =
                                   else " " ++ intercalate "\n" (map go args)
     go arg = "(" ++ prettyPrintType arg ++ ")"
 prettyPrintType (AppTy _ _) = error "unimplemented"
-prettyPrintType (ForAllTy bndr ty) = "forall {" ++ showBndr False bndr ++ "}." ++ prettyPrintType ty
+prettyPrintType (ForAllTy bndr ty) = "forall {" ++ ppr Type bndr ++ "}." ++ prettyPrintType ty
 prettyPrintType LitTy = error "unimplemented"
 prettyPrintType CoercionTy = error "unimplemented"
-
-instance Show (Change (Binder, Expr)) where
-  show (Change (lhs, rhs)) = showChange (pprBndg lhs) (pprBndg rhs)
-  -- show (lhs, rhs) = showChange (prettyPrint lhs) (prettyPrint rhs)
-instance Show (Change Expr) where
-  show (Change (lhs, rhs)) = showChange (pprExpr lhs) (pprExpr rhs)
-instance Show (Change Binder) where
-  show (Change (lhs, rhs)) = showChange (pprBndr lhs) (pprBndr rhs)
-instance Show (Change Alt) where
-  show (Change (lhs, rhs)) = showChange (show lhs) (show rhs)
-
-pprBndg :: (Binder, Expr) -> String
-pprBndg (bndr, expr) = prettyPrint $ BindingC bndr' expr'
-  where bndr' = unsafeCoerce bndr :: BndrC () () () ()
-        expr' = unsafeCoerce expr :: ExprC () () () ()
-
-pprExpr :: Expr -> String
-pprExpr expr = prettyPrintExpr (unsafeCoerce expr :: ExprC () () () ())
-
-pprBndr :: Binder -> String
-pprBndr bndr = prettyPrintBndr True (BndrC bndr :: BndrC () () () ())
-
-{-
--- TODO: do we need to display types here?
-instance Show (Change BndrC) where
-  show (Change (lhs, rhs)) = showChange (prettyPrintBndr True lhs) (prettyPrintBndr True rhs)
-
-instance Show (Change ExprC) where
-  show (Change (lhs, rhs)) = showChange (prettyPrintExpr lhs) (prettyPrintExpr rhs)
-
-instance Show (Change AltC) where
-  show (Change (lhs, rhs)) = showChange (prettyPrintAlt lhs) (prettyPrintAlt rhs)
--}
 
 -- TODO: use Show term/PrettyPrint term or something
 showChange :: String -> String -> String
 showChange lhs rhs
-  | lhs == rhs = lhs
-  | otherwise = "(" ++ red lhs ++ "/" ++ green rhs ++ ")"
+  | otherwise = "#(" ++ red lhs ++ "/" ++ green rhs ++ ")"
   where red = ansiColor 31
         green = ansiColor 32
         ansiColor code str =
           "\ESC[" ++ show code ++ "m" ++ str ++ "\ESC[0m"
-
--- terminals
-
-prettyPrintExtName extName =
-  T.unpack (getModuleName $ externalModuleName extName) ++ "." ++ T.unpack (externalName extName)
 
 -- utilities
 
@@ -170,5 +219,22 @@ indent :: Int -> String -> String
 indent n = unlines . map go . lines 
   where go str = replicate n ' ' ++ str
 
-parensIf True str = "(" ++ str ++")"
-parensIf False str = str
+ifp :: Bool -> (a -> a) -> a -> a
+ifp p f x
+  | p = f x
+  | otherwise = x
+
+parens s = "(" ++ s ++ ")"
+
+pprLambda ctx prefix param body =
+  -- TODO: multi-argument functions
+  ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
+    "\\" ++ prefix ++ ppr LambdaParam param ++ " ->\n" ++ indent 2 (ppr LambdaBody body)
+
+showAltCon :: PrettyPrint a => AltCon -> [a] -> String
+showAltCon con bndrs = ifp (length bndrs /= 0) (++ (" " ++ intercalate " " (map (ppr CaseAlt) bndrs))) (showCon con)
+  where
+    -- TODO: is this alright?
+    showCon (AltDataCon conName) = T.unpack conName
+    showCon (AltLit lit) = show lit
+    showCon (AltDefault) = "DEFAULT"
