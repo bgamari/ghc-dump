@@ -4,11 +4,13 @@
 module CoreDiff.Preprocess where
 
 import Control.Monad.State.Lazy -- TODO: is Lazy important/bad here?
+import Control.Monad.Reader
 import Data.List
 import Unsafe.Coerce
 import qualified Data.Text as T
-
 import GhcDump.Ast
+
+import CoreDiff.Diff
 
 -- Converting SExpr to Expr, SBndr to Binder, etc.
 
@@ -138,3 +140,70 @@ instance DeBruijn Alt where
     binders' <- mapM dbi binders
     rhs' <- dbi rhs
     return $ Alt con binders' rhs'
+
+-- Un-De-Bruijn terms after diffing:
+
+class UnDeBruijn a where
+  undoDeBruijn :: a -> Reader [Binder] a
+  undoDeBruijn = udb
+  udb :: a -> Reader [Binder] a
+
+instance UnDeBruijn (Binder, Expr) where
+  udb (bndr, expr) = (,) <$> udb bndr <*> udb expr
+
+instance UnDeBruijn Binder where
+  udb (Bndr bndr) = do
+    binders <- ask
+    let Bndr named = binders !! index
+    return $ Bndr $ bndr { binderName = binderName named, binderId = binderId named }
+    where BinderId (Unique 'b' index) = binderId bndr
+
+instance UnDeBruijn Expr where
+  udb (EVar v) = EVar <$> udb v
+  udb (EVarGlobal extName) = return $ EVarGlobal extName
+  udb (ELit lit) = return $ ELit lit
+  udb (EApp f x) = EApp <$> udb f <*> udb x
+  udb (ETyLam p b) = ETyLam <$> udb p <*> udb b
+  udb (ELam p b) = ELam <$> udb p <*> udb b
+  udb (ELet bindings expr) = ELet <$> mapM udb bindings <*> udb expr
+  udb (ECase match bndr alts) = ECase <$> udb match <*> udb bndr <*> mapM udb alts
+  udb (EType ty) = return $ EType ty
+  udb (ECoercion) = return $ ECoercion
+
+instance UnDeBruijn Alt where
+  udb (Alt con binders rhs) = Alt con <$> mapM udb binders <*> udb rhs
+
+-- change instance
+
+instance UnDeBruijn t => UnDeBruijn (Change t) where
+  udb (Change (lhs, rhs)) = do
+    lhs' <- udb lhs
+    rhs' <- udb rhs
+    return $ Change (lhs', rhs')
+
+-- diff instances
+
+instance UnDeBruijn (Diff BindingC) where
+  udb (BindingC bndr expr) = BindingC <$> udb bndr <*> udb expr
+  udb (BindingHole bndgChg) = BindingHole <$> udb bndgChg
+
+instance UnDeBruijn (Diff BndrC) where
+  udb (BndrC bndr) = BndrC <$> udb bndr
+  udb (BndrHole bndrChg) = BndrHole <$> udb bndrChg
+
+instance UnDeBruijn (Diff ExprC) where
+  udb (EVarC v) = EVarC <$> udb v
+  udb (EVarGlobalC extName) = return $ EVarGlobalC extName
+  udb (ELitC lit) = return $ ELitC lit
+  udb (EAppC f x) = EAppC <$> udb f <*> udb x
+  udb (ETyLamC p b) = ETyLamC <$> udb p <*> udb b
+  udb (ELamC p b) = ELamC <$> udb p <*> udb b
+  udb (ELetC bindings expr) = ELetC <$> mapM udb bindings <*> udb expr
+  udb (ECaseC match bndr alts) = ECaseC <$> udb match <*> udb bndr <*> mapM udb alts
+  udb (ETypeC ty) = return $ ETypeC ty
+  udb (ECoercionC) = return $ ECoercionC
+  udb (ExprHole exprChg) = ExprHole <$> udb exprChg
+
+instance UnDeBruijn (Diff AltC) where
+  udb (AltC con binders rhs) = AltC con <$> mapM udb binders <*> udb rhs
+  udb (AltHole altChg) = AltHole <$> udb altChg

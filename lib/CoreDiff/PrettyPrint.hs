@@ -207,7 +207,7 @@ prettyPrintType CoercionTy = error "unimplemented"
 -- TODO: use Show term/PrettyPrint term or something
 showChange :: String -> String -> String
 showChange lhs rhs
-  | otherwise = "#(" ++ red lhs ++ "/" ++ green rhs ++ ")"
+  | otherwise = "#( " ++ red lhs ++ "\n / " ++ green rhs ++ "\n )"
   where red = ansiColor 31
         green = ansiColor 32
         ansiColor code str =

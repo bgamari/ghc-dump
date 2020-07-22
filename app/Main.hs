@@ -3,6 +3,7 @@ module Main where
 import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
 import Control.Monad.State.Lazy
+import Control.Monad.Reader
 import Data.List (find)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
@@ -36,7 +37,7 @@ main' [binding, pathA, pathB] = do
   let rhs@(bb, _) = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
 
-  -- TODO: maybe include global env?
+  -- TODO: include global binders
   putStrLn "LHS:"
   print lhs
   let (lhs', lhsBinders) = runState (deBruijnIndex lhs) [ba]
@@ -50,7 +51,25 @@ main' [binding, pathA, pathB] = do
   let gcp = gcpBinding lhs' rhs'
   putStrLn $ ppr TopLevel gcp
 
+  putStrLn "Fixed GCP:"
+  -- Currently undoDeBruijn favors lhsBinders for binders that appeared in both terms
+  -- There is probably a bug in there i'm not seeing
+  --
+  -- Example: \y.\x.x  //  \y.\a.(a y)
+  --          \0.\1.1  //  \0.\1.(1 0)
+  -- Would yield:   \y.\x.(x/a y) would show a even tho its not defined
+  -- It should be:  \y.\x.(x/x y) or, when rhsBinders is preferred: \y.\a.(a/a y)
+  -- Solution: Somehow check for structural binder equality on-the-fly
+  -- Alternatively: only substitute the names back, hacky but works
+  let allBinders = extendIfShorter lhsBinders rhsBinders
+  let gcp' = runReader (undoDeBruijn gcp) (allBinders)
+  putStrLn $ ppr TopLevel gcp'
+
 main' _ = putStrLn "Incorrect number of arguments, aborting."
+
+
+extendIfShorter lb rb = lb ++ drop (length lb) rb
+
 
 readModFile :: FilePath -> IO SModule
 readModFile path = deserialise <$> BSL.readFile path
