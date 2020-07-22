@@ -1,9 +1,16 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module CoreDiff.Preprocess where
 
+import Control.Monad.State.Lazy -- TODO: is Lazy important/bad here?
 import Data.List
 import Unsafe.Coerce
+import qualified Data.Text as T
 
 import GhcDump.Ast
+
+-- Converting SExpr to Expr, SBndr to Binder, etc.
 
 sexprToExpr :: [Binder] -> SExpr -> Expr
 sexprToExpr = go
@@ -73,3 +80,61 @@ lookupBndrId :: BinderId -> [Binder] -> Binder
 lookupBndrId id = fromJust . find go
   where go bndr = id == binderId (unBndr bndr)
         fromJust (Just x) = x
+
+-- Calculate De-Bruijn index for terms
+
+class DeBruijn a where
+  dbi :: a -> State [Binder] a
+  
+  deBruijnIndex :: a -> State [Binder] a
+  deBruijnIndex = dbi
+
+instance DeBruijn Binder where
+  dbi wrapper@(Bndr bndr) = do
+    bndrs <- get
+    let dbId = BinderId $ Unique 'b' $ fromJust $ findIndex (== wrapper) bndrs
+    return $ Bndr $ bndr { binderName = "", binderId = dbId }
+    where fromJust (Just x) = x
+          fromJust Nothing = error $ T.unpack $ binderUniqueName wrapper
+
+-- Doesn't take care of making sure that bndr appears in the binders for expr
+-- Code that handles top-level bindings/bindings in let takes care of that
+instance DeBruijn (Binder, Expr) where
+  dbi (bndr, expr) = (,) <$> dbi bndr <*> dbi expr
+  -- This is all kinds of cool and point-free but i feel like do would be a little clearer
+
+instance DeBruijn Expr where
+  dbi (EVar v) = EVar <$> dbi v
+  dbi (EVarGlobal extName) = return $ EVarGlobal extName
+  dbi (ELit lit) = return $ ELit lit
+  dbi (EApp f x) = EApp <$> dbi f <*> dbi x
+  dbi (ETyLam param body) = do
+    modify (++ [param])
+    param' <- dbi param
+    body' <- dbi body
+    return $ ETyLam param' body'
+  dbi (ELam param body) = do
+    modify (++ [param])
+    param' <- dbi param
+    body' <- dbi body
+    return $ ELam param' body'
+  dbi (ELet bindings expr) = do
+    modify (++ (map fst bindings))
+    bindings' <- mapM dbi bindings
+    expr' <- dbi expr
+    return $ ELet bindings' expr'
+  dbi (ECase match bndr alts) = do
+    match' <- dbi match
+    modify (++ [bndr])
+    bndr' <- dbi bndr
+    alts' <- mapM dbi alts
+    return $ ECase match' bndr' alts'
+  dbi (EType ty) = return $ EType ty
+  dbi (ECoercion) = return ECoercion
+
+instance DeBruijn Alt where
+  dbi (Alt con binders rhs) = do
+    modify (++ binders)
+    binders' <- mapM dbi binders
+    rhs' <- dbi rhs
+    return $ Alt con binders' rhs'

@@ -2,6 +2,7 @@ module Main where
 
 import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
+import Control.Monad.State.Lazy
 import Data.List (find)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
@@ -24,23 +25,29 @@ main' [binding, pathA, pathB] = do
   let Just (bndrB, _statsB, exprB) = lookupBinding binding modB
 
   {-
-  putStrLn $ "Binder of " ++ binding ++ " in " ++ pathA ++ ":"
-  print bndrA
-  putStrLn $ "Binder of " ++ binding ++ " in " ++ pathB ++ ":"
-  print bndrB
-  -}
-
   putStrLn $ "Binding A (" ++ T.unpack (modulePhase modA) ++ "):"
   print (bndrA, exprA)
 
   putStrLn $ "Binding B (" ++ T.unpack (modulePhase modB) ++ "):"
   print (bndrB, exprB)
+  -}
 
-  let lhs = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
-  let rhs = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
+  let lhs@(ba, _) = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
+  let rhs@(bb, _) = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
+
+
+  -- TODO: maybe include global env?
+  putStrLn "LHS:"
+  print lhs
+  let (lhs', lhsBinders) = runState (deBruijnIndex lhs) [ba]
+  print lhs'
+  putStrLn "RHS:"
+  print rhs
+  let (rhs', rhsBinders) = runState (deBruijnIndex rhs) [bb]
+  print rhs'
 
   putStrLn "GCP:"
-  let gcp = gcpBinding lhs rhs
+  let gcp = gcpBinding lhs' rhs'
   putStrLn $ ppr TopLevel gcp
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
