@@ -47,11 +47,11 @@ main' [binding, pathA, pathB] = do
   let (rhs', rhsBinders) = runState (deBruijnIndex rhs) [bb]
   print rhs'
 
-  putStrLn "GCP:"
+  putStrLn "GCP (De-Bruijn indexed terms):"
   let gcp = gcpBinding lhs' rhs'
   putStrLn $ ppr TopLevel gcp
 
-  putStrLn "Fixed GCP:"
+  putStrLn "Fixed GCP (Binder names resubstituted):"
   -- Currently undoDeBruijn favors lhsBinders for binders that appeared in both terms
   -- There is probably a bug in there i'm not seeing
   --
