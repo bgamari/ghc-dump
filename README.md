@@ -38,7 +38,7 @@ Dump GHC Core programs using `ghc-dump-core`, e.g.:
 ```bash
 # ./demos contains a few files I use for testing
 # $GHC points to the version of GHC you want to use
-$GHC -fplugin GhcDump.Plugin demos/Maths.hs
+$GHC -fplugin GhcDump.Plugin -O2 demos/Maths.hs
 ```
 
 Compare two passes or two completely different files in the top-level binding `square`:
