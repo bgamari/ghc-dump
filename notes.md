@@ -55,3 +55,11 @@ another (hacky) solution would be to convert variables that refer to global bind
 stuff like `GHC.* (Numinstance) Float a b` often gets converted into stuff like `GHC.timesFloat a b`.
 The diffs look pretty horrible because no diffs are summarized yet.
 See Maths2/cube from 0001 to 0002 for an example.
+
+## TODO
+
+- [ ] module diffen pairing ausdenken
+- [ ] ghc-dump-util compilen
+- [ ] corediff file1:bndr file2:bndr'
+- [ ] rausfloaten mal anschauen (expr -> let ... in expr')
+- [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen
