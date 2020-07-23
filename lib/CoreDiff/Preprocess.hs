@@ -57,7 +57,7 @@ sbinderToBinder env (SBndr (bndr@Binder {})) = Bndr $ bndr
 sbinderToBinder env (SBndr (bndr@TyBinder {})) = Bndr $ bndr
   { binderKind = kind'
   }
-  where kind' = stypeToType env $ binderType bndr
+  where kind' = stypeToType env $ binderKind bndr
 
 saltToAlt env alt = alt { altBinders = binders', altRHS = rhs' }
   where

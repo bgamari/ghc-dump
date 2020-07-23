@@ -83,11 +83,11 @@ instance PrettyPrint (Diff AltC) where
 
 instance PrettyPrint Binder where
   ppr ctx (Bndr bndr) =
-    T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optInfo
+    T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optInfo bndr
     where showBndrId (BinderId bndrId) = show bndrId
-          optInfo = if ctx == Variable
-                    then ""
-                    else " " ++ prettyPrintBndrInfo bndr ++ " :: " ++ prettyPrintType (binderType bndr)
+          optInfo _ | ctx == Variable = ""
+          optInfo (Binder _ _ idi _ ty) = " " ++ prettyPrintIdInfo idi ++ " :: " ++ prettyPrintType ty
+          optInfo (TyBinder _ _ kind) = " :: " ++ prettyPrintType kind
 
 -- TODO: this is almost exactly the same as the instance for Diff ExprC
 -- TODO: Do we want to be able to edit them seperately or should the somehow be unified?
@@ -140,7 +140,7 @@ instance PrettyPrint t => PrettyPrint (Change t) where
   ppr ctx (Change (lhs, rhs)) = showChange (ppr ctx lhs) (ppr ctx rhs)
 
 -- TODO: look at GhcDump/Convert.hs to achieve close-to-original output
-prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
+prettyPrintIdInfo bInfo = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
   where
     infos =
       [ arity
@@ -182,7 +182,6 @@ prettyPrintBndrInfo bndr = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
               , "Guidance=" ++ T.unpack (unfGuidance unf)
               ]
 
-    bInfo = binderIdInfo bndr
     toMaybe test payload
       | test      = Just payload
       | otherwise = Nothing
