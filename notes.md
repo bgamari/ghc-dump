@@ -62,4 +62,6 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [ ] ghc-dump-util compilen
 - [ ] corediff file1:bndr file2:bndr'
 - [ ] rausfloaten mal anschauen (expr -> let ... in expr')
-- [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen
+- [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
+- [ ] Coolen erweiterbaren AST einbauen
+- [ ] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
