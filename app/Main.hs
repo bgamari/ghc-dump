@@ -10,7 +10,7 @@ import qualified Data.Text as T
 import GhcDump.Ast
 import System.Environment (getArgs)
 
-import CoreDiff.Diff
+import qualified CoreDiff.XAst as XAst
 import CoreDiff.Preprocess
 import CoreDiff.PrettyPrint
 
@@ -33,37 +33,16 @@ main' [binding, pathA, pathB] = do
   print (bndrB, exprB)
   -}
 
-  let lhs@(ba, _) = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
-  let rhs@(bb, _) = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
+  -- TODO: this is already implemented in ghc-dump-util. (reconModule)
+  let lhs = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
+  let rhs = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
+  let lhs' = XAst.cvtBinding lhs
+  let rhs' = XAst.cvtBinding rhs
 
-  -- TODO: include global binders
-  putStrLn "LHS:"
-  print lhs
-  let (lhs', lhsBinders) = runState (deBruijnIndex lhs) [ba]
   print lhs'
-  putStrLn "RHS:"
-  print rhs
-  let (rhs', rhsBinders) = runState (deBruijnIndex rhs) [bb]
   print rhs'
 
-  putStrLn "GCP (De-Bruijn indexed terms):"
-  let gcp = gcpBinding lhs' rhs'
-  putStrLn $ ppr TopLevel gcp
-
-  putStrLn "Fixed GCP (Binder names resubstituted):"
-  -- Currently undoDeBruijn favors lhsBinders for binders that appeared in both terms
-  -- There is probably a bug in there i'm not seeing
-  --
-  -- Example: \y.\x.x  //  \y.\a.(a y)
-  --          \0.\1.1  //  \0.\1.(1 0)
-  -- Would yield:   \y.\x.(x/a y) would show a even tho its not defined
-  -- It should be:  \y.\x.(x/x y) or, when rhsBinders is preferred: \y.\a.(a/a y)
-  -- Solution: Somehow check for structural binder equality on-the-fly
-  -- Alternatively: only substitute the names back, hacky but works
-  let allBinders = extendIfShorter lhsBinders rhsBinders
-  let gcp' = runReader (undoDeBruijn gcp) (allBinders)
-  putStrLn $ ppr TopLevel gcp'
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
