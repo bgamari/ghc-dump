@@ -1,8 +1,22 @@
 # de bruijn method
 
 de-bruijning two terms will fail in some situations.
-I had an example in mind which turned out to be a symptom of the GCP-function.
-I guess I'll have to think some more.
+
+Example:
+
+```
+Inputs:
+
+\y.(\x.x) (\x.x)
+\y.y (\x.x)
+
+De-Bruijn:
+
+\0.(\1.1) (\2.2)
+\0.0 (\1.1)
+```
+
+These terms should not mark the argument of the function call as different!
 
 # diffing let expressions
 
@@ -65,3 +79,4 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
 - [ ] Coolen erweiterbaren AST einbauen
 - [ ] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
+- [ ] Alternativen zu De-Bruijn-Indizes testen
