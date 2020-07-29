@@ -32,16 +32,16 @@ class PprOpts a where
 
 
 instance PprOpts (XBinding a) where
-  ppr (XBinding binder@(XBinder (Bndr b@Binder{})) expr) = do
+  ppr (XBinding binder@XBinder{} expr) = do
     typeSig <- pprTypeSig binder
-    idInfo <- pprIdInfo $ binderIdInfo b
+    idInfo <- pprIdInfo $ xBinderIdInfo binder
     binderDoc <- ppr binder
     exprDoc <- ppr expr
     let assignment = hang' (binderDoc <+> equals) 2 exprDoc
 
     return $ typeSig <$$> idInfo <$$> assignment
 
-  ppr (XBinding binder@(XBinder (Bndr TyBinder{})) expr) = do
+  ppr (XBinding binder@XTyBinder{} expr) = do
     binderDoc <- ppr binder
     exprDoc <- ppr expr
     let assignment = hang' (binderDoc <+> equals) 2 (exprDoc)
@@ -56,24 +56,21 @@ pprIdInfo idi = return "TODO"
 
 
 pprTypeSig :: XBinder a -> Reader PprOptions Doc
-pprTypeSig b@(XBinder (Bndr binder)) = do
-  binderDoc <- ppr b
-  typeDoc <- ppr $ binderType binder -- TODO: move somewhere nice.
+pprTypeSig binder@XBinder{} = do
+  binderDoc <- ppr binder
+  typeDoc <- ppr $ xBinderType binder -- TODO: move somewhere nice.
 
   return $ binderDoc <+> dcolon <+> align typeDoc
 
 
 instance PprOpts (XBinder a) where
-  ppr (XBinder binder) = pprBinder binder
+  ppr binder = do
+    opts <- ask
+    if pprShowUniques opts then
+      return $ text $ T.unpack $ xBinderUniqueName binder
+    else
+      return $ text $ T.unpack $ xBinderName binder
   -- TODO: pprBinder (XXBinder ...
-
-pprBinder :: Binder -> Reader PprOptions Doc
-pprBinder binder@(Bndr b) = do
-  opts <- ask
-  if pprShowUniques opts then
-    return $ text $ T.unpack $ binderUniqueName binder
-  else
-    return $ text $ T.unpack $ binderName b
 
 
 instance PprOpts (XExpr a) where
@@ -165,7 +162,7 @@ pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
 
-instance PprOpts Type where
+instance PprOpts (XType a) where
   ppr = pprType' TopPrec
 
 
@@ -176,23 +173,23 @@ data TyPrec
   | TyConPrec
   deriving (Eq, Ord)
 
-pprType' :: TyPrec -> Type -> Reader PprOptions Doc
-pprType' _    (VarTy binder) = pprBinder binder
-pprType' prec t@FunTy{} = do
+pprType' :: TyPrec -> (XType a) -> Reader PprOptions Doc
+pprType' _    (XVarTy binder) = ppr binder
+pprType' prec t@XFunTy{} = do
   funTyDocs <- mapM (pprType' FunPrec) funTys
   return $ maybeParens (prec >= FunPrec) $ sep $ punctuate " ->" funTyDocs
   where funTys = collectFunTys t
 -- TODO: special types like [], (,), etc.
-pprType' _    (TyConApp tyCon []) = return $ pprTyCon tyCon
-pprType' prec (TyConApp tyCon tys) = do
+pprType' _    (XTyConApp tyCon []) = return $ pprTyCon tyCon
+pprType' prec (XTyConApp tyCon tys) = do
   tyDocs <- mapM (pprType' TyConPrec) tys
   return $ maybeParens (prec >= FunPrec) $ pprTyCon tyCon <+> hsep tyDocs
-pprType' prec (AppTy f x) = do
+pprType' prec (XAppTy f x) = do
   fDoc <- pprType' TyConPrec f
   xDoc <- pprType' TyConPrec x
   return $ maybeParens (prec >= TyConPrec) $ fDoc <+> xDoc
-pprType' prec t@ForAllTy{} = do
-  let binderDocs = map (text . show) binders
+pprType' prec t@XForAllTy{} = do
+  binderDocs <- mapM ppr binders
   tyDoc <- ppr ty
   return $ maybeParens (prec >= TyOpPrec) $ "forall" <+> hsep binderDocs <> dot <+> tyDoc
   where
@@ -228,12 +225,12 @@ collectBinders = go []
   where go acc (XLam p b) = go (p : acc) b
         go acc expr       = (reverse acc, expr)
 
-collectFunTys :: Type -> [Type]
+collectFunTys :: XType a -> [XType a]
 collectFunTys = go []
-  where go acc (FunTy l r) = go (l : acc) r
+  where go acc (XFunTy l r) = go (l : acc) r
         go acc ty          = reverse acc ++ [ty] -- <=> reverse (ty : acc)
 
-collectForAlls :: Type -> ([Binder], Type)
+collectForAlls :: XType a -> ([XBinder a], XType a)
 collectForAlls = go []
-  where go acc (ForAllTy binder ty) = go (binder : acc) ty
+  where go acc (XForAllTy binder ty) = go (binder : acc) ty
         go acc ty                   = (reverse acc, ty)
