@@ -1,239 +1,239 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
+-- Contains a lot of code from GhcDump.Ast
 module CoreDiff.PrettyPrint where
 
-import Unsafe.Coerce
-import Data.Maybe
-import Data.List
-import GhcDump.Ast
+import Control.Monad.Reader
+import Data.Ratio
+import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
+import GhcDump.Ast
+-- Extension of functional pretty-printer presented in
+-- https://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf
+-- Provides means to output ANSI color codes
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
-import CoreDiff.Diff
+import CoreDiff.XAst
 
-data PprContext
-  = TopLevel
-  | Variable
-  | ApplicationL
-  | ApplicationR
-  | LambdaParam
-  | LambdaBody
-  | Type
-  | Let -- bindings in a let expr
-  | LetExpr -- the expr in a let expr
-  | CaseMatch
-  | CaseAlt
-  deriving (Eq)
+data PprOptions = PprOptions
+  { pprShowUniques :: Bool
+  }
 
-class PrettyPrint t where
-  ppr :: PprContext -> t -> String
-
-instance PrettyPrint (Diff BindingC) where
-  -- TODO: better distinction between toplevel and let binders
-  ppr ctx (BindingC bndr expr) =
-    intercalate "\n" $
-      [ ppr ctx bndr
-      , "* ="
-      , indent 2 $ ppr ctx expr
-      ]
-  -- TODO: BindingHole
-
-instance PrettyPrint (Diff BndrC) where
-  -- TODO: distinguish between toplevel, inline, let, etc. binders
-  ppr ctx (BndrC bndr) = ifp (ctx == CaseAlt) parens $ ppr ctx bndr
-  ppr ctx (BndrHole bndrChg) = ppr ctx bndrChg
-  -- TODO: BndrHole
-
-instance PrettyPrint (Diff ExprC) where
-  ppr ctx (EVarC bndr) = ppr Variable bndr
-
-  ppr ctx (EVarGlobalC extName) = extName'
-    where
-      extName' = T.unpack (getModuleName $ externalModuleName extName) ++ "." ++ T.unpack (externalName extName)
-
-  -- TODO: better show here
-  ppr _ (ELitC lit) = show lit
-
-  -- TODO: type applications
-  ppr ctx (EAppC f x) =
-    ifp (ctx == ApplicationR) parens $
-      ppr ApplicationL f ++ " " ++ ppr ApplicationR x
-
-  ppr ctx (ETyLamC param body) = pprLambda ctx "@" param body
-  ppr ctx (ELamC param body) = pprLambda ctx "" param body
-
-  ppr ctx (ELetC bindings expr) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
-    "let\n" ++ indent 2 (intercalate "\n" $ map (ppr Let) bindings) ++ "\nin\n" ++ indent 2 (ppr LetExpr expr)
-
-  -- TODO: display binder if it appears in any alt
-  ppr ctx (ECaseC match _bndr alts) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
-    "case " ++ ppr CaseMatch match ++ " of\n" ++ indent 2 (intercalate "\n" $ map (ppr CaseAlt) alts)
-
-  -- TODO: make these two prettier
-  ppr ctx (ETypeC ty) = prettyPrintType ty
-
-  ppr _ ECoercionC = error "unimplemented"
-
-  ppr ctx (ExprHole exprChg) = ppr ctx exprChg
-
-instance PrettyPrint (Diff AltC) where
-  ppr ctx (AltC con bndrs rhs) =
-    showAltCon con bndrs ++ " ->\n" ++ indent 2 (ppr CaseAlt rhs)
+pprDefaultOpts = PprOptions
+  { pprShowUniques = True
+  }
 
 
-instance PrettyPrint Binder where
-  ppr ctx (Bndr bndr) =
-    T.unpack (binderName bndr) ++ "_" ++ showBndrId (binderId bndr) ++ optInfo bndr
-    where showBndrId (BinderId bndrId) = show bndrId
-          optInfo _ | ctx == Variable = ""
-          optInfo (Binder _ _ idi _ ty) = " " ++ prettyPrintIdInfo idi ++ " :: " ++ prettyPrintType ty
-          optInfo (TyBinder _ _ kind) = " :: " ++ prettyPrintType kind
-
--- TODO: this is almost exactly the same as the instance for Diff ExprC
--- TODO: Do we want to be able to edit them seperately or should the somehow be unified?
-instance PrettyPrint Expr where
-  ppr ctx (EVar bndr) = ppr Variable bndr
-
-  ppr ctx (EVarGlobal extName) = extName'
-    where
-      extName' = T.unpack (getModuleName $ externalModuleName extName) ++ "." ++ T.unpack (externalName extName)
-
-  -- TODO: better show here
-  ppr _ (ELit lit) = show lit
-
-  -- TODO: type applications
-  ppr ctx (EApp f x) =
-    ifp (ctx == ApplicationR) parens $
-      ppr ApplicationL f ++ " " ++ ppr ApplicationR x
-
-  ppr ctx (ETyLam param body) = pprLambda ctx "@" param body
-  ppr ctx (ELam param body) = pprLambda ctx "" param body
-
-  ppr ctx (ELet bindings expr) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
-    "let\n" ++ indent 2 (intercalate "\n" $ map (ppr Let) bindings) ++ "\nin\n" ++ indent 2 (ppr LetExpr expr)
-
-  -- TODO: display binder if it appears in any alt
-  ppr ctx (ECase match _bndr alts) = ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
-    "case " ++ ppr CaseMatch match ++ " of\n" ++ indent 2 (intercalate "\n" $ map (ppr CaseAlt) alts)
-
-  ppr ctx (EType ty) = prettyPrintType ty
-
-  ppr _ ECoercion = error "unimplemented"
+class PprOpts a where
+  ppr :: a -> Reader PprOptions Doc
 
 
-instance PrettyPrint (Binder, Expr) where
-  -- TODO: better distinction between toplevel and let binders
-  ppr ctx (bndr, expr) =
-    intercalate "\n" $
-      [ ppr ctx bndr
-      , "* ="
-      , indent 2 $ ppr ctx expr
-      ]
+instance PprOpts (XBinding a) where
+  ppr (XBinding binder@(XBinder (Bndr b@Binder{})) expr) = do
+    typeSig <- pprTypeSig binder
+    idInfo <- pprIdInfo $ binderIdInfo b
+    binderDoc <- ppr binder
+    exprDoc <- ppr expr
+    let assignment = hang' (binderDoc <+> equals) 2 exprDoc
 
-instance PrettyPrint Alt where
-  ppr ctx (Alt con bndrs rhs) =
-    showAltCon con bndrs ++ " ->\n" ++ indent 2 (ppr CaseAlt rhs)
+    return $ typeSig <$$> idInfo <$$> assignment
 
--- TODO: replace by more specific instances, e.g. Change Binder
--- TODO: alternatively, char-by-char classical diff
-instance PrettyPrint t => PrettyPrint (Change t) where
-  ppr ctx (Change (lhs, rhs)) = showChange (ppr ctx lhs) (ppr ctx rhs)
+  ppr (XBinding binder@(XBinder (Bndr TyBinder{})) expr) = do
+    binderDoc <- ppr binder
+    exprDoc <- ppr expr
+    let assignment = hang' (binderDoc <+> equals) 2 (exprDoc)
 
--- TODO: look at GhcDump/Convert.hs to achieve close-to-original output
-prettyPrintIdInfo bInfo = "[" ++ intercalate ", " (catMaybes infos) ++ "]"
+    return assignment
+
+  -- TODO: XXBinding
+
+pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
+pprIdInfo idi = return "TODO"
+-- TODO
+
+
+pprTypeSig :: XBinder a -> Reader PprOptions Doc
+pprTypeSig b@(XBinder (Bndr binder)) = do
+  binderDoc <- ppr b
+  typeDoc <- ppr $ binderType binder -- TODO: move somewhere nice.
+
+  return $ binderDoc <+> dcolon <+> align typeDoc
+
+
+instance PprOpts (XBinder a) where
+  ppr (XBinder binder) = pprBinder binder
+  -- TODO: pprBinder (XXBinder ...
+
+pprBinder :: Binder -> Reader PprOptions Doc
+pprBinder binder@(Bndr b) = do
+  opts <- ask
+  if pprShowUniques opts then
+    return $ text $ T.unpack $ binderUniqueName binder
+  else
+    return $ text $ T.unpack $ binderName b
+
+
+instance PprOpts (XExpr a) where
+  ppr = pprExpr False
+
+pprExpr :: Bool -> XExpr a -> Reader PprOptions Doc
+pprExpr _ (XVar binder) = ppr binder
+pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
+pprExpr _ (XLit lit) = return $ pprLit lit
+pprExpr _ (XCoercion) = return "CO"
+pprExpr parens expr = maybeParens parens <$> pprExpr' expr
+
+pprExpr' expr@(XApp{}) = do
+  fDoc <- pprExpr True f
+  argDocs <- mapM (pprExpr True) args
+
+  return $ hang' fDoc 2 (sep argDocs)
   where
-    infos =
-      [ arity
-      , strictness
-      , demand
-      , occurences
-      , unfolding
-      ]
+    (f, args) = collectArguments expr
 
-    arity =
-      if idiArity bInfo == 0
-      then Nothing
-      else Just $ "Arity=" ++ show (idiArity bInfo)
+pprExpr' expr@(XTyLam{}) = do
+  paramDocs <- mapM ppr params
+  bodyDoc <- pprExpr False body
 
-    strictness =
-      toMaybe (idiStrictnessSig bInfo /= "") ("Str=" ++ T.unpack (idiStrictnessSig bInfo))
+  return $ hang' ("\\@" <+> sep paramDocs <+> "->") 2 bodyDoc
+  where (params, body) = collectTyBinders expr
 
-    demand =
-      toMaybe (idiDemandSig bInfo /= "") ("Dmd=" ++ T.unpack (idiDemandSig bInfo))
+pprExpr' expr@(XLam{}) = do
+  paramDocs <- mapM ppr params
+  bodyDoc <- pprExpr False body
 
-    occurences = Just $ "Occ=" ++ show' (idiOccInfo bInfo)
-      where show' OccManyOccs        = "Many"
-            show' OccDead            = "Dead"
-            show' OccOneOcc          = "Once"
-            show' (OccLoopBreaker _) = "LoopBreaker" -- TODO: show strong/weak loopbreaker (?)
+  return $ hang' ("\\" <+> sep paramDocs <+> "->") 2 bodyDoc
+  where (params, body) = collectBinders expr
 
-    unfolding =
-      toMaybe (idiUnfolding bInfo /= NoUnfolding) ("Unf=" ++ showUnfolding (idiUnfolding bInfo))
-      where
-        showUnfolding (BootUnfolding) = "BootUnfolding"
-        showUnfolding (OtherCon _) = "OtherCon"
-        showUnfolding (DFunUnfolding) = "OtherCon"
-        showUnfolding unf@(CoreUnfolding {}) = "Unf{" ++ intercalate ", " unfInfos ++ "}"
-          where
-            unfInfos =
-              [ "Value=" ++ show (unfIsValue unf)
-              , "ConLike=" ++ show (unfIsConLike unf)
-              , "WorkFree=" ++ show (unfIsWorkFree unf)
-              , "Guidance=" ++ T.unpack (unfGuidance unf)
-              ]
+pprExpr' (XLet bindings body) = do
+  bindingDocs <- mapM ppr bindings
+  bodyDoc <- pprExpr False body
+  return $ "let" <+> (align $ vcat $ bindingDocs) <$$> "in" <+> align bodyDoc
 
-    toMaybe test payload
-      | test      = Just payload
-      | otherwise = Nothing
+pprExpr' (XCase match binder alts) = do
+  matchDoc <- pprExpr False match
+  binderDoc <- ppr binder
+  altDocs <- mapM ppr alts
 
-prettyPrintType (VarTy bndr) = ppr Variable bndr
-prettyPrintType (FunTy lhs rhs) =
-  ifp (isFunTy lhs) parens $ (prettyPrintType lhs) ++ " -> " ++ ifp (not $ isFunTy rhs) parens (prettyPrintType rhs)
+  return $ sep [ sep [ "case" <+> matchDoc
+                     , "of" <+> binderDoc <+> "{"
+                     ]
+               , indent 2 $ vcat $ altDocs
+               , "}"
+               ]
+
+pprExpr' (XType ty) = do
+  tyDoc <- ppr ty
+
+  return $ "TYPE:" <+> tyDoc
+
+
+instance PprOpts (XAlt a) where
+  ppr (XAlt con binders rhs) = do
+    binderDocs <- mapM ppr binders
+    rhsDoc <- pprExpr False rhs
+    
+    return $ hang' (hsep (pprAltCon con : binderDocs) <+> "->") 2 rhsDoc
+
+
+pprExtName extName@ExternalName{} =
+  modName <> dot <> varName
   where
-    isFunTy (FunTy _ _) = True
-    isFunTy _           = False
-prettyPrintType (TyConApp (TyCon tcName _tcUnique) args) =
-  T.unpack tcName ++ optArgs
+    modName = text $ T.unpack $ getModuleName $ externalModuleName extName
+    varName = text $ T.unpack $ externalName extName
+pprExtName ForeignCall = "<foreign>"
+
+pprLit (MachChar c) = squotes $ pretty c
+pprLit (MachStr s) = dquotes $ text $ BS.unpack s
+pprLit (MachNullAddr) = "nullAddr#"
+pprLit (MachInt i) = pretty i <> "#"
+pprLit (MachInt64 i) = pretty i <> "#"
+pprLit (MachWord w) = pretty w <> "#"
+pprLit (MachWord64 w) = pretty w <> "##"
+pprLit (MachFloat f) = "FLOAT" <> parens (pprRational f)
+pprLit (MachDouble d) = "DOUBLE" <> parens (pprRational d)
+pprLit (MachLabel l) = "LABEL" <> parens (text $ T.unpack l)
+pprLit (LitInteger i) = pretty i
+
+pprRational r = pretty (numerator r) <> "/" <> pretty (denominator r)
+
+pprAltCon (AltDataCon t) = text $ T.unpack t  
+pprAltCon (AltLit l) = pprLit l
+pprAltCon (AltDefault) = "DEFAULT"
+
+
+instance PprOpts Type where
+  ppr = pprType' TopPrec
+
+
+data TyPrec
+  = TopPrec
+  | FunPrec
+  | TyOpPrec
+  | TyConPrec
+  deriving (Eq, Ord)
+
+pprType' :: TyPrec -> Type -> Reader PprOptions Doc
+pprType' _    (VarTy binder) = pprBinder binder
+pprType' prec t@FunTy{} = do
+  funTyDocs <- mapM (pprType' FunPrec) funTys
+  return $ maybeParens (prec >= FunPrec) $ sep $ punctuate " ->" funTyDocs
+  where funTys = collectFunTys t
+-- TODO: special types like [], (,), etc.
+pprType' _    (TyConApp tyCon []) = return $ pprTyCon tyCon
+pprType' prec (TyConApp tyCon tys) = do
+  tyDocs <- mapM (pprType' TyConPrec) tys
+  return $ maybeParens (prec >= FunPrec) $ pprTyCon tyCon <+> hsep tyDocs
+pprType' prec (AppTy f x) = do
+  fDoc <- pprType' TyConPrec f
+  xDoc <- pprType' TyConPrec x
+  return $ maybeParens (prec >= TyConPrec) $ fDoc <+> xDoc
+pprType' prec t@ForAllTy{} = do
+  let binderDocs = map (text . show) binders
+  tyDoc <- ppr ty
+  return $ maybeParens (prec >= TyOpPrec) $ "forall" <+> hsep binderDocs <> dot <+> tyDoc
   where
-    optArgs = if length args == 0 then ""
-                                  else " " ++ intercalate "\n" (map go args)
-    go arg = "(" ++ prettyPrintType arg ++ ")"
-prettyPrintType (AppTy _ _) = error "unimplemented"
-prettyPrintType (ForAllTy bndr ty) = "forall {" ++ ppr Type bndr ++ "}." ++ prettyPrintType ty
-prettyPrintType LitTy = error "unimplemented"
-prettyPrintType CoercionTy = error "unimplemented"
+    (binders, ty) = collectForAlls t
 
--- TODO: use Show term/PrettyPrint term or something
-showChange :: String -> String -> String
-showChange lhs rhs
-  | otherwise = "#( " ++ red lhs ++ "\n / " ++ green rhs ++ "\n )"
-  where red = ansiColor 31
-        green = ansiColor 32
-        ansiColor code str =
-          "\ESC[" ++ show code ++ "m" ++ str ++ "\ESC[0m"
+pprType' _ _ = return "TODO"
+-- TODO
 
--- utilities
+pprTyCon (TyCon t _) = text $ T.unpack t
 
-indent :: Int -> String -> String
-indent n = unlines . map go . lines 
-  where go str = replicate n ' ' ++ str
+-- some helpers
 
-ifp :: Bool -> (a -> a) -> a -> a
-ifp p f x
-  | p = f x
-  | otherwise = x
+dcolon :: Doc
+dcolon = "::"
 
-parens s = "(" ++ s ++ ")"
+maybeParens True = parens
+maybeParens False = id
 
-pprLambda ctx prefix param body =
-  -- TODO: multi-argument functions
-  ifp (ctx `elem` [ApplicationL, ApplicationR]) parens $
-    "\\" ++ prefix ++ ppr LambdaParam param ++ " ->\n" ++ indent 2 (ppr LambdaBody body)
+hang' l i r = hang i $ sep [l, r]
 
-showAltCon :: PrettyPrint a => AltCon -> [a] -> String
-showAltCon con bndrs = ifp (length bndrs /= 0) (++ (" " ++ intercalate " " (map (ppr CaseAlt) bndrs))) (showCon con)
-  where
-    -- TODO: is this alright?
-    showCon (AltDataCon conName) = T.unpack conName
-    showCon (AltLit lit) = show lit
-    showCon (AltDefault) = "DEFAULT"
+collectArguments :: XExpr a -> (XExpr a, [XExpr a])
+collectArguments = go []
+  where go acc (XApp f x) = go (x : acc) f
+        go acc expr       = (expr, acc)
+
+collectTyBinders :: XExpr a -> ([XBinder a], XExpr a)
+collectTyBinders = go []
+  where go acc (XTyLam p b) = go (p : acc) b
+        go acc expr       = (reverse acc, expr)
+
+collectBinders :: XExpr a -> ([XBinder a], XExpr a)
+collectBinders = go []
+  where go acc (XLam p b) = go (p : acc) b
+        go acc expr       = (reverse acc, expr)
+
+collectFunTys :: Type -> [Type]
+collectFunTys = go []
+  where go acc (FunTy l r) = go (l : acc) r
+        go acc ty          = reverse acc ++ [ty] -- <=> reverse (ty : acc)
+
+collectForAlls :: Type -> ([Binder], Type)
+collectForAlls = go []
+  where go acc (ForAllTy binder ty) = go (binder : acc) ty
+        go acc ty                   = (reverse acc, ty)

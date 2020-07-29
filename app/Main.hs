@@ -2,7 +2,6 @@ module Main where
 
 import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
-import Control.Monad.State.Lazy
 import Control.Monad.Reader
 import Data.List (find)
 import qualified Data.ByteString.Lazy as BSL
@@ -40,8 +39,8 @@ main' [binding, pathA, pathB] = do
   let lhs' = XAst.cvtBinding lhs
   let rhs' = XAst.cvtBinding rhs
 
-  print lhs'
-  print rhs'
+  print $ runReader (ppr lhs') (pprDefaultOpts { pprShowUniques = False })
+  print $ runReader (ppr rhs') pprDefaultOpts
 
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
