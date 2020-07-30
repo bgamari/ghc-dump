@@ -3,6 +3,7 @@ module Main where
 import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
 import Control.Monad.Reader
+import Control.Monad.State
 import Data.List (find)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
@@ -33,14 +34,14 @@ main' [binding, pathA, pathB] = do
   -}
 
   -- TODO: this is already implemented in ghc-dump-util. (reconModule)
-  let lhs = (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
-  let rhs = (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
+  let lhs@(XAst.XBinding lhsBinder _) = XAst.cvtBinding (sbinderToBinder [] bndrA, sexprToExpr [] exprA)
+  let rhs@(XAst.XBinding rhsBinder _) = XAst.cvtBinding (sbinderToBinder [] bndrB, sexprToExpr [] exprB)
 
-  let lhs' = XAst.cvtBinding lhs
-  let rhs' = XAst.cvtBinding rhs
+  let (dbLhs, lhsBinders) = runState (deBruijnIndex lhs) [lhsBinder]
+  let (dbRhs, rhsBinders) = runState (deBruijnIndex rhs) [rhsBinder]
 
-  print $ runReader (ppr lhs') (pprDefaultOpts { pprShowUniques = False })
-  print $ runReader (ppr rhs') pprDefaultOpts
+  print $ runReader (ppr dbLhs) pprDefaultOpts
+  print $ runReader (ppr dbRhs) pprDefaultOpts
 
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."

@@ -4,6 +4,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- https://www.microsoft.com/en-us/research/uploads/prod/2016/11/trees-that-grow.pdf
@@ -64,6 +65,12 @@ data XType (a :: Variant)
   | XLitTy
   | XCoercionTy
   | XXType (XTypeExtension a)
+
+deriving instance ForAllExtensions Eq a => Eq (XBinding a)
+deriving instance ForAllExtensions Eq a => Eq (XBinder a)
+deriving instance ForAllExtensions Eq a => Eq (XExpr a)
+deriving instance ForAllExtensions Eq a => Eq (XAlt a)
+deriving instance ForAllExtensions Eq a => Eq (XType a)
 
 -- UD: Undecorated, "normal" expression without extension.
 -- Diff: Additional constructor for (Expr, Expr) holes.

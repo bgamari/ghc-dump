@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -10,7 +11,7 @@ import Unsafe.Coerce
 import qualified Data.Text as T
 import GhcDump.Ast
 
-import CoreDiff.Diff
+import CoreDiff.XAst
 
 -- Converting SExpr to Expr, SBndr to Binder, etc.
 
@@ -86,61 +87,84 @@ lookupBndrId id = fromJust . find go
 -- Calculate De-Bruijn index for terms
 
 class DeBruijn a where
-  dbi :: a -> State [Binder] a
+  dbi :: a -> State [XBinder UD] a
   
-  deBruijnIndex :: a -> State [Binder] a
+  deBruijnIndex :: a -> State [XBinder UD] a
   deBruijnIndex = dbi
 
-instance DeBruijn Binder where
-  dbi wrapper@(Bndr bndr) = do
-    bndrs <- get
-    let dbId = BinderId $ Unique 'b' $ fromJust $ findIndex (== wrapper) bndrs
-    return $ Bndr $ bndr { binderName = "", binderId = dbId }
-    where fromJust (Just x) = x
-          fromJust Nothing = error $ T.unpack $ binderUniqueName wrapper
 
 -- Doesn't take care of making sure that bndr appears in the binders for expr
 -- Code that handles top-level bindings/bindings in let takes care of that
-instance DeBruijn (Binder, Expr) where
-  dbi (bndr, expr) = (,) <$> dbi bndr <*> dbi expr
+instance DeBruijn (XBinding UD) where
+  dbi (XBinding binder expr) = XBinding <$> dbi binder <*> dbi expr
   -- This is all kinds of cool and point-free but i feel like do would be a little clearer
 
-instance DeBruijn Expr where
-  dbi (EVar v) = EVar <$> dbi v
-  dbi (EVarGlobal extName) = return $ EVarGlobal extName
-  dbi (ELit lit) = return $ ELit lit
-  dbi (EApp f x) = EApp <$> dbi f <*> dbi x
-  dbi (ETyLam param body) = do
+instance DeBruijn (XBinder UD) where
+  dbi binder@XBinder{} = do
+    binders <- get
+    let dbId = BinderId $ Unique 'b' $ fromJust $ findIndex (== binder) binders
+    dbType <- dbi $ xBinderType binder
+    return $ binder { xBinderName = "", xBinderId = dbId, xBinderType = dbType }
+    where fromJust (Just x) = x
+          fromJust Nothing = error $ T.unpack $ xBinderUniqueName binder
+  dbi binder@XTyBinder{} = do
+    binders <- get
+    let dbId = BinderId $ Unique 'b' $ fromJust $ findIndex (== binder) binders
+    dbKind <- dbi $ xBinderKind binder
+    return $ binder { xBinderName = "", xBinderId = dbId, xBinderKind = dbKind }
+    where fromJust (Just x) = x
+          fromJust Nothing = error $ T.unpack $ xBinderUniqueName binder
+-- TODO: reduce code duplication
+
+instance DeBruijn (XExpr UD) where
+  dbi (XVar binder) = XVar <$> dbi binder
+  dbi (XVarGlobal extName) = return $ XVarGlobal extName
+  dbi (XLit lit) = return $ XLit lit
+  dbi (XApp f x) = XApp <$> dbi f <*> dbi x
+  dbi (XTyLam param body) = do
     modify (++ [param])
     param' <- dbi param
     body' <- dbi body
-    return $ ETyLam param' body'
-  dbi (ELam param body) = do
+    return $ XTyLam param' body'
+  dbi (XLam param body) = do
     modify (++ [param])
     param' <- dbi param
     body' <- dbi body
-    return $ ELam param' body'
-  dbi (ELet bindings expr) = do
-    modify (++ (map fst bindings))
+    return $ XLam param' body'
+  dbi (XLet bindings expr) = do
+    modify (++ map go bindings)
     bindings' <- mapM dbi bindings
     expr' <- dbi expr
-    return $ ELet bindings' expr'
-  dbi (ECase match bndr alts) = do
+    return $ XLet bindings' expr'
+    where go (XBinding binder _) = binder
+  dbi (XCase match bndr alts) = do
     match' <- dbi match
     modify (++ [bndr])
     bndr' <- dbi bndr
     alts' <- mapM dbi alts
-    return $ ECase match' bndr' alts'
-  dbi (EType ty) = return $ EType ty
-  dbi (ECoercion) = return ECoercion
+    return $ XCase match' bndr' alts'
+  dbi (XType ty) = XType <$> dbi ty
+  dbi (XCoercion) = return XCoercion
 
-instance DeBruijn Alt where
-  dbi (Alt con binders rhs) = do
+instance DeBruijn (XAlt UD) where
+  dbi (XAlt con binders rhs) = do
     modify (++ binders)
     binders' <- mapM dbi binders
     rhs' <- dbi rhs
-    return $ Alt con binders' rhs'
+    return $ XAlt con binders' rhs'
 
+instance DeBruijn (XType UD) where
+  dbi (XVarTy binder) = XVarTy <$> dbi binder
+  dbi (XFunTy l r) = XFunTy <$> dbi l <*> dbi r
+  dbi (XTyConApp tc args) = XTyConApp tc <$> mapM dbi args
+  dbi (XAppTy f x) = XAppTy <$> dbi f <*> dbi x
+  dbi (XForAllTy binder ty) = do
+    modify (++ [binder])
+    XForAllTy <$> dbi binder <*> dbi ty
+  dbi (XLitTy) = return $ XLitTy
+  dbi (XCoercionTy) = return $ XCoercionTy
+
+{-
 -- Un-De-Bruijn terms after diffing:
 
 class UnDeBruijn a where
@@ -207,3 +231,4 @@ instance UnDeBruijn (Diff ExprC) where
 instance UnDeBruijn (Diff AltC) where
   udb (AltC con binders rhs) = AltC con <$> mapM udb binders <*> udb rhs
   udb (AltHole altChg) = AltHole <$> udb altChg
+-}
