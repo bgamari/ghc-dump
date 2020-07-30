@@ -18,6 +18,12 @@ De-Bruijn:
 
 These terms should not mark the argument of the function call as different!
 
+## possible solution
+
+- Traverse both terms simultaneously, pair up corresponding binders, translate one of them into the "binder universe" of the other
+- diff stuff!
+- profit
+
 # diffing let expressions
 
 using the GCP function from AEATSD isnt great for diffing lets:
