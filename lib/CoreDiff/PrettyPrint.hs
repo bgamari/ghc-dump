@@ -9,6 +9,7 @@ module CoreDiff.PrettyPrint where
 
 import Control.Monad.Reader
 import qualified Data.ByteString.Char8 as BS
+import Data.Maybe
 import Data.Ratio
 import qualified Data.Text as T
 import Data.Void
@@ -65,9 +66,9 @@ instance ForAllExtensions PprOpts a => PprOpts (XBinder a) where
   ppr binder = do
     opts <- ask
     if pprShowUniques opts then
-      return $ text $ T.unpack $ xBinderUniqueName binder
+      return $ pretty$ xBinderUniqueName binder
     else
-      return $ text $ T.unpack $ xBinderName binder
+      return $ pretty $ xBinderName binder
   ppr (XXBinder extension) = ppr extension
 
 
@@ -190,8 +191,8 @@ instance PprOpts x => PprOpts (Change x) where
 pprExtName extName@ExternalName{} =
   modName <> dot <> varName
   where
-    modName = text $ T.unpack $ getModuleName $ externalModuleName extName
-    varName = text $ T.unpack $ externalName extName
+    modName = pretty $ getModuleName $ externalModuleName extName
+    varName = pretty $ externalName extName
 pprExtName ForeignCall = "<foreign>"
 
 pprLit (MachChar c) = squotes $ pretty c
@@ -203,19 +204,48 @@ pprLit (MachWord w) = pretty w <> "#"
 pprLit (MachWord64 w) = pretty w <> "##"
 pprLit (MachFloat f) = "FLOAT" <> parens (pprRational f)
 pprLit (MachDouble d) = "DOUBLE" <> parens (pprRational d)
-pprLit (MachLabel l) = "LABEL" <> parens (text $ T.unpack l)
+pprLit (MachLabel l) = "LABEL" <> parens (pretty l)
 pprLit (LitInteger i) = pretty i
 
 pprRational r = pretty (numerator r) <> "/" <> pretty (denominator r)
 
-pprAltCon (AltDataCon t) = text $ T.unpack t  
+pprAltCon (AltDataCon t) = pretty t  
 pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
 pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
-pprIdInfo idi = return "TODO"
+pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
+  -- TODO: don't show empty fields
+  [ Just $ "arity=" <> pretty (idiArity idi)
+  , Just $ "inline=" <> pretty (idiInlinePragma idi)
+  , Just $ "occ=" <> pretty (idiOccInfo idi)
+  , Just $ "str=" <> pretty (idiStrictnessSig idi)
+  , Just $ "dmd=" <> pretty (idiDemandSig idi)
+  , Just $ "call-arity=" <> pretty (idiCallArity idi)
+  , Just $ "unfolding=" <> pretty (idiUnfolding idi)
+  , toMaybe (idiIsOneShot idi) "one-shot"
+  ]
+  where toMaybe True x = Just x
+        toMaybe _    _ = Nothing
 
-pprTyCon (TyCon t _) = text $ T.unpack t
+instance Pretty T.Text where
+  pretty = text . T.unpack
+
+instance Pretty (Unfolding Binder Binder) where
+  pretty NoUnfolding = "NoUnfolding"
+  pretty BootUnfolding = "BootUnfolding"
+  pretty OtherCon{} = "OtherCon"
+  pretty DFunUnfolding = "DFunUnfolding"
+  pretty CoreUnfolding{} = "CoreUnf{..}"
+
+instance Pretty OccInfo where
+    pretty OccManyOccs = "Many"
+    pretty OccDead = "Dead"
+    pretty OccOneOcc = "One"
+    pretty (OccLoopBreaker strong) =
+      if strong then "Strong Loopbrk" else "Weak Loopbrk"
+
+pprTyCon (TyCon t _) = pretty t
 
 -- some helpers
 
