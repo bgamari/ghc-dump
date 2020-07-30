@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE KindSignatures #-}
@@ -11,6 +12,7 @@
 module CoreDiff.XAst where
 
 import qualified Data.Text as T
+import Data.Kind (Constraint)
 import Data.Void (Void)
 import GhcDump.Ast
 
@@ -86,6 +88,17 @@ type family XAltExtension a where
 type family XTypeExtension a where
   XTypeExtension UD = Void
   XTypeExtension Diff = Change (XType UD)
+
+
+-- makes signatures of instances a little shorter
+type ForAllExtensions (constr :: * -> Constraint) a =
+  ( constr (XBindingExtension a)
+  , constr (XBinderExtension a)
+  , constr (XExprExtension a)
+  , constr (XAltExtension a)
+  , constr (XTypeExtension a)
+  )
+
 
 newtype Change a = Change (a, a)
 

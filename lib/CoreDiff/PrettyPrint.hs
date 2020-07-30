@@ -2,14 +2,16 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- Contains a lot of code from GhcDump.Ast
 module CoreDiff.PrettyPrint where
 
 import Control.Monad.Reader
-import Data.Ratio
 import qualified Data.ByteString.Char8 as BS
+import Data.Ratio
 import qualified Data.Text as T
+import Data.Void
 import GhcDump.Ast
 -- Extension of functional pretty-printer presented in
 -- https://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf
@@ -31,7 +33,7 @@ class PprOpts a where
   ppr :: a -> Reader PprOptions Doc
 
 
-instance PprOpts (XBinding a) where
+instance ForAllExtensions PprOpts a => PprOpts (XBinding a) where
   ppr (XBinding binder@XBinder{} expr) = do
     typeSig <- pprTypeSig binder
     idInfo <- pprIdInfo $ xBinderIdInfo binder
@@ -48,39 +50,36 @@ instance PprOpts (XBinding a) where
 
     return assignment
 
-  -- TODO: XXBinding
-
-pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
-pprIdInfo idi = return "TODO"
--- TODO
+  ppr (XXBinding extension) = ppr extension
 
 
-pprTypeSig :: XBinder a -> Reader PprOptions Doc
+pprTypeSig :: ForAllExtensions PprOpts a => XBinder a -> Reader PprOptions Doc
 pprTypeSig binder@XBinder{} = do
   binderDoc <- ppr binder
-  typeDoc <- ppr $ xBinderType binder -- TODO: move somewhere nice.
+  typeDoc <- ppr $ xBinderType binder
 
   return $ binderDoc <+> dcolon <+> align typeDoc
 
 
-instance PprOpts (XBinder a) where
+instance ForAllExtensions PprOpts a => PprOpts (XBinder a) where
   ppr binder = do
     opts <- ask
     if pprShowUniques opts then
       return $ text $ T.unpack $ xBinderUniqueName binder
     else
       return $ text $ T.unpack $ xBinderName binder
-  -- TODO: pprBinder (XXBinder ...
+  ppr (XXBinder extension) = ppr extension
 
 
-instance PprOpts (XExpr a) where
+instance ForAllExtensions PprOpts a => PprOpts (XExpr a) where
   ppr = pprExpr False
 
-pprExpr :: Bool -> XExpr a -> Reader PprOptions Doc
+pprExpr :: ForAllExtensions PprOpts a => Bool -> XExpr a -> Reader PprOptions Doc
 pprExpr _ (XVar binder) = ppr binder
 pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
 pprExpr _ (XLit lit) = return $ pprLit lit
 pprExpr _ (XCoercion) = return "CO"
+pprExpr _ (XXExpr extension) = ppr extension
 pprExpr parens expr = maybeParens parens <$> pprExpr' expr
 
 pprExpr' expr@(XApp{}) = do
@@ -128,13 +127,65 @@ pprExpr' (XType ty) = do
   return $ "TYPE:" <+> tyDoc
 
 
-instance PprOpts (XAlt a) where
+instance ForAllExtensions PprOpts a => PprOpts (XAlt a) where
   ppr (XAlt con binders rhs) = do
     binderDocs <- mapM ppr binders
     rhsDoc <- pprExpr False rhs
     
     return $ hang' (hsep (pprAltCon con : binderDocs) <+> "->") 2 rhsDoc
 
+  ppr (XXAlt extension) = ppr extension
+
+
+instance ForAllExtensions PprOpts a => PprOpts (XType a) where
+  ppr = pprType' TopPrec
+
+
+data TyPrec
+  = TopPrec
+  | FunPrec
+  | TyOpPrec
+  | TyConPrec
+  deriving (Eq, Ord)
+
+pprType' :: ForAllExtensions PprOpts a => TyPrec -> (XType a) -> Reader PprOptions Doc
+pprType' _    (XVarTy binder) = ppr binder
+pprType' prec t@XFunTy{} = do
+  funTyDocs <- mapM (pprType' FunPrec) funTys
+  return $ maybeParens (prec >= FunPrec) $ sep $ punctuate " ->" funTyDocs
+  where funTys = collectFunTys t
+-- TODO: special types like [], (,), etc.
+pprType' _    (XTyConApp tyCon []) = return $ pprTyCon tyCon
+pprType' prec (XTyConApp tyCon tys) = do
+  tyDocs <- mapM (pprType' TyConPrec) tys
+  return $ maybeParens (prec >= FunPrec) $ pprTyCon tyCon <+> hsep tyDocs
+pprType' prec (XAppTy f x) = do
+  fDoc <- pprType' TyConPrec f
+  xDoc <- pprType' TyConPrec x
+  return $ maybeParens (prec >= TyConPrec) $ fDoc <+> xDoc
+pprType' prec t@XForAllTy{} = do
+  binderDocs <- mapM ppr binders
+  tyDoc <- ppr ty
+  return $ maybeParens (prec >= TyOpPrec) $ "forall" <+> hsep binderDocs <> dot <+> tyDoc
+  where
+    (binders, ty) = collectForAlls t
+pprType' _ (XXType extension) = ppr extension
+
+
+-- pretty-printing of extensions
+
+instance PprOpts Void where
+  ppr _ = error "Oh dear!"
+
+
+instance PprOpts x => PprOpts (Change x) where
+  ppr (Change (lhs, rhs)) = do
+    lhsDoc <- ppr lhs
+    rhsDoc <- ppr rhs
+    -- TODO: nice indentation
+    return $ "#(" <> red lhsDoc <> "/" <> green rhsDoc <> ")"
+
+-- terminals
 
 pprExtName extName@ExternalName{} =
   modName <> dot <> varName
@@ -161,42 +212,8 @@ pprAltCon (AltDataCon t) = text $ T.unpack t
 pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
-
-instance PprOpts (XType a) where
-  ppr = pprType' TopPrec
-
-
-data TyPrec
-  = TopPrec
-  | FunPrec
-  | TyOpPrec
-  | TyConPrec
-  deriving (Eq, Ord)
-
-pprType' :: TyPrec -> (XType a) -> Reader PprOptions Doc
-pprType' _    (XVarTy binder) = ppr binder
-pprType' prec t@XFunTy{} = do
-  funTyDocs <- mapM (pprType' FunPrec) funTys
-  return $ maybeParens (prec >= FunPrec) $ sep $ punctuate " ->" funTyDocs
-  where funTys = collectFunTys t
--- TODO: special types like [], (,), etc.
-pprType' _    (XTyConApp tyCon []) = return $ pprTyCon tyCon
-pprType' prec (XTyConApp tyCon tys) = do
-  tyDocs <- mapM (pprType' TyConPrec) tys
-  return $ maybeParens (prec >= FunPrec) $ pprTyCon tyCon <+> hsep tyDocs
-pprType' prec (XAppTy f x) = do
-  fDoc <- pprType' TyConPrec f
-  xDoc <- pprType' TyConPrec x
-  return $ maybeParens (prec >= TyConPrec) $ fDoc <+> xDoc
-pprType' prec t@XForAllTy{} = do
-  binderDocs <- mapM ppr binders
-  tyDoc <- ppr ty
-  return $ maybeParens (prec >= TyOpPrec) $ "forall" <+> hsep binderDocs <> dot <+> tyDoc
-  where
-    (binders, ty) = collectForAlls t
-
-pprType' _ _ = return "TODO"
--- TODO
+pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
+pprIdInfo idi = return "TODO"
 
 pprTyCon (TyCon t _) = text $ T.unpack t
 
