@@ -197,12 +197,13 @@ instance PprOpts Void where
   ppr _ = error "Oh dear!"
 
 
+-- todo: special instances
 instance PprOpts x => PprOpts (Change x) where
   ppr (Change (lhs, rhs)) = do
     lhsDoc <- ppr lhs
     rhsDoc <- ppr rhs
     -- TODO: nice indentation
-    return $ "#(" <> red lhsDoc <> "/" <> green rhsDoc <> ")"
+    return $ "#" <> align (vsep [ "( " <> red lhsDoc, "/ " <> green rhsDoc, ")" ])
 
 -- terminals
 
@@ -241,14 +242,14 @@ pprBinderName binder = do
 pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
 pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   -- TODO: don't show empty fields
-  [ Just $ "arity=" <> pretty (idiArity idi)
-  , Just $ "inline=" <> pretty (idiInlinePragma idi)
+  [ toMaybe (idiArity idi /= 0)               $ "arity=" <> pretty (idiArity idi)
+  , toMaybe (idiInlinePragma idi /= "")       $ "inline=" <> pretty (idiInlinePragma idi)
   , Just $ "occ=" <> pretty (idiOccInfo idi)
-  , Just $ "str=" <> pretty (idiStrictnessSig idi)
-  , Just $ "dmd=" <> pretty (idiDemandSig idi)
-  , Just $ "call-arity=" <> pretty (idiCallArity idi)
-  , Just $ "unfolding=" <> pretty (idiUnfolding idi)
-  , toMaybe (idiIsOneShot idi) "one-shot"
+  , toMaybe (idiStrictnessSig idi /= "")      $ "str=" <> pretty (idiStrictnessSig idi)
+  , toMaybe (idiDemandSig idi /= "")          $ "dmd=" <> pretty (idiDemandSig idi)
+  , toMaybe (idiCallArity idi /= 0)           $ "call-arity=" <> pretty (idiCallArity idi)
+  , toMaybe (idiUnfolding idi /= NoUnfolding) $ "unfolding=" <> pretty (idiUnfolding idi)
+  , toMaybe (idiIsOneShot idi)                $ "one-shot"
   ]
   where toMaybe True x = Just x
         toMaybe _    _ = Nothing
