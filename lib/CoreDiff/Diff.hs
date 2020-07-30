@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module CoreDiff.Diff where
 
@@ -7,6 +8,11 @@ import CoreDiff.XAst
 -- Since XExpr UD never has any extensions, this is a no-op
 -- The type system can't unify their types tho.
 import Unsafe.Coerce
+
+-- Do some steppos
+
+diff :: XBinding UD -> XBinding UD -> XBinding Diff
+diff lhs rhs = closureBinding $ gcpBinding lhs rhs
 
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
 
@@ -73,3 +79,62 @@ gcpType (XCoercionTy) (XCoercionTy) =
   XCoercionTy
 gcpType ty ty' =
   XXType $ Change (ty, ty')
+
+
+-- Zip up terms that are different in all their subterms
+-- E.g. (f/g) (x/y) ~> (f x/g h)
+
+closureBinding :: XBinding Diff -> XBinding Diff
+closureBinding (XBinding binder expr) = go binder' expr'
+  where
+    binder' = closureBinder binder
+    expr' = closureExpr expr
+    go (XXBinder (Change (b1, b2))) (XXExpr (Change (e1, e2))) =
+      XXBinding $ Change (XBinding b1 e1, XBinding b2 e2)
+    go _ _ =
+      XBinding binder' expr'
+closureBinding (XXBinding extension) = XXBinding extension
+
+closureBinder :: XBinder Diff -> XBinder Diff
+closureBinder = id
+
+-- TODO: is this necessary for Var?
+closureExpr (XVar binder) = go binder'
+  where
+    binder' = closureBinder binder
+    go (XXBinder (Change (b1, b2))) =
+      XXExpr $ Change (XVar b1, XVar b2)
+    go _ =
+      XVar binder'
+closureExpr (XVarGlobal extName) = XVarGlobal extName
+closureExpr (XLit lit) = XLit lit
+closureExpr (XApp f x) = go f' x'
+  where
+    f' = closureExpr f
+    x' = closureExpr x
+    go (XXExpr (Change (f1, f2))) (XXExpr (Change (x1, x2))) =
+      XXExpr $ Change (XApp f1 x1, XApp f2 x2)
+    go _ _ =
+      XApp f' x'
+closureExpr (XTyLam p b) = go p' b'
+  where
+    p' = closureBinder p
+    b' = closureExpr b
+    go (XXBinder (Change (p1, p2))) (XXExpr (Change (b1, b2))) =
+      XXExpr $ Change (XTyLam p1 b1, XTyLam p2 b2)
+    go _ _ =
+      XTyLam p' b'
+closureExpr (XLam p b) = go p' b'
+  where
+    p' = closureBinder p
+    b' = closureExpr b
+    go (XXBinder (Change (p1, p2))) (XXExpr (Change (b1, b2))) =
+      XXExpr $ Change (XLam p1 b1, XLam p2 b2)
+    go _ _ =
+      XLam p' b'
+-- TODO: close up these Let, Case and maybe type
+closureExpr (XLet bindings expr) = XLet bindings expr
+closureExpr (XCase match binder alts) = XCase match binder alts
+closureExpr (XType ty) = XType ty
+closureExpr (XCoercion) = XCoercion
+closureExpr (XXExpr extension) = XXExpr extension

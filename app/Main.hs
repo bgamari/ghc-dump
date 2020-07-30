@@ -47,7 +47,7 @@ main' [binding, pathA, pathB] = do
   print $ runReader (ppr dbRhs) pprDefaultOpts
 
   putStrLn "GCP:"
-  print $ runReader (ppr $ gcpBinding dbLhs dbRhs) pprDefaultOpts
+  print $ runReader (ppr $ diff dbLhs dbRhs) pprDefaultOpts
 
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
