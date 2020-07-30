@@ -11,6 +11,7 @@ import GhcDump.Ast
 import System.Environment (getArgs)
 
 import qualified CoreDiff.XAst as XAst
+import CoreDiff.Diff
 import CoreDiff.Preprocess
 import CoreDiff.PrettyPrint
 
@@ -40,8 +41,13 @@ main' [binding, pathA, pathB] = do
   let (dbLhs, lhsBinders) = runState (deBruijnIndex lhs) [lhsBinder]
   let (dbRhs, rhsBinders) = runState (deBruijnIndex rhs) [rhsBinder]
 
+  putStrLn "Left binder after De-Bruijn:"
   print $ runReader (ppr dbLhs) pprDefaultOpts
+  putStrLn "Right binder after De-Bruijn:"
   print $ runReader (ppr dbRhs) pprDefaultOpts
+
+  putStrLn "GCP:"
+  print $ runReader (ppr $ gcpBinding dbLhs dbRhs) pprDefaultOpts
 
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."

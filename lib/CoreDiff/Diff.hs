@@ -1,110 +1,75 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds #-}
 
 module CoreDiff.Diff where
 
-import Data.List
-import GhcDump.Ast
-import qualified Data.Text as T
-
--- each kind of diff-able structure needs
--- * a corresponding context type
--- * a type of metavariable
-data BindingC bindingMv exprMv bndrMv altMv
-  = BindingC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
-  | BindingHole bindingMv
-  deriving (Show)
-
-data ExprC bindingMv exprMv bndrMv altMv
-  = EVarC (BndrC bindingMv exprMv bndrMv altMv)
-  | EVarGlobalC ExternalName
-  | ELitC Lit
-  | EAppC (ExprC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
-  | ETyLamC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
-  | ELamC (BndrC bindingMv exprMv bndrMv altMv) (ExprC bindingMv exprMv bndrMv altMv)
-  | ELetC [BindingC bindingMv exprMv bndrMv altMv] (ExprC bindingMv exprMv bndrMv altMv)
-  | ECaseC (ExprC bindingMv exprMv bndrMv altMv) (BndrC bindingMv exprMv bndrMv altMv) [AltC bindingMv exprMv bndrMv altMv]
-  | ETypeC Type
-  | ECoercionC
-  | ExprHole exprMv
-  deriving (Show)
-
-data BndrC bindingMv exprMv bndrMv altMv
-  = BndrC Binder
-  | BndrHole bndrMv
-  deriving (Show)
-
-data AltC bindingMv exprMv bndrMv altMv
-  = AltC
-    { altCCon :: AltCon
-    , altCBinders :: [BndrC bindingMv exprMv bndrMv altMv]
-    , altCRHS :: ExprC bindingMv exprMv bndrMv altMv
-    }
-  | AltHole altMv
-  deriving (Show)
-
-{-
-data TypeC metavar
-  = VarTyC (BndrC metavar)
-  | FunTyC (TypeC metavar) (TypeC metavar)
-  | TyConAppC TyCon [TypeC metavar]
-  | AppTyC (TypeC metavar) (TypeC metavar)
-  | ForAllTyC (BndrC metavar) (TypeC metavar)
-  | LitTyC
-  | CoercionTyC
-  | TypeHole metavar
-  deriving (Show)
--}
-
-newtype Change t = Change (t, t)
-
-type Diff t = t (Change (Binder, Expr)) (Change Expr) (Change Binder) (Change Alt)
+import CoreDiff.XAst
+-- TODO: Sometimes we want to convert an XExpr UD to an XExpr Diff
+-- Since XExpr UD never has any extensions, this is a no-op
+-- The type system can't unify their types tho.
+import Unsafe.Coerce
 
 -- Calculate spine of two contexts a.k.a. their Greatest Common Prefix
-gcpBinding :: (Binder, Expr) -> (Binder, Expr) -> Diff BindingC
-gcpBinding (bndr, expr) (bndr', expr') =
-  BindingC (gcpBndr Complete bndr bndr') (gcpExpr expr expr')
-{-
-gcpBinding a b =
-  BindingHole $ Change (a, b)
--}
 
-data BndrCmp = NameOnly | Complete
+gcpBinding :: XBinding UD -> XBinding UD -> XBinding Diff
+gcpBinding (XBinding binder expr) (XBinding binder' expr') =
+  XBinding (gcpBinder binder binder') (gcpExpr expr expr')
 
-gcpBndr Complete bndr bndr'
-  | bndr == bndr' = BndrC bndr 
-gcpBndr NameOnly bndr bndr'
-  | bndrName bndr == bndrName bndr' = BndrC bndr
-  where
-    bndrName :: Binder -> T.Text
-    bndrName (Bndr bndr) = binderName bndr <> "_" <> unBinderId (binderId bndr)
-    unBinderId (BinderId uniq) = T.pack $ show uniq
-gcpBndr _ a b =
-  BndrHole $ Change (a, b)
 
--- This could be a little shorter (grouping EVarC, EVarGlobalC, ELitC and ECoercionC by matching interesting terms first then checking equality only).
--- But for now we're gonna stay explicit.
-gcpExpr (EVar var) (EVar var') = EVarC $ gcpBndr NameOnly var var'
-gcpExpr (EVarGlobal extName) (EVarGlobal extName')
-  | extName == extName' = EVarGlobalC extName
-gcpExpr (ELit lit) (ELit lit')
-  | lit == lit' = ELitC lit
-gcpExpr (EApp f x) (EApp f' x') =
-  EAppC (gcpExpr f f') (gcpExpr x x')
-gcpExpr (ETyLam p b) (ETyLam p' b') =
-  ETyLamC (gcpBndr Complete p p') (gcpExpr b b')
-gcpExpr (ELam p b) (ELam p' b') =
-  ELamC (gcpBndr Complete p p') (gcpExpr b b')
-gcpExpr (ELet bindings expr) (ELet bindings' expr')
-  | length bindings == length bindings' = ELetC (zipWith gcpBinding bindings bindings') (gcpExpr expr expr')
-gcpExpr (ECase match bndr alts) (ECase match' bndr' alts')
-  | length alts == length alts' =
-    ECaseC (gcpExpr match match') (gcpBndr Complete bndr bndr') (zipWith gcpAlt alts alts')
-gcpExpr (EType ty) (EType ty')
-  | ty == ty' = ETypeC ty
-gcpExpr ECoercion ECoercion = ECoercionC
-gcpExpr a b = ExprHole $ Change (a, b)
+gcpBinder :: XBinder UD -> XBinder UD -> XBinder Diff
+gcpBinder binder@XBinder{} binder'@XBinder{}
+  | binder == binder' = unsafeCoerce binder
+gcpBinder binder@XTyBinder{} binder'@XTyBinder{}
+  | binder == binder' = unsafeCoerce binder
+gcpBinder binder binder' =
+  XXBinder $ Change (binder, binder')
 
--- TODO
-gcpAlt (Alt con bndrs rhs) (Alt con' bndrs' rhs')
-  | con == con' = AltC con (zipWith (gcpBndr Complete) bndrs bndrs') (gcpExpr rhs rhs')
-gcpAlt a b = AltHole $ Change (a, b)
+
+gcpExpr :: XExpr UD -> XExpr UD -> XExpr Diff
+gcpExpr (XVar binder) (XVar binder') =
+  XVar $ gcpBinder binder binder'
+gcpExpr (XVarGlobal extName) (XVarGlobal extName') | extName == extName' =
+  XVarGlobal extName
+gcpExpr (XLit lit) (XLit lit') | lit == lit' =
+  XLit lit
+gcpExpr (XApp f x) (XApp f' x') =
+  XApp (gcpExpr f f') (gcpExpr x x')
+gcpExpr (XTyLam p b) (XTyLam p' b') =
+  XTyLam (gcpBinder p p') (gcpExpr b b')
+gcpExpr (XLam p b) (XLam p' b') =
+  XLam (gcpBinder p p') (gcpExpr b b')
+gcpExpr (XLet bindings expr) (XLet bindings' expr') | length bindings == length bindings' =
+  XLet (zipWith gcpBinding bindings bindings') (gcpExpr expr expr')
+gcpExpr (XCase match binder alts) (XCase match' binder' alts') | length alts == length alts' =
+  XCase (gcpExpr match match') (gcpBinder binder binder') (zipWith gcpAlt alts alts')
+gcpExpr (XCoercion) (XCoercion) =
+  XCoercion
+gcpExpr (XType ty) (XType ty') =
+  XType $ gcpType ty ty'
+gcpExpr expr expr' =
+  XXExpr $ Change (expr, expr')
+
+
+gcpAlt :: XAlt UD -> XAlt UD -> XAlt Diff
+gcpAlt (XAlt con binders rhs) (XAlt con' binders' rhs') | con == con' =
+  XAlt con (zipWith gcpBinder binders binders') (gcpExpr rhs rhs')
+gcpAlt alt alt' =
+  XXAlt $ Change (alt, alt')
+
+
+gcpType :: XType UD -> XType UD -> XType Diff
+gcpType (XVarTy binder) (XVarTy binder') =
+  XVarTy $ gcpBinder binder binder'
+gcpType (XFunTy l r) (XFunTy l' r') =
+  XFunTy (gcpType l l') (gcpType r r')
+gcpType (XTyConApp tc args) (XTyConApp tc' args') | tc == tc' =
+  XTyConApp tc $ zipWith gcpType args args'
+gcpType (XAppTy f x) (XAppTy f' x') =
+  XAppTy (gcpType f f') (gcpType x x')
+gcpType (XForAllTy binder ty) (XForAllTy binder' ty') =
+  XForAllTy (gcpBinder binder binder') (gcpType ty ty')
+gcpType (XLitTy) (XLitTy) =
+  XLitTy
+gcpType (XCoercionTy) (XCoercionTy) =
+  XCoercionTy
+gcpType ty ty' =
+  XXType $ Change (ty, ty')

@@ -23,10 +23,14 @@ import CoreDiff.XAst
 
 data PprOptions = PprOptions
   { pprShowUniques :: Bool
+  -- changing this option shouldnt have an effect.
+  -- it is used by the pretty-printer itself to distinguish between binders and variables
+  , pprShowIdInfo :: Bool
   }
 
 pprDefaultOpts = PprOptions
   { pprShowUniques = True
+  , pprShowIdInfo = True
   }
 
 
@@ -35,6 +39,7 @@ class PprOpts a where
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XBinding a) where
+  {- Implementation as in ghc-dump-util (misses case for binder-hole
   ppr (XBinding binder@XBinder{} expr) = do
     typeSig <- pprTypeSig binder
     idInfo <- pprIdInfo $ xBinderIdInfo binder
@@ -50,6 +55,12 @@ instance ForAllExtensions PprOpts a => PprOpts (XBinding a) where
     let assignment = hang' (binderDoc <+> equals) 2 (exprDoc)
 
     return assignment
+  -}
+
+  ppr (XBinding binder expr) = do
+    binderDoc <- ppr binder
+    expr <- ppr expr
+    return $ hang' (binderDoc <+> equals) 2 expr
 
   ppr (XXBinding extension) = ppr extension
 
@@ -63,20 +74,27 @@ pprTypeSig binder@XBinder{} = do
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XBinder a) where
-  ppr binder = do
-    opts <- ask
-    if pprShowUniques opts then
-      return $ pretty$ xBinderUniqueName binder
-    else
-      return $ pretty $ xBinderName binder
-  ppr (XXBinder extension) = ppr extension
+  ppr = pprBinder
+
+
+pprBinder :: ForAllExtensions PprOpts a => XBinder a -> Reader PprOptions Doc
+pprBinder (XXBinder extension) = ppr extension
+pprBinder (binder@XTyBinder{}) = pprBinderName binder
+pprBinder (binder@XBinder{})   = do
+  opts <- ask
+  if not $ pprShowIdInfo opts then
+    pprBinderName binder
+  else do
+    nameDoc <- pprBinderName binder
+    infoDoc <- pprIdInfo $ xBinderIdInfo binder
+    return $ nameDoc <+> infoDoc
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XExpr a) where
   ppr = pprExpr False
 
 pprExpr :: ForAllExtensions PprOpts a => Bool -> XExpr a -> Reader PprOptions Doc
-pprExpr _ (XVar binder) = ppr binder
+pprExpr _ (XVar binder) = local dontShowIdInfo $ ppr binder
 pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
 pprExpr _ (XLit lit) = return $ pprLit lit
 pprExpr _ (XCoercion) = return "CO"
@@ -213,6 +231,13 @@ pprAltCon (AltDataCon t) = pretty t
 pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
+pprBinderName binder = do
+  opts <- ask
+  if pprShowUniques opts then
+    return $ pretty (xBinderName binder) <> "_" <> pretty (xBinderId binder)
+  else
+    return $ pretty $ xBinderName binder
+
 pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
 pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   -- TODO: don't show empty fields
@@ -231,6 +256,9 @@ pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
 instance Pretty T.Text where
   pretty = text . T.unpack
 
+instance Pretty BinderId where
+  pretty (BinderId (Unique c i)) = pretty c <> pretty i
+
 instance Pretty (Unfolding Binder Binder) where
   pretty NoUnfolding = "NoUnfolding"
   pretty BootUnfolding = "BootUnfolding"
@@ -248,6 +276,8 @@ instance Pretty OccInfo where
 pprTyCon (TyCon t _) = pretty t
 
 -- some helpers
+
+dontShowIdInfo opts = opts { pprShowIdInfo = False }
 
 dcolon :: Doc
 dcolon = "::"
