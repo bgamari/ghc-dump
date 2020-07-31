@@ -15,6 +15,7 @@ import CoreDiff.XAst
 
 -- Converting SExpr to Expr, SBndr to Binder, etc.
 
+-- TODO: convert to Reader
 sexprToExpr :: [Binder] -> SExpr -> Expr
 sexprToExpr = go
   where
