@@ -4,6 +4,7 @@
 module CoreDiff.Diff where
 
 import CoreDiff.XAst
+import Data.List
 -- TODO: Sometimes we want to convert an XExpr UD to an XExpr Diff
 -- Since XExpr UD never has any extensions, this is a no-op
 -- The type system can't unify their types tho.
@@ -138,3 +139,45 @@ closureExpr (XCase match binder alts) = XCase match binder alts
 closureExpr (XType ty) = XType ty
 closureExpr (XCoercion) = XCoercion
 closureExpr (XXExpr extension) = XXExpr extension
+
+-- Heuristic that pairs up top-level bindings for diffing complete modules
+-- Steps:
+-- * Find bindings whose (non-unique) binder names appear on each side exactly once, pair those.
+-- * Group bindings that share a binder name. For each group:
+-- * Find bindings whose Type structure appears on each side exactly once, pair those.
+-- * Find bindings whose Term structure appears on each side exactly once, pair those.
+-- * ?
+-- * Profit
+data Pairing a
+  = Both a a -- appears on both sides
+  | OnlyLeft a   -- appears only on the left side
+  | OnlyRight a  -- appears only on the right side
+  deriving (Show)
+
+findPairings :: [XBinding UD] -> [XBinding UD] -> [Pairing (XBinding UD)]
+findPairings ls rs =
+  foldl go [] allNames
+  where
+    go acc name
+      | length ls' == 1 && length rs' == 1 = acc ++ [Both (head ls') (head rs')]
+      | otherwise                          = acc ++ foldl go' [] allTypes
+      where
+        ls' = filter ((== name) . xBinderName . xb) ls
+        rs' = filter ((== name) . xBinderName . xb) rs
+
+        lTypes = map (xBinderType . xb) ls'
+        rTypes = map (xBinderType . xb) rs'
+        allTypes = nub $ union lTypes rTypes
+
+        go' acc ty
+          | length ls'' == 1 && length rs'' == 1 = acc ++ [Both (head ls'') (head rs'')]
+          | otherwise                          = acc ++ map OnlyLeft ls'' ++ map OnlyRight rs''
+          where
+            ls'' = filter ((== ty) . xBinderType . xb) ls'
+            rs'' = filter ((== ty) . xBinderType . xb) rs'
+
+    lNames = map (xBinderName . xb) ls
+    rNames = map (xBinderName . xb) rs
+    allNames = nub $ union lNames rNames
+
+    xb (XBinding binder _) = binder

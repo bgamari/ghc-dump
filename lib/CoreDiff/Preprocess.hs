@@ -15,6 +15,9 @@ import CoreDiff.XAst
 
 -- Converting SExpr to Expr, SBndr to Binder, etc.
 
+sbindingToBinding env (bndr, expr) =
+  (sbinderToBinder env bndr, sexprToExpr env expr)
+
 -- TODO: convert to Reader
 sexprToExpr :: [Binder] -> SExpr -> Expr
 sexprToExpr = go
@@ -32,9 +35,7 @@ sexprToExpr = go
       where
         env' = binders ++ env
         binders = map (sbinderToBinder env' . fst) bindings
-        bindings' = map cvtBinding bindings
-        cvtBinding (bndr, expr) =
-          (sbinderToBinder env' bndr, go env' expr)
+        bindings' = map (sbindingToBinding env') bindings
     go env (ECase match bndr alts) = ECase
       (go env match)
       (sbinderToBinder env bndr)
@@ -84,6 +85,7 @@ lookupBndrId :: BinderId -> [Binder] -> Binder
 lookupBndrId id = fromJust . find go
   where go bndr = id == binderId (unBndr bndr)
         fromJust (Just x) = x
+        fromJust Nothing = error $ "missing: " ++ show id
 
 -- Calculate De-Bruijn index for terms
 
@@ -107,7 +109,8 @@ instance DeBruijn (XBinder UD) where
     dbType <- dbi $ xBinderType binder
     return $ binder { xBinderName = "", xBinderId = dbId, xBinderType = dbType }
     where fromJust (Just x) = x
-          fromJust Nothing = error $ T.unpack $ xBinderUniqueName binder
+          -- fromJust Nothing = error $ T.unpack $ xBinderUniqueName binder
+          fromJust Nothing = -1
   dbi binder@XTyBinder{} = do
     binders <- get
     let dbId = BinderId $ Unique 'b' $ fromJust $ findIndex (== binder) binders
