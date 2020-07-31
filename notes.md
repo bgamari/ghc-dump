@@ -78,11 +78,15 @@ See Maths2/cube from 0001 to 0002 for an example.
 
 ## TODO
 
-- [ ] module diffen pairing ausdenken
+- [x] module diffen pairing ausdenken
+  - [ ] dont check type equality, check structure-based equality
+  - [ ] check term structure if types couldnt be matched
 - [ ] ghc-dump-util compilen
+  - [ ] find out what that error means
 - [ ] corediff file1:bndr file2:bndr'
 - [ ] rausfloaten mal anschauen (expr -> let ... in expr')
 - [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
-- [ ] Coolen erweiterbaren AST einbauen
-- [ ] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
+- [x] Coolen erweiterbaren AST einbauen
+- [x] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
 - [ ] Alternativen zu De-Bruijn-Indizes testen
+  - important and kind of a requirement for a nice pairing algo
