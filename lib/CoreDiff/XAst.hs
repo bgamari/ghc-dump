@@ -118,12 +118,15 @@ cvtBinder :: Binder -> XBinder UD
 cvtBinder (Bndr b@Binder{}) = XBinder
   (binderName b)
   (binderId b)
-  (binderIdInfo b)
+  (removeUnfolding $ binderIdInfo b) -- TODO: this should be temporary
   (cvtType $ binderType b)
 cvtBinder (Bndr b@TyBinder{}) = XTyBinder
   (binderName b)
   (binderId b)
   (cvtType $ binderKind b)
+
+removeUnfolding idi@IdInfo{} =
+  idi { idiUnfolding = NoUnfolding }
 
 cvtExpr :: Expr -> XExpr UD
 cvtExpr (EVar binder) = XVar $ cvtBinder binder
