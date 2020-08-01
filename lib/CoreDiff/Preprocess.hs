@@ -5,6 +5,7 @@
 module CoreDiff.Preprocess where
 
 import Control.Monad.State.Lazy -- TODO: is Lazy important/bad here?
+import Control.Monad.Reader
 import Data.List
 import qualified Data.Text as T
 import GhcDump.Ast
@@ -160,3 +161,96 @@ instance UnDeBruijn (Diff AltC) where
   udb (AltC con binders rhs) = AltC con <$> mapM udb binders <*> udb rhs
   udb (AltHole altChg) = AltHole <$> udb altChg
 -}
+
+-- assmimilate terms by finding binder name that can be paired up
+
+data XBinderUniqueName = XBinderUniqueName T.Text BinderId deriving (Eq, Show)
+
+getUName :: XBinder a -> XBinderUniqueName
+getUName binder = XBinderUniqueName (xBinderName binder) (xBinderId binder)
+
+setUName :: XBinder a -> XBinderUniqueName -> XBinder a
+setUName binder (XBinderUniqueName name id) =
+  binder { xBinderName = name, xBinderId = id }
+
+swapNamesTopLvl :: XBinding UD -> XBinding UD -> XBinding UD
+swapNamesTopLvl l@(XBinding lBinder _) r@(XBinding rBinder _) =
+  runReader (swapNames l r) [(getUName lBinder, getUName rBinder)]
+
+applyPerm :: [(XBinderUniqueName, XBinderUniqueName)] -> XBinder a -> XBinder a
+applyPerm perm binder =
+  foldl go binder perm
+  where
+    go binder (lhs, rhs)
+      | getUName binder == rhs = setUName binder lhs
+      | otherwise              = binder
+
+class Swap a where
+  swapNames :: a -> a -> Reader [(XBinderUniqueName, XBinderUniqueName)] a
+
+instance Swap (XBinding UD) where
+  swapNames (XBinding binder expr) (XBinding binder' expr') =
+    XBinding <$> swapNames binder binder' <*> swapNames expr expr'
+
+instance Swap (XBinder UD) where
+  swapNames binder@XBinder{} binder'@XBinder{} = do
+    perm <- ask
+    ty' <- swapNames (xBinderType binder) (xBinderType binder')
+    return $ applyPerm perm $ binder' { xBinderType = ty' }
+  swapNames binder@XTyBinder{} binder'@XTyBinder{} = do
+    perm <- ask
+    kind' <- swapNames (xBinderKind binder) (xBinderKind binder')
+    return $ applyPerm perm $ binder' { xBinderKind = kind' }
+  swapNames _ r = return r
+
+instance Swap (XExpr UD) where
+  swapNames (XVar binder) (XVar binder') =
+    XVar <$> swapNames binder binder'
+  swapNames (XApp f x) (XApp f' x') =
+    XApp <$> swapNames f f' <*> swapNames x x'
+  swapNames (XTyLam binder expr) (XTyLam binder' expr') =
+    XTyLam <$> withBndr (swapNames binder binder') <*> withBndr (swapNames expr expr')
+    where withBndr = local (++ [(getUName binder, getUName binder')])
+  swapNames (XLam binder expr) (XLam binder' expr') =
+    XLam <$> withBndr (swapNames binder binder') <*> withBndr (swapNames expr expr')
+    where withBndr = local (++ [(getUName binder, getUName binder')])
+  -- If the both lets have the same number of bindings, assume that we can swap them
+  -- otherwise, dont swap any of them (but still apply permutation)
+  swapNames (XLet bindings expr) (XLet bindings' expr')
+    | length bindings == length bindings' =
+      XLet <$> withBndrs (zipWithM swapNames bindings bindings') <*> withBndrs (swapNames expr expr')
+    | otherwise = error "TODO, lazy programmer"
+    where withBndrs = local (++ zipWith go bindings bindings')
+          go (XBinding bndr _) (XBinding bndr' _) = (getUName bndr, getUName bndr')
+  -- same problem as above with the alts
+  swapNames (XCase match binder alts) (XCase match' binder' alts')
+    | length alts == length alts' =
+      XCase <$> swapNames match match' <*> withBndr (swapNames binder binder') <*> zipWithM swapNames alts alts'
+    | otherwise = error "TODO, lazy programmer"
+    where withBndr = local (++ [(getUName binder, getUName binder')])
+  swapNames (XType ty) (XType ty') =
+    XType <$> swapNames ty ty'
+  swapNames _ r = return r
+
+instance Swap (XAlt UD) where
+  -- aaand same problem again
+  swapNames (XAlt altCon binders rhs) (XAlt altCon' binders' rhs')
+    | length binders == length binders' =
+      XAlt altCon' <$> withBinders (zipWithM swapNames binders binders') <*> withBinders (swapNames rhs rhs')
+    | otherwise = error "TODO, lazy programmer"
+    where withBinders = local (++ zipWith go binders binders')
+          go binder binder' = (getUName binder, getUName binder')
+
+instance Swap (XType UD) where
+  swapNames (XVarTy binder)       (XVarTy binder')        =
+    XVarTy <$> swapNames binder binder'
+  swapNames (XFunTy l r)          (XFunTy l' r')          =
+    XFunTy <$> swapNames l l' <*> swapNames r r'
+  swapNames (XTyConApp tc args)   (XTyConApp tc' args')   =
+    XTyConApp tc' <$> zipWithM swapNames args args'
+  swapNames (XAppTy f x)          (XAppTy f' x')          =
+    XAppTy <$> swapNames f f' <*> swapNames x x'
+  swapNames (XForAllTy binder ty) (XForAllTy binder' ty') =
+    XForAllTy <$> withBndr (swapNames binder binder') <*> withBndr (swapNames ty ty')
+    where withBndr = local (++ [(getUName binder, getUName binder')])
+  swapNames _ r = return r

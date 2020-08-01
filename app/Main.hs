@@ -113,12 +113,11 @@ printPairingDiffs = mapM_ go
     go (OnlyRight l) = do
       putStrLn "Right only:"
       print $ runReader (ppr l) opts
-    go (Both l@(XAst.XBinding lBinder _) r@(XAst.XBinding rBinder _)) = do
-      putStrLn "Both (DB-d):"
-      print $ runReader (ppr $ diff dbL dbR) opts
+    go (Both l r) = do
+      putStrLn "Both (assimilated):"
+      print $ runReader (ppr $ diff l r') opts
       where
-        (dbL, _) = runState (deBruijnIndex l) [lBinder]
-        (dbR, _) = runState (deBruijnIndex r) [rBinder]
+        r' = swapNamesTopLvl l r
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
