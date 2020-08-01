@@ -177,31 +177,32 @@ swapNamesTopLvl :: XBinding UD -> XBinding UD -> XBinding UD
 swapNamesTopLvl l@(XBinding lBinder _) r@(XBinding rBinder _) =
   runReader (swapNames l r) [(getUName lBinder, getUName rBinder)]
 
-applyPerm :: [(XBinderUniqueName, XBinderUniqueName)] -> XBinder a -> XBinder a
-applyPerm perm binder =
-  foldl go binder perm
-  where
-    go binder (lhs, rhs)
-      | getUName binder == rhs = setUName binder lhs
-      | otherwise              = binder
-
 class Swap a where
   swapNames :: a -> a -> Reader [(XBinderUniqueName, XBinderUniqueName)] a
+  applyPerm :: a -> Reader [(XBinderUniqueName, XBinderUniqueName)] a
 
 instance Swap (XBinding UD) where
   swapNames (XBinding binder expr) (XBinding binder' expr') =
     XBinding <$> swapNames binder binder' <*> swapNames expr expr'
 
+  applyPerm (XBinding binder expr) =
+    XBinding <$> applyPerm binder <*> applyPerm expr
+
 instance Swap (XBinder UD) where
   swapNames binder@XBinder{} binder'@XBinder{} = do
-    perm <- ask
     ty' <- swapNames (xBinderType binder) (xBinderType binder')
-    return $ applyPerm perm $ binder' { xBinderType = ty' }
+    applyPerm $ binder' { xBinderType = ty' }
   swapNames binder@XTyBinder{} binder'@XTyBinder{} = do
-    perm <- ask
     kind' <- swapNames (xBinderKind binder) (xBinderKind binder')
-    return $ applyPerm perm $ binder' { xBinderKind = kind' }
-  swapNames _ r = return r
+    applyPerm $ binder' { xBinderKind = kind' }
+  swapNames _ r = applyPerm r
+
+  applyPerm binder =
+    foldl go binder <$> ask
+    where
+      go binder (lhs, rhs)
+        | getUName binder == rhs = setUName binder lhs
+        | otherwise              = binder
 
 instance Swap (XExpr UD) where
   swapNames (XVar binder) (XVar binder') =
@@ -230,7 +231,17 @@ instance Swap (XExpr UD) where
     where withBndr = local (++ [(getUName binder, getUName binder')])
   swapNames (XType ty) (XType ty') =
     XType <$> swapNames ty ty'
-  swapNames _ r = return r
+  swapNames _ r = applyPerm r
+  
+  applyPerm (XVar binder) = XVar <$> applyPerm binder
+  applyPerm (XApp f x) = XApp <$> applyPerm f <*> applyPerm x
+  -- TODO: do we need to apply the permutation to binders here?
+  applyPerm (XTyLam binder expr) = XTyLam <$> applyPerm binder <*> applyPerm expr
+  applyPerm (XLam binder expr) = XLam <$> applyPerm binder <*> applyPerm expr
+  applyPerm (XLet bindings expr) = XLet <$> mapM applyPerm bindings <*> applyPerm expr
+  applyPerm (XCase match binder expr) = XCase <$> applyPerm match <*> applyPerm binder <*> mapM applyPerm expr
+  applyPerm (XType ty) = XType <$> applyPerm ty
+  applyPerm expr = return expr
 
 instance Swap (XAlt UD) where
   -- aaand same problem again
@@ -240,6 +251,9 @@ instance Swap (XAlt UD) where
     | otherwise = error "TODO, lazy programmer"
     where withBinders = local (++ zipWith go binders binders')
           go binder binder' = (getUName binder, getUName binder')
+
+  applyPerm (XAlt altCon binders rhs) = XAlt altCon <$> mapM applyPerm binders <*> applyPerm rhs
+
 
 instance Swap (XType UD) where
   swapNames (XVarTy binder)       (XVarTy binder')        =
@@ -253,4 +267,11 @@ instance Swap (XType UD) where
   swapNames (XForAllTy binder ty) (XForAllTy binder' ty') =
     XForAllTy <$> withBndr (swapNames binder binder') <*> withBndr (swapNames ty ty')
     where withBndr = local (++ [(getUName binder, getUName binder')])
-  swapNames _ r = return r
+  swapNames _ r = applyPerm r
+
+  applyPerm (XVarTy binder) = XVarTy <$> applyPerm binder
+  applyPerm (XFunTy l r) = XFunTy <$> applyPerm l <*> applyPerm r
+  applyPerm (XTyConApp tc args) = XTyConApp tc <$> mapM applyPerm args
+  applyPerm (XAppTy f x) = XAppTy <$> applyPerm f <*> applyPerm x
+  applyPerm (XForAllTy binder ty) = XForAllTy <$> applyPerm binder <*> applyPerm ty
+  applyPerm ty = return ty
