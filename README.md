@@ -18,8 +18,6 @@ cd ghc-dump
 cabal v1-install -w ${ghc up to 8.11} --allow-newer
 ```
 
-TODO: Install `ghc-dump-util`, see `$projectroot/testcases/gdc-source/README.md`.
-
 Install this package in the same way (there is no entry on Hackage yet):
 
 ```bash

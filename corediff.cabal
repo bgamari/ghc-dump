@@ -91,6 +91,7 @@ executable corediff
   build-depends:       base >=4.13,
                        corediff,
                        ghc-dump-core >=0.1.1.0,
+                       ghc-dump-util >=0.1.1.0,
                        serialise >=0.2.3.0,
                        bytestring >=0.10.9.0,
                        text >=1.2.4.0,

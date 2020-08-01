@@ -10,6 +10,7 @@ import Data.List (find)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
 import GhcDump.Ast
+import GhcDump.Util
 import System.Environment (getArgs)
 
 import qualified CoreDiff.XAst as XAst
@@ -22,8 +23,8 @@ main = main' =<< getArgs
 
 -- diff files on a specific binding
 main' ["debruijn", binding, pathA, pathB] = do
-  modA <- readModFile pathA
-  modB <- readModFile pathB
+  modA <- readDump pathA
+  modB <- readDump pathB
 
   let Just bndgA = lookupBinding binding modA
   let Just bndgB = lookupBinding binding modB
@@ -37,8 +38,8 @@ main' ["debruijn", binding, pathA, pathB] = do
   -}
 
   -- TODO: this is already implemented in ghc-dump-util. (reconModule)
-  let lhs@(XAst.XBinding lhsBinder _) = XAst.cvtBinding (sbindingToBinding [] $ ignoreStats bndgA)
-  let rhs@(XAst.XBinding rhsBinder _) = XAst.cvtBinding (sbindingToBinding [] $ ignoreStats bndgB)
+  let lhs@(XAst.XBinding lhsBinder _) = XAst.cvtBinding $ ignoreStats bndgA
+  let rhs@(XAst.XBinding rhsBinder _) = XAst.cvtBinding $ ignoreStats bndgB
 
   let (dbLhs, lhsBinders) = runState (deBruijnIndex lhs) [lhsBinder]
   let (dbRhs, rhsBinders) = runState (deBruijnIndex rhs) [rhsBinder]
@@ -52,31 +53,31 @@ main' ["debruijn", binding, pathA, pathB] = do
   print $ runReader (ppr $ diff dbLhs dbRhs) pprDefaultOpts
 
 main' ["pairings", pathA, pathB] = do
-  modA <- readModFile pathA
-  modB <- readModFile pathB
+  modA <- readDump pathA
+  modB <- readDump pathB
 
-  let bindersA = map (sbinderToBinder [] . fst . ignoreStats) $ moduleBindings modA
-  let bindersB = map (sbinderToBinder [] . fst . ignoreStats) $ moduleBindings modB
+  let bindersA = map (fst . ignoreStats) $ moduleBindings modA
+  let bindersB = map (fst . ignoreStats) $ moduleBindings modB
 
   print $ map (\b -> (binderUniqueName b, binderType $ unBndr b)) bindersA
   print $ map (\b -> (binderUniqueName b, binderType $ unBndr b)) bindersB
 
-  let bindingsA = map (XAst.cvtBinding . sbindingToBinding bindersA . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . sbindingToBinding bindersB . ignoreStats) $ moduleBindings modB
+  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
   
   let pairings = findPairings bindingsA bindingsB
 
   printPairings pairings
 
 main' ["diffmod", pathA, pathB] = do
-  modA <- readModFile pathA
-  modB <- readModFile pathB
+  modA <- readDump pathA
+  modB <- readDump pathB
 
-  let bindersA = map (sbinderToBinder [] . fst . ignoreStats) $ moduleBindings modA
-  let bindersB = map (sbinderToBinder [] . fst . ignoreStats) $ moduleBindings modB
+  let bindersA = map (fst . ignoreStats) $ moduleBindings modA
+  let bindersB = map (fst . ignoreStats) $ moduleBindings modB
 
-  let bindingsA = map (XAst.cvtBinding . sbindingToBinding bindersA . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . sbindingToBinding bindersB . ignoreStats) $ moduleBindings modB
+  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
   
   let pairings = findPairings bindingsA bindingsB
 
@@ -85,15 +86,12 @@ main' ["diffmod", pathA, pathB] = do
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
 
-readModFile :: FilePath -> IO SModule
-readModFile path = deserialise <$> BSL.readFile path
-
-lookupBinding :: String -> SModule -> Maybe (SBinder, CoreStats, SExpr)
+lookupBinding :: String -> Module -> Maybe (Binder, CoreStats, Expr)
 lookupBinding binding mod = find go $ moduleBindings mod
   where go (binder, _, _) = binding == getName binder
 
-getName :: SBinder -> String
-getName = T.unpack . binderName . unSBndr
+getName :: Binder -> String
+getName = T.unpack . binderName . unBndr
 
 ignoreStats (binder, _stats, expr) = (binder, expr)
 
@@ -115,12 +113,12 @@ printPairingDiffs = mapM_ go
     go (OnlyRight l) = do
       putStrLn "Right only:"
       print $ runReader (ppr l) opts
-    go (Both l r) = do
+    go (Both l@(XAst.XBinding lBinder _) r@(XAst.XBinding rBinder _)) = do
       putStrLn "Both (DB-d):"
       print $ runReader (ppr $ diff dbL dbR) opts
       where
-        (dbL, _) = runState (deBruijnIndex l) []
-        (dbR, _) = runState (deBruijnIndex r) []
+        (dbL, _) = runState (deBruijnIndex l) [lBinder]
+        (dbR, _) = runState (deBruijnIndex r) [rBinder]
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
