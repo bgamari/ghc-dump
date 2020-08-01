@@ -18,6 +18,8 @@ cd ghc-dump
 cabal v1-install -w ${ghc up to 8.11} --allow-newer
 ```
 
+Install `ghc-dump-util` (described in `$projectroot/testcases/gdc-source/README.md`).
+
 Install this package in the same way (there is no entry on Hackage yet):
 
 ```bash
@@ -44,7 +46,12 @@ $GHC -fplugin GhcDump.Plugin -O2 demos/Maths.hs
 Compare two passes or two completely different files in the top-level binding `square`:
 
 ```bash
-corediff square demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
+corediff debruijn square demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
+```
+Compare two modules:
+
+```bash
+corediff diffmod demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
 ```
 
 ## Challenges
