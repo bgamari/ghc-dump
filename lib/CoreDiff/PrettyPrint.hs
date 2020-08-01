@@ -88,7 +88,7 @@ pprBinder (binder@XBinder{})   = do
     nameDoc <- pprBinderName binder
     tyDoc <- ppr $ xBinderType binder
     infoDoc <- pprIdInfo $ xBinderIdInfo binder
-    return $ nameDoc <+> dcolon <+> tyDoc <+> infoDoc
+    return $ nameDoc <+> infoDoc <+> dcolon <+> tyDoc
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XExpr a) where

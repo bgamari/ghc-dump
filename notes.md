@@ -18,6 +18,8 @@ De-Bruijn:
 
 These terms should not mark the argument of the function call as different!
 
+TODO: make up modules that exhibit this behavior for tests
+
 ## possible solution
 
 - Traverse both terms simultaneously, pair up corresponding binders, translate one of them into the "binder universe" of the other
@@ -90,3 +92,5 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [x] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
 - [ ] Alternativen zu De-Bruijn-Indizes testen
   - important and kind of a requirement for a nice pairing algo
+- [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
+- [ ] diffmod Maths/1 und Maths/23 macht Fehler, liegt wahrscheinlich an fehlenden eingebundenen globals. Sollte ohne DB eig nicht auftreten
