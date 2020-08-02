@@ -157,7 +157,7 @@ cvtType (ForAllTy binder ty) = XForAllTy (cvtBinder binder) (cvtType ty)
 cvtType (LitTy) = XLitTy
 cvtType (CoercionTy) = XCoercionTy
 
---
+-- helper functions
 
 xBinderUniqueName :: XBinder a -> T.Text
 xBinderUniqueName binder =

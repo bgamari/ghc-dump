@@ -6,7 +6,7 @@ import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
 import Control.Monad.Reader
 import Control.Monad.State
-import Data.List (find)
+import Data.List (find, intercalate)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Text as T
 import GhcDump.Ast
@@ -17,6 +17,8 @@ import qualified CoreDiff.XAst as XAst
 import CoreDiff.Diff
 import CoreDiff.Preprocess
 import CoreDiff.PrettyPrint
+
+-- TODO: clean up this mess, its horrible
 
 main :: IO ()
 main = main' =<< getArgs
@@ -83,6 +85,20 @@ main' ["diffmod", pathA, pathB] = do
 
   printPairingDiffs pairings
 
+main' ["diffmod2", pathA, pathB, diffA, diffB] = do
+  modA <- readDump pathA
+  modB <- readDump pathB
+
+  let bindersA = map (fst . ignoreStats) $ moduleBindings modA
+  let bindersB = map (fst . ignoreStats) $ moduleBindings modB
+
+  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+
+  let pairings = findPairings bindingsA bindingsB
+
+  printPairingDiffs' pairings diffA diffB
+
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
 
@@ -121,3 +137,19 @@ printPairingDiffs = mapM_ go
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
+
+printPairingDiffs' pairings diffL diffR = do
+  writeFile diffL $ intercalate "\n" $ reverse lStrs
+  writeFile diffR $ intercalate "\n" $ reverse rStrs
+  where
+    (lStrs, rStrs) = foldl go ([], []) pairings
+    go (accL, accR) (OnlyLeft l)  = (accL ++ [show $ ppr' l], accR)
+    go (accL, accR) (OnlyRight r) = (accL, accR ++ [show $ ppr' r])
+    go (accL, accR) (Both l r)    =
+      ( accL ++ [show (ppr' l)]
+      , accR ++ [show (ppr' r')]
+      )
+      where
+        r' = swapNamesTopLvl l r
+
+    ppr' x = runReader (ppr x) pprDefaultOpts
