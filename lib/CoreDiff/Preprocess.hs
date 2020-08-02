@@ -220,14 +220,17 @@ instance Swap (XExpr UD) where
   swapNames (XLet bindings expr) (XLet bindings' expr')
     | length bindings == length bindings' =
       XLet <$> withBndrs (zipWithM swapNames bindings bindings') <*> withBndrs (swapNames expr expr')
-    | otherwise = error "TODO, lazy programmer"
+    | otherwise =
+      XLet <$> mapM applyPerm bindings' <*> applyPerm expr'
     where withBndrs = local (++ zipWith go bindings bindings')
           go (XBinding bndr _) (XBinding bndr' _) = (getUName bndr, getUName bndr')
-  -- same problem as above with the alts
+  -- Same thing as above: If two cases dont have the same number of alts,
+  -- we won't even try to pair them up nicely; we will just apply the permutation
   swapNames (XCase match binder alts) (XCase match' binder' alts')
     | length alts == length alts' =
       XCase <$> swapNames match match' <*> withBndr (swapNames binder binder') <*> zipWithM swapNames alts alts'
-    | otherwise = error "TODO, lazy programmer"
+    | otherwise =
+      XCase <$> applyPerm match' <*> applyPerm binder' <*> mapM applyPerm alts'
     where withBndr = local (++ [(getUName binder, getUName binder')])
   swapNames (XType ty) (XType ty') =
     XType <$> swapNames ty ty'
@@ -244,11 +247,12 @@ instance Swap (XExpr UD) where
   applyPerm expr = return expr
 
 instance Swap (XAlt UD) where
-  -- aaand same problem again
+  -- aaand same problem for different number of binders
   swapNames (XAlt altCon binders rhs) (XAlt altCon' binders' rhs')
     | length binders == length binders' =
       XAlt altCon' <$> withBinders (zipWithM swapNames binders binders') <*> withBinders (swapNames rhs rhs')
-    | otherwise = error "TODO, lazy programmer"
+    | otherwise =
+      XAlt altCon' <$> mapM applyPerm binders' <*> applyPerm rhs
     where withBinders = local (++ zipWith go binders binders')
           go binder binder' = (getUName binder, getUName binder')
 
