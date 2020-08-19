@@ -95,6 +95,7 @@ executable corediff
                        serialise >=0.2.3.0,
                        bytestring >=0.10.9.0,
                        text >=1.2.4.0,
+                       ansi-wl-pprint >=0.6.9,
                        mtl >=2.2.2
 
   -- Directories containing source files.

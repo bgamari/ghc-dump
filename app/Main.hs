@@ -12,6 +12,7 @@ import qualified Data.Text as T
 import GhcDump.Ast
 import GhcDump.Util
 import System.Environment (getArgs)
+import Text.PrettyPrint.ANSI.Leijen (red, green)
 
 import qualified CoreDiff.XAst as XAst
 import CoreDiff.Diff
@@ -60,9 +61,6 @@ main' ["pairings", pathA, pathB] = do
 
   let bindersA = map (fst . ignoreStats) $ moduleBindings modA
   let bindersB = map (fst . ignoreStats) $ moduleBindings modB
-
-  print $ map (\b -> (binderUniqueName b, binderType $ unBndr b)) bindersA
-  print $ map (\b -> (binderUniqueName b, binderType $ unBndr b)) bindersB
 
   let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
   let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
@@ -115,10 +113,10 @@ ignoreStats (binder, _stats, expr) = (binder, expr)
 printPairings = mapM_ go
   where
     go (Both l r) = putStrLn $ "Both: (" ++ show (runReader (ppr $ xb l) opts) ++ "," ++ show (runReader (ppr $ xb r) opts) ++ ")"
-    go (OnlyLeft l) = putStrLn $ "Left: " ++ show (runReader (ppr $ xb l) opts)
-    go (OnlyRight l) = putStrLn $ "Right: " ++ show (runReader (ppr $ xb l) opts)
+    go (OnlyLeft l) = putStrLn $ "Left: " ++ show (red $ runReader (ppr $ xb l) opts)
+    go (OnlyRight l) = putStrLn $ "Right: " ++ show (green $ runReader (ppr $ xb l) opts)
 
-    opts = pprDefaultOpts { pprShowIdInfo = False }
+    opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
 
 printPairingDiffs = mapM_ go
