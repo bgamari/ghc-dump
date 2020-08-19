@@ -83,14 +83,16 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [x] module diffen pairing ausdenken
   - [ ] dont check type equality, check structure-based equality
   - [ ] check term structure if types couldnt be matched
-- [ ] ghc-dump-util compilen
-  - [ ] find out what that error means
+- [x] ghc-dump-util compilen
+  - [x] find out what that error means
 - [ ] corediff file1:bndr file2:bndr'
 - [ ] rausfloaten mal anschauen (expr -> let ... in expr')
 - [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
 - [x] Coolen erweiterbaren AST einbauen
 - [x] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
-- [ ] Alternativen zu De-Bruijn-Indizes testen
+- [x] Alternativen zu De-Bruijn-Indizes testen
   - important and kind of a requirement for a nice pairing algo
 - [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
-- [ ] diffmod Maths/1 und Maths/23 macht Fehler, liegt wahrscheinlich an fehlenden eingebundenen globals. Sollte ohne DB eig nicht auftreten
+- [x] diffmod Maths/1 und Maths/23 macht Fehler, liegt wahrscheinlich an fehlenden eingebundenen globals. Sollte ohne DB eig nicht auftreten
+- [ ] floatIn-Funktion, die ausgewählte Binder aus let-blöcken entfernt und im Body substituiert.
+- [ ] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
