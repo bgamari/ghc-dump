@@ -23,8 +23,6 @@ import CoreDiff.XAst
 
 data PprOptions = PprOptions
   { pprShowUniques :: Bool
-  -- changing this option shouldnt have an effect.
-  -- it is used by the pretty-printer itself to distinguish between binders and variables
   , pprShowIdInfo :: Bool
   }
 
@@ -233,7 +231,7 @@ pprAltCon (AltDataCon t) = pretty t
 pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
-pprBinderName binder = do
+pprBinderName binder = blue <$> do
   opts <- ask
   if pprShowUniques opts then
     return $ pretty (xBinderName binder) <> "_" <> pretty (xBinderId binder)

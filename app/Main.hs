@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module Main where
@@ -6,13 +7,15 @@ import Codec.Serialise (deserialise)
 import Control.Monad (mapM_)
 import Control.Monad.Reader
 import Control.Monad.State
-import Data.List (find, intercalate)
+import Data.List
 import qualified Data.ByteString.Lazy as BSL
+import qualified Data.Set as Set
+import qualified Data.Map as Map
 import qualified Data.Text as T
 import GhcDump.Ast
 import GhcDump.Util
 import System.Environment (getArgs)
-import Text.PrettyPrint.ANSI.Leijen (red, green)
+import Text.PrettyPrint.ANSI.Leijen
 
 import qualified CoreDiff.XAst as XAst
 import CoreDiff.Diff
@@ -59,15 +62,30 @@ main' ["pairings", pathA, pathB] = do
   modA <- readDump pathA
   modB <- readDump pathB
 
-  let bindersA = map (fst . ignoreStats) $ moduleBindings modA
-  let bindersB = map (fst . ignoreStats) $ moduleBindings modB
-
   let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
   let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+
+  print $ bold $ text $ "Binders in " ++ pathA ++ ":"
+  printBinderNames bindingsA
+  print $ bold $ text $ "Binders in " ++ pathB ++ ":"
+  printBinderNames bindingsB
+
+  print $ bold $ text $ "Unique binder names in " ++ pathA ++ ":"
+  printBinderNameCounts bindingsA
+  print $ bold $ text $ "Unique binder names in " ++ pathB ++ ":"
+  printBinderNameCounts bindingsB
+
+  print $ bold $ text $ "Bindings in " ++ pathA ++ ":"
+  printBindings bindingsA
+
+  print $ bold $ text $ "Bindings in " ++ pathB ++ ":"
+  printBindings bindingsB
   
+  {-
   let pairings = findPairings bindingsA bindingsB
 
   printPairings pairings
+  -}
 
 main' ["diffmod", pathA, pathB] = do
   modA <- readDump pathA
@@ -109,6 +127,7 @@ getName = T.unpack . binderName . unBndr
 
 ignoreStats (binder, _stats, expr) = (binder, expr)
 
+{-
 -- TODO: this is just for debugging
 printPairings = mapM_ go
   where
@@ -118,6 +137,7 @@ printPairings = mapM_ go
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
+-}
 
 printPairingDiffs = mapM_ go
   where
@@ -151,3 +171,26 @@ printPairingDiffs' pairings diffL diffR = do
         r' = swapNamesTopLvl l r
 
     ppr' x = runReader (ppr x) pprDefaultOpts
+
+printBinderNames :: [XAst.XBinding XAst.UD] -> IO ()
+printBinderNames bindings =
+  print $ map go bindings
+  where
+    go (XAst.XBinding binder _)= runReader (ppr binder) opts
+    opts = pprDefaultOpts { pprShowIdInfo = False }
+
+printBinderNameCounts :: [XAst.XBinding XAst.UD] -> IO ()
+printBinderNameCounts bindings = do
+  mapM_ printRow $ sort binderCounts
+  where
+    binderNames = map (\(XAst.XBinding bndr _) -> XAst.xBinderName bndr) bindings
+    binderNameSet = Set.fromList binderNames
+    binderCounts = [(count name binderNames, name) | name <- Set.toList binderNameSet]
+    count x list = length $ filter (== x) list
+
+    printRow (count, name) =
+      putStrLn $ show count ++ "\t" ++ T.unpack name
+
+printBindings :: [XAst.XBinding XAst.UD] -> IO ()
+printBindings = print . vsep . intersperse hardline . map go
+  where go binding = runReader (ppr binding) pprDefaultOpts

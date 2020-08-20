@@ -95,4 +95,9 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
 - [x] diffmod Maths/1 und Maths/23 macht Fehler, liegt wahrscheinlich an fehlenden eingebundenen globals. Sollte ohne DB eig nicht auftreten
 - [ ] floatIn-Funktion, die ausgewählte Binder aus let-blöcken entfernt und im Body substituiert.
+  - "automatic float-in detection" ist nicht komplett trivial, da afaik user-definierte und compiler-erzeugte binder nicht unterscheidbar sind. heuristiken:
+    - [ ] Namen wie `lvl`, `$w...` die *wahrscheinlich* Compiler-erzeugt sind.
+    - [ ] Variablen, deren Name oft vorkommt, bspw. `main_r1332`, `main_s31666`, etc. => nicht user-definierbar, der Compiler hat Sachen gemacht => Wurzel finden
+      - Wenn keine Wurzel: global reinfloaten, unterschied zw. bspw. `$trModule` und `lvl` bindern
+      - Manchmal muss auch `$w...` beachtet werden.
 - [ ] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
