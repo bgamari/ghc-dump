@@ -75,11 +75,21 @@ main' ["pairings", pathA, pathB] = do
   print $ bold $ text $ "Unique binder names in " ++ pathB ++ ":"
   printBinderNameCounts bindingsB
 
-  print $ bold $ text $ "Bindings in " ++ pathA ++ ":"
-  printBindings bindingsA
+  print $ bold $ red $ text $ "Floating in..."
 
-  print $ bold $ text $ "Bindings in " ++ pathB ++ ":"
-  printBindings bindingsB
+  let bindingsAFloatedIn = floatInTopLvl bindingsA
+  let bindingsBFloatedIn = floatInTopLvl bindingsB
+
+  print $ bold $ text $ "Unique binder names in " ++ pathA ++ " after float-in:"
+  printBinderNameCounts bindingsAFloatedIn
+  print $ bold $ text $ "Unique binder names in " ++ pathB ++ " after float-in:"
+  printBinderNameCounts bindingsBFloatedIn
+
+  print $ bold $ text $ "Bindings in " ++ pathA ++ " after float-in:"
+  printBindings bindingsAFloatedIn
+
+  print $ bold $ text $ "Bindings in " ++ pathB ++ " after float-in:"
+  printBindings bindingsBFloatedIn
   
   {-
   let pairings = findPairings bindingsA bindingsB

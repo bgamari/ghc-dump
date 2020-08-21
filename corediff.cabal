@@ -68,7 +68,8 @@ library
                        text >=1.2.4.0,
                        mtl >=2.2.2,
                        ansi-wl-pprint >=0.6.9,
-                       bytestring >=0.10
+                       bytestring >=0.10,
+                       containers >=0.6.2.1
 
   -- Directories containing source files.
   hs-source-dirs:      lib

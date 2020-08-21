@@ -10,6 +10,11 @@ import Data.List
 import qualified Data.Text as T
 import GhcDump.Ast
 
+import Data.Map (Map)
+import Data.Set (Set)
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+
 import CoreDiff.XAst
 
 -- Calculate De-Bruijn index for terms
@@ -279,3 +284,111 @@ instance Swap (XType UD) where
   applyPerm (XAppTy f x) = XAppTy <$> applyPerm f <*> applyPerm x
   applyPerm (XForAllTy binder ty) = XForAllTy <$> applyPerm binder <*> applyPerm ty
   applyPerm ty = return ty
+ 
+
+data FloatInState = FloatInState
+  { bindersToFloatIn :: Map (XBinder UD) (XExpr UD)
+  , usedBinders :: Set (XBinder UD)
+  }
+
+initFloatInState = FloatInState Map.empty Set.empty
+
+addBindersToFloatIn :: [XBinding UD] -> State FloatInState ()
+addBindersToFloatIn bindings = modify go
+  where
+    go s = s { bindersToFloatIn = Map.union (bindersToFloatIn s) bindingsMap }
+    bindingsMap =
+      Map.fromList [(binder, expr) | XBinding binder expr <- bindings ]
+
+markAsUsed :: XBinder UD -> State FloatInState ()
+markAsUsed binder = modify go
+  where
+    go s = s { usedBinders = Set.insert binder $ usedBinders s }
+
+getUsedBinders :: State FloatInState (Set (XBinder UD))
+getUsedBinders = usedBinders <$> get
+
+
+floatInTopLvl :: [XBinding UD] -> [XBinding UD]
+floatInTopLvl bindings =
+  evalState (floatInTopLvl' p bindings) initFloatInState
+  where
+    p = filter go
+      where go (XBinding binder _ ) = xBinderName binder `elem` ["lvl", "$wlvl"]
+
+-- Given a function that selects bindings to float in, this function
+-- replaces each occurrence of the given binders with their bound expr.
+-- Bindings that have actually been substituted are removed from the
+-- resulting bindings list
+floatInTopLvl'
+  :: ([XBinding UD] -> [XBinding UD])
+  -> [XBinding UD]
+  -> State FloatInState [XBinding UD]
+floatInTopLvl' selector bindings = do
+  addBindersToFloatIn $ selector bindings
+  bindings' <- mapM (floatIn selector) bindings
+  usedBinders <- getUsedBinders
+  return [b | b@(XBinding binder _) <- bindings', not $ binder `elem` usedBinders]
+
+class FloatIn a where
+  floatIn :: ([XBinding UD] -> [XBinding UD]) -> a -> State FloatInState a
+
+instance FloatIn (XBinding UD) where
+  floatIn selector (XBinding binder expr) =
+    XBinding <$> floatIn selector binder <*> floatIn selector expr
+
+instance FloatIn (XBinder UD) where
+  floatIn _ binder = return binder
+
+instance FloatIn (XExpr UD) where
+  floatIn selector (XVar binder) = do
+    binders <- bindersToFloatIn <$> get
+    case Map.lookup binder binders of
+      Nothing -> return $ XVar binder
+      Just expr -> do
+        markAsUsed binder
+        floatIn selector expr
+
+  floatIn selector (XApp f x) =
+    XApp <$> floatIn selector f <*> floatIn selector x
+
+  -- lambdas should be irrelevant to float-in, don't add binder
+  floatIn selector (XTyLam p b) =
+    XTyLam <$> floatIn selector p <*> floatIn selector b
+  floatIn selector (XLam p b) =
+    XLam <$> floatIn selector p <*> floatIn selector b
+
+  -- this is the most important part of the whole float-in stuff
+  floatIn selector (XLet bindings expr) = do
+    -- new lvl-binders etc. from this let are marked as "to float in"
+    addBindersToFloatIn $ selector bindings
+    -- bindings and expression are recursed into
+    bindings' <- mapM (floatIn selector) bindings
+    expr' <- floatIn selector expr
+    -- binders that have been used in the bindings and expression above are marked as used
+    usedBinders <- getUsedBinders
+    -- only bindings that havent been used are retained
+    let bindings'' = [b | b@(XBinding binder _) <- bindings', not $ binder `elem` usedBinders]
+
+    -- if no bindings are left, return the expression itself
+    if bindings'' == [] then
+      return expr'
+    else
+      return $ XLet bindings'' expr'
+
+  -- cases should be irrelevant to float-in, don't add binder
+  floatIn pred (XCase match binder alts) = do
+    XCase <$> floatIn pred match <*> floatIn pred binder <*> mapM (floatIn pred) alts
+
+  floatIn pred (XType ty) = XType <$> floatIn pred ty
+
+  floatIn _ other = return other
+
+instance FloatIn (XType UD) where
+  -- TODO: can stuff even *be* floated out of types?
+  -- I guess $krep stuff and such, why shouldn't be relevant tho
+  floatIn _ ty = return ty
+
+instance FloatIn (XAlt UD) where
+  floatIn pred (XAlt con binders rhs) =
+    XAlt con binders <$> floatIn pred rhs

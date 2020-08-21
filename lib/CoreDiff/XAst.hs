@@ -72,6 +72,12 @@ deriving instance ForAllExtensions Eq a => Eq (XExpr a)
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
 deriving instance ForAllExtensions Eq a => Eq (XType a)
 
+deriving instance ForAllExtensions Ord a => Ord (XBinding a)
+deriving instance ForAllExtensions Ord a => Ord (XBinder a)
+deriving instance ForAllExtensions Ord a => Ord (XExpr a)
+deriving instance ForAllExtensions Ord a => Ord (XAlt a)
+deriving instance ForAllExtensions Ord a => Ord (XType a)
+
 -- UD: Undecorated, "normal" expression without extension.
 -- Diff: Additional constructor for (Expr, Expr) holes.
 data Variant = UD | Diff
