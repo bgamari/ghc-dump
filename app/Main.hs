@@ -136,8 +136,12 @@ ignoreStats (binder, _stats, expr) = (binder, expr)
 printPairings = mapM_ go
   where
     go (Both l r) = putStrLn $ "Both: (" ++ show (runReader (ppr $ xb l) opts) ++ "," ++ show (runReader (ppr $ xb r) opts) ++ ")"
-    go (OnlyLeft l) = putStrLn $ "Left: " ++ show (red $ runReader (ppr $ xb l) opts)
-    go (OnlyRight l) = putStrLn $ "Right: " ++ show (green $ runReader (ppr $ xb l) opts)
+    go (OnlyLeft l) = do
+      putStrLn $ "Left: " ++ show (red $ runReader (ppr $ xb l) opts)
+      putStrLn $ "Dbg : " ++ show (xb l)
+    go (OnlyRight l) = do
+      putStrLn $ "Right: " ++ show (green $ runReader (ppr $ xb l) opts)
+      putStrLn $ "Dbg  : " ++ show (xb l)
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b

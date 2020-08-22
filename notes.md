@@ -87,6 +87,7 @@ See Maths2/cube from 0001 to 0002 for an example.
   - [x] find out what that error means
 - [ ] corediff file1:bndr file2:bndr'
 - [ ] rausfloaten mal anschauen (expr -> let ... in expr')
+  - Siehe [GHC wiki][1].
 - [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
 - [x] Coolen erweiterbaren AST einbauen
 - [x] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
@@ -101,4 +102,8 @@ See Maths2/cube from 0001 to 0002 for an example.
       - Wenn keine Wurzel: global reinfloaten, unterschied zw. bspw. `$trModule` und `lvl` bindern
       - Manchmal muss auch `$w...` beachtet werden.
     - [ ] `$krep`? Das reinzufloaten ist wahrscheinlich nicht ganz richtig => Möglichkeit einbauen, das in der endansicht zu filtern.
-- [ ] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
+- [x] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
+  - A: `TyCon`s und `ExternalName`s haben auch uniques drin, die aber für unseren Anwendungsfall irrelevant sein sollten. Die abgeleitete `Eq`-Instanz beachtet diese aber natürlich => selber implementieren, mindestens für `XExpr` und `XType`.
+
+
+[1]: https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/compiler/core-to-core-pipeline

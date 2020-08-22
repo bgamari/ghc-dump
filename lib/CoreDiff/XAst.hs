@@ -66,12 +66,19 @@ data XType (a :: Variant)
   | XCoercionTy
   | XXType (XTypeExtension a)
 
+deriving instance ForAllExtensions Show a => Show (XBinding a)
+deriving instance ForAllExtensions Show a => Show (XBinder a)
+deriving instance ForAllExtensions Show a => Show (XExpr a)
+deriving instance ForAllExtensions Show a => Show (XAlt a)
+deriving instance ForAllExtensions Show a => Show (XType a)
+
 deriving instance ForAllExtensions Eq a => Eq (XBinding a)
 deriving instance ForAllExtensions Eq a => Eq (XBinder a)
 deriving instance ForAllExtensions Eq a => Eq (XExpr a)
--- TODO: Provide out own instance, for example for XExtName's ExternalName, don't compare uniques
+-- TODO: Provide our own instance, for example for XExtName's ExternalName, don't compare uniques
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
 deriving instance ForAllExtensions Eq a => Eq (XType a)
+-- TODO: Same thing applies here, uniques in TyCons shouldn't be take into account
 
 deriving instance ForAllExtensions Ord a => Ord (XBinding a)
 deriving instance ForAllExtensions Ord a => Ord (XBinder a)

@@ -231,7 +231,7 @@ pprAltCon (AltDataCon t) = pretty t
 pprAltCon (AltLit l) = pprLit l
 pprAltCon (AltDefault) = "DEFAULT"
 
-pprBinderName binder = blue <$> do
+pprBinderName binder = do
   opts <- ask
   if pprShowUniques opts then
     return $ pretty (xBinderName binder) <> "_" <> pretty (xBinderId binder)
