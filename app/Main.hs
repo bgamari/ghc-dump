@@ -87,15 +87,11 @@ main' ["pairings", pathA, pathB] = do
 
   print $ bold $ text $ "Bindings in " ++ pathA ++ " after float-in:"
   printBindings bindingsAFloatedIn
-
   print $ bold $ text $ "Bindings in " ++ pathB ++ " after float-in:"
   printBindings bindingsBFloatedIn
   
-  {-
-  let pairings = findPairings bindingsA bindingsB
-
+  let pairings = findPairings bindingsAFloatedIn bindingsBFloatedIn
   printPairings pairings
-  -}
 
 main' ["diffmod", pathA, pathB] = do
   modA <- readDump pathA
@@ -137,8 +133,6 @@ getName = T.unpack . binderName . unBndr
 
 ignoreStats (binder, _stats, expr) = (binder, expr)
 
-{-
--- TODO: this is just for debugging
 printPairings = mapM_ go
   where
     go (Both l r) = putStrLn $ "Both: (" ++ show (runReader (ppr $ xb l) opts) ++ "," ++ show (runReader (ppr $ xb r) opts) ++ ")"
@@ -147,7 +141,6 @@ printPairings = mapM_ go
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
--}
 
 printPairingDiffs = mapM_ go
   where

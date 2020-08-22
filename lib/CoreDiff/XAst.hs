@@ -69,6 +69,7 @@ data XType (a :: Variant)
 deriving instance ForAllExtensions Eq a => Eq (XBinding a)
 deriving instance ForAllExtensions Eq a => Eq (XBinder a)
 deriving instance ForAllExtensions Eq a => Eq (XExpr a)
+-- TODO: Provide out own instance, for example for XExtName's ExternalName, don't compare uniques
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
 deriving instance ForAllExtensions Eq a => Eq (XType a)
 

@@ -22,6 +22,8 @@ gcpBinding (XBinding binder expr) (XBinding binder' expr') =
   XBinding (gcpBinder binder binder') (gcpExpr expr expr')
 
 
+-- TODO: unfoldings?
+-- TODO: Remove coercions
 gcpBinder :: XBinder UD -> XBinder UD -> XBinder Diff
 gcpBinder binder@XBinder{} binder'@XBinder{}
   | binder == binder' = unsafeCoerce binder
