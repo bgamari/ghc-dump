@@ -74,11 +74,98 @@ deriving instance ForAllExtensions Show a => Show (XType a)
 
 deriving instance ForAllExtensions Eq a => Eq (XBinding a)
 deriving instance ForAllExtensions Eq a => Eq (XBinder a)
-deriving instance ForAllExtensions Eq a => Eq (XExpr a)
--- TODO: Provide our own instance, for example for XExtName's ExternalName, don't compare uniques
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
-deriving instance ForAllExtensions Eq a => Eq (XType a)
--- TODO: Same thing applies here, uniques in TyCons shouldn't be take into account
+
+
+-- NOTE: Uniques appear in binders, type constructors and external names.
+-- For our purposes, they are only relevant in binders (?).
+-- TODO: Make sure this is actually true.
+-- This is also relevant during diffing:
+-- Since we can't override (==), we need to resort to this hacky solution
+-- where we define the same (~~) both here and in CoreDiff.Diff.
+-- A more elegant solution would define another typeclass, that would break
+-- Ord tho.
+-- This code duplication can be avoided by wrapping stuff back up into XExpr
+-- and XType respectively in the Diff module and then (==) those instead
+-- of their members.
+
+
+-- We need this instance to specify a special comparison (~~) for external
+-- names which ignores uniques.
+instance ForAllExtensions Eq a => Eq (XExpr a) where
+  (XVar bndr)               == (XVar bndr') =
+    bndr == bndr'
+
+  (XVarGlobal extName)      == (XVarGlobal extName') =
+    extName ~~ extName'
+    where 
+      (ExternalName mod name _) ~~ (ExternalName mod' name' _) =
+        mod == mod' && name == name'
+
+  (XLit literal)            == (XLit literal') =
+    literal == literal'
+
+  (XApp f x)                == (XApp f' x') =
+    f == f' && x == x'
+
+  (XTyLam param body)       == (XTyLam param' body') =
+    param == param' && body == body'
+
+  (XLam param body)         == (XLam param' body') =
+    param == param' && body == body'
+
+  (XLet bindings expr)      == (XLet bindings' expr') =
+    bindings == bindings' && expr == expr'
+
+  (XCase match binder alts) == (XCase match' binder' alts') =
+    match == match' && binder == binder' && alts == alts'
+
+  (XType ty)                == (XType ty') =
+    ty == ty'
+
+  (XCoercion)               == (XCoercion) =
+    True
+
+  (XXExpr extension)        == (XXExpr extension') =
+    extension == extension'
+
+  _                         == _ =
+    False
+    
+
+-- We need this instance to specify a special comparison (~~) for type
+-- constructors which ignores uniques.
+instance ForAllExtensions Eq a => Eq (XType a) where
+  (XVarTy bndr)       == (XVarTy bndr') =
+    bndr == bndr'
+
+  (XFunTy a b)        == (XFunTy a' b') =
+    a == a' && b == b'
+
+  (XTyConApp tc tys)  == (XTyConApp tc' tys') =
+    tc ~~ tc' && tys == tys'
+    where
+      (TyCon name _) ~~ (TyCon name' _) =
+        name == name'
+
+  (XAppTy f x)        == (XAppTy f' x') =
+    f == f' && x == x'
+
+  (XForAllTy bndr ty) == (XForAllTy bndr' ty') =
+    bndr == bndr' && ty == ty'
+
+  (XLitTy) == (XLitTy) =
+    True
+
+  (XCoercionTy)       == (XCoercionTy) =
+    True
+
+  (XXType extension)  == (XXType extension') =
+    extension == extension'
+
+  _                   == _ =
+    False
+
 
 deriving instance ForAllExtensions Ord a => Ord (XBinding a)
 deriving instance ForAllExtensions Ord a => Ord (XBinder a)

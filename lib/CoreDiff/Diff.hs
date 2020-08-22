@@ -5,6 +5,7 @@ module CoreDiff.Diff where
 
 import CoreDiff.XAst
 import Data.List
+import GhcDump.Ast (ExternalName(..), TyCon(..))
 -- TODO: Sometimes we want to convert an XExpr UD to an XExpr Diff
 -- Since XExpr UD never has any extensions, this is a no-op
 -- The type system can't unify their types tho.
@@ -36,8 +37,12 @@ gcpBinder binder binder' =
 gcpExpr :: XExpr UD -> XExpr UD -> XExpr Diff
 gcpExpr (XVar binder) (XVar binder') =
   XVar $ gcpBinder binder binder'
-gcpExpr (XVarGlobal extName) (XVarGlobal extName') | extName == extName' =
+gcpExpr (XVarGlobal extName) (XVarGlobal extName') | extName ~~ extName' =
   XVarGlobal extName
+  where
+    -- See note in CoreDiff.XAst's Eq (XExpr a) instance
+    (ExternalName mod name _) ~~ (ExternalName mod' name' _) =
+      mod == mod' && name == name'
 gcpExpr (XLit lit) (XLit lit') | lit == lit' =
   XLit lit
 gcpExpr (XApp f x) (XApp f' x') =
@@ -70,8 +75,13 @@ gcpType (XVarTy binder) (XVarTy binder') =
   XVarTy $ gcpBinder binder binder'
 gcpType (XFunTy l r) (XFunTy l' r') =
   XFunTy (gcpType l l') (gcpType r r')
-gcpType (XTyConApp tc args) (XTyConApp tc' args') | tc == tc' =
+gcpType (XTyConApp tc args) (XTyConApp tc' args') | tc ~~ tc' =
+  -- Possible solution: Check (TyCon tc []) == (TyCon tc' []), ugly but works.
   XTyConApp tc $ zipWith gcpType args args'
+  where
+    -- See note in CoreDiff.XAst's Eq (XExpr a) instance
+    (TyCon name _) ~~ (TyCon name' _) =
+      name == name'
 gcpType (XAppTy f x) (XAppTy f' x') =
   XAppTy (gcpType f f') (gcpType x x')
 gcpType (XForAllTy binder ty) (XForAllTy binder' ty') =
