@@ -52,11 +52,6 @@ Dump GHC Core programs using `ghc-dump-core`, e.g.:
 $GHC -fplugin GhcDump.Plugin -O2 demos/Maths.hs
 ```
 
-Compare two passes or two completely different files in the top-level binding `square`:
-
-```bash
-corediff debruijn square demos/Maths.pass-0000.cbor demos/Maths.pass-0019.cbor
-```
 Compare two modules:
 
 ```bash

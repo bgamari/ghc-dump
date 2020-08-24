@@ -112,13 +112,18 @@ main' ["diffmod2", pathA, pathB, diffA, diffB] = do
   modA <- readDump pathA
   modB <- readDump pathB
 
+  print $ bold $ text $ "Comparing " ++ T.unpack (modulePhase modA) ++ " and " ++ T.unpack (modulePhase modB) ++ "..."
+
   let bindersA = map (fst . ignoreStats) $ moduleBindings modA
   let bindersB = map (fst . ignoreStats) $ moduleBindings modB
 
   let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
   let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
 
-  let pairings = findPairings bindingsA bindingsB
+  let bindingsAFloatedIn = floatInTopLvl bindingsA
+  let bindingsBFloatedIn = floatInTopLvl bindingsB
+
+  let pairings = findPairings bindingsAFloatedIn bindingsBFloatedIn
 
   printPairingDiffs' pairings diffA diffB
 
@@ -147,7 +152,7 @@ printPairings = mapM_ go
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
 
-printPairingDiffs = mapM_ go
+printPairingDiffs pairings = mapM_ go pairings
   where
     go (OnlyLeft l) = do
       putStrLn "Left only: "
@@ -159,10 +164,14 @@ printPairingDiffs = mapM_ go
       putStrLn "Both (assimilated):"
       print $ runReader (ppr $ diff l r') opts
       where
-        r' = swapNamesTopLvl l r
+        r' = runReader (swapNames l r) associatedBinderNames
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
     xb (XAst.XBinding b _) = b
+    associatedBinderNames =
+      [ (getUName lBinder, getUName rBinder)
+      | Both (XAst.XBinding lBinder _) (XAst.XBinding rBinder _) <- pairings
+      ]
 
 printPairingDiffs' pairings diffL diffR = do
   writeFile diffL $ intercalate "\n" $ reverse lStrs
@@ -176,9 +185,13 @@ printPairingDiffs' pairings diffL diffR = do
       , accR ++ [show (ppr' r')]
       )
       where
-        r' = swapNamesTopLvl l r
+        r' = runReader (swapNames l r) associatedBinderNames
 
     ppr' x = runReader (ppr x) pprDefaultOpts
+    associatedBinderNames =
+      [ (getUName lBinder, getUName rBinder)
+      | Both (XAst.XBinding lBinder _) (XAst.XBinding rBinder _) <- pairings
+      ]
 
 printBinderNames :: [XAst.XBinding XAst.UD] -> IO ()
 printBinderNames bindings =

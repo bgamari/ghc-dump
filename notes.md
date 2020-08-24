@@ -83,7 +83,7 @@ See Maths2/cube from 0001 to 0002 for an example.
 ### `occ=Many vs. occ=Dead`
 
 ```
-./testdemo ~/.cabal/bin/corediff diffmod Simple 0015 | less -R
+./testdemo ~/.cabal/bin/corediff diffmod Simple 0000 | less -R
 ```
 
 Then go to line 12682 by typing `:12682<ENTER>`.
@@ -91,8 +91,7 @@ Then go to line 12682 by typing `:12682<ENTER>`.
 ## TODO
 
 - [x] module diffen pairing ausdenken
-  - [ ] dont check type equality, check structure-based equality
-  - [ ] check term structure if types couldnt be matched
+  - [ ] check term structure if types couldnt be matched (important pls)
 - [x] ghc-dump-util compilen
   - [x] find out what that error means
 - [ ] corediff file1:bndr file2:bndr'
@@ -114,6 +113,17 @@ Then go to line 12682 by typing `:12682<ENTER>`.
     - [ ] `$krep`? Das reinzufloaten ist wahrscheinlich nicht ganz richtig => Möglichkeit einbauen, das in der endansicht zu filtern.
 - [x] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
   - A: `TyCon`s und `ExternalName`s haben auch uniques drin, die aber für unseren Anwendungsfall irrelevant sein sollten. Die abgeleitete `Eq`-Instanz beachtet diese aber natürlich => selber implementieren, mindestens für `XExpr` und `XType`.
+- [ ] Eigene Implementierungen für `Ppr (Change x)` machen.
+
+### 2020-08-25
+
+- Module diffen funktioniert jetzt größtenteils.
+- Henne-und-Ei-Problem beim paarfinden, bspw. für `main` in `Simple`.
+  - Bspw. auch `$krep` in `Flags`, evl. kann man das brute-forcey oder inkrementär machen.
+- Float-in ist eher rudimentär gelöst, reicht die aktuelle Lösung?
+- CPR in ghc-dump-core mitkonvertieren: Wie dringend?
+- Mehr Beispiele!!1!
+- Abschnitt zu GHC sinnvoll von der Länge? Grafik einbauen?
 
 
 [1]: https://gitlab.haskell.org/ghc/ghc/-/wikis/commentary/compiler/core-to-core-pipeline
