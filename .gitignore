@@ -1,4 +1,3 @@
-*.pass-*
 *.hi
 *.o
 dist
