@@ -31,7 +31,16 @@ cabal v1-install -w ${ghc up to 8.11} --allow-newer
 
 There are no automatic unit or integration tests yet.
 I'm planning to write some.
-Until then, you can use the commands described in "Usage" to see if the program works.
+
+### `testdemo` script
+
+The `testdemo` script in this repo can be used for basic testing.
+
+```
+./testdemo ~/.cabal/bin/corediff pairings Simple 0015
+```
+
+runs `corediff pairings` on `demos/ghc-8.8.3/Simple.pass-0015.cbor` and `demos/ghc-8.11.0.20200610/Simple.pass-0015.cbor`.
 
 ## Usage
 
