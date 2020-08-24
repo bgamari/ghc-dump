@@ -78,6 +78,16 @@ stuff like `GHC.* (Numinstance) Float a b` often gets converted into stuff like 
 The diffs look pretty horrible because no diffs are summarized yet.
 See Maths2/cube from 0001 to 0002 for an example.
 
+## Examples that the program works as intended
+
+### `occ=Many vs. occ=Dead`
+
+```
+./testdemo ~/.cabal/bin/corediff diffmod Simple 0015 | less -R
+```
+
+Then go to line 12682 by typing `:12682<ENTER>`.
+
 ## TODO
 
 - [x] module diffen pairing ausdenken
@@ -86,7 +96,7 @@ See Maths2/cube from 0001 to 0002 for an example.
 - [x] ghc-dump-util compilen
   - [x] find out what that error means
 - [ ] corediff file1:bndr file2:bndr'
-- [ ] rausfloaten mal anschauen (expr -> let ... in expr')
+- [x] rausfloaten mal anschauen (expr -> let ... in expr')
   - Siehe [GHC wiki][1].
 - [ ] Constructed Product Result Analysis in GhcDump/Ast unter neuer Version einbauen (eventuell...)
 - [x] Coolen erweiterbaren AST einbauen

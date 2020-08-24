@@ -97,14 +97,15 @@ main' ["diffmod", pathA, pathB] = do
   modA <- readDump pathA
   modB <- readDump pathB
 
-  let bindersA = map (fst . ignoreStats) $ moduleBindings modA
-  let bindersB = map (fst . ignoreStats) $ moduleBindings modB
-
   let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
   let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
-  
-  let pairings = findPairings bindingsA bindingsB
 
+  -- print $ bold $ red $ text $ "Floating in..."
+
+  let bindingsAFloatedIn = floatInTopLvl bindingsA
+  let bindingsBFloatedIn = floatInTopLvl bindingsB
+  
+  let pairings = findPairings bindingsAFloatedIn bindingsBFloatedIn
   printPairingDiffs pairings
 
 main' ["diffmod2", pathA, pathB, diffA, diffB] = do
