@@ -35,10 +35,20 @@ data XBinder (a :: Variant)
     }
   | XXBinder (XBinderExtension a)
 
+-- ExternalName from GhcDump.Ast without the Unique field.
+-- Provides a simple derived Eq instance.
+-- TODO: field names and type name are less than nice, what
+-- are the alternatives here?
+data ExternalName' = ExternalName'
+  { externalModuleName' :: ModuleName
+  , externalName' :: T.Text
+  }
+  | ForeignCall'
+  deriving (Show, Eq, Ord)
+
 data XExpr (a :: Variant)
   = XVar (XBinder a)
-  -- TODO: Ersetzen durch ExternalName ohne Unique
-  | XVarGlobal ExternalName
+  | XVarGlobal ExternalName'
   | XLit Lit
   | XApp (XExpr a) (XExpr a)
   | XTyLam (XBinder a) (XExpr a)
@@ -57,11 +67,16 @@ data XAlt (a :: Variant)
     }
   | XXAlt (XAltExtension a)
 
+-- TyCon from GhcDump.Ast without the Unique field.
+-- Provides a simple derived Eq instance.
+-- TODO: newtype?
+data TyCon' = TyCon' T.Text
+  deriving (Show, Eq, Ord)
+
 data XType (a :: Variant)
   = XVarTy (XBinder a)
   | XFunTy (XType a) (XType a)
-  -- TODO: Ersetzen durch TyCon ohne Unique
-  | XTyConApp TyCon [XType a]
+  | XTyConApp TyCon' [XType a]
   | XAppTy (XType a) (XType a)
   | XForAllTy (XBinder a) (XType a)
   | XLitTy
@@ -76,98 +91,9 @@ deriving instance ForAllExtensions Show a => Show (XType a)
 
 deriving instance ForAllExtensions Eq a => Eq (XBinding a)
 deriving instance ForAllExtensions Eq a => Eq (XBinder a)
+deriving instance ForAllExtensions Eq a => Eq (XExpr a)
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
-
-
--- NOTE: Uniques appear in binders, type constructors and external names.
--- For our purposes, they are only relevant in binders (?).
--- TODO: Make sure this is actually true.
--- This is also relevant during diffing:
--- Since we can't override (==), we need to resort to this hacky solution
--- where we define the same (~~) both here and in CoreDiff.Diff.
--- A more elegant solution would define another typeclass, that would break
--- Ord tho.
--- This code duplication can be avoided by wrapping stuff back up into XExpr
--- and XType respectively in the Diff module and then (==) those instead
--- of their members.
-
-
--- We need this instance to specify a special comparison (~~) for external
--- names which ignores uniques.
-instance ForAllExtensions Eq a => Eq (XExpr a) where
-  (XVar bndr)               == (XVar bndr') =
-    bndr == bndr'
-
-  (XVarGlobal extName)      == (XVarGlobal extName') =
-    extName ~~ extName'
-    where 
-      (ExternalName mod name _) ~~ (ExternalName mod' name' _) =
-        mod == mod' && name == name'
-
-  (XLit literal)            == (XLit literal') =
-    literal == literal'
-
-  (XApp f x)                == (XApp f' x') =
-    f == f' && x == x'
-
-  (XTyLam param body)       == (XTyLam param' body') =
-    param == param' && body == body'
-
-  (XLam param body)         == (XLam param' body') =
-    param == param' && body == body'
-
-  (XLet bindings expr)      == (XLet bindings' expr') =
-    bindings == bindings' && expr == expr'
-
-  (XCase match binder alts) == (XCase match' binder' alts') =
-    match == match' && binder == binder' && alts == alts'
-
-  (XType ty)                == (XType ty') =
-    ty == ty'
-
-  (XCoercion)               == (XCoercion) =
-    True
-
-  (XXExpr extension)        == (XXExpr extension') =
-    extension == extension'
-
-  _                         == _ =
-    False
-    
-
--- We need this instance to specify a special comparison (~~) for type
--- constructors which ignores uniques.
-instance ForAllExtensions Eq a => Eq (XType a) where
-  (XVarTy bndr)       == (XVarTy bndr') =
-    bndr == bndr'
-
-  (XFunTy a b)        == (XFunTy a' b') =
-    a == a' && b == b'
-
-  (XTyConApp tc tys)  == (XTyConApp tc' tys') =
-    tc ~~ tc' && tys == tys'
-    where
-      (TyCon name _) ~~ (TyCon name' _) =
-        name == name'
-
-  (XAppTy f x)        == (XAppTy f' x') =
-    f == f' && x == x'
-
-  (XForAllTy bndr ty) == (XForAllTy bndr' ty') =
-    bndr == bndr' && ty == ty'
-
-  (XLitTy) == (XLitTy) =
-    True
-
-  (XCoercionTy)       == (XCoercionTy) =
-    True
-
-  (XXType extension)  == (XXType extension') =
-    extension == extension'
-
-  _                   == _ =
-    False
-
+deriving instance ForAllExtensions Eq a => Eq (XType a)
 
 deriving instance ForAllExtensions Ord a => Ord (XBinding a)
 deriving instance ForAllExtensions Ord a => Ord (XBinder a)
@@ -233,7 +159,9 @@ removeUnfolding idi@IdInfo{} =
 
 cvtExpr :: Expr -> XExpr UD
 cvtExpr (EVar binder) = XVar $ cvtBinder binder
-cvtExpr (EVarGlobal extName) = XVarGlobal extName
+cvtExpr (EVarGlobal extName) = XVarGlobal $ cvtExtName extName
+  where
+    cvtExtName (ExternalName modName name _) = ExternalName' modName name
 cvtExpr (ELit lit) = XLit lit
 cvtExpr (EApp f x) = XApp (cvtExpr f) (cvtExpr x)
 cvtExpr (ETyLam p b) = XTyLam (cvtBinder p) (cvtExpr b)
@@ -254,7 +182,9 @@ cvtAlt (Alt con binders rhs) = XAlt con (map cvtBinder binders) (cvtExpr rhs)
 cvtType :: Type -> XType UD
 cvtType (VarTy binder) = XVarTy $ cvtBinder binder
 cvtType (FunTy l r) = XFunTy (cvtType l) (cvtType r)
-cvtType (TyConApp tc args) = XTyConApp tc $ map cvtType args
+cvtType (TyConApp tc args) = XTyConApp (cvtTyCon tc) (map cvtType args)
+  where
+    cvtTyCon (TyCon name _) = TyCon' name
 cvtType (AppTy l r) = XAppTy (cvtType l) (cvtType r)
 cvtType (ForAllTy binder ty) = XForAllTy (cvtBinder binder) (cvtType ty)
 cvtType (LitTy) = XLitTy

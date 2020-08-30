@@ -206,12 +206,12 @@ instance PprOpts x => PprOpts (Change x) where
 
 -- terminals
 
-pprExtName extName@ExternalName{} =
-  modName <> dot <> varName
+pprExtName (ExternalName' modName name) =
+  modNameDoc <> dot <> nameDoc
   where
-    modName = pretty $ getModuleName $ externalModuleName extName
-    varName = pretty $ externalName extName
-pprExtName ForeignCall = "<foreign>"
+    modNameDoc = pretty $ getModuleName modName
+    nameDoc = pretty name
+pprExtName ForeignCall' = "<foreign>"
 
 pprLit (MachChar c) = squotes $ pretty c
 pprLit (MachStr s) = dquotes $ text $ BS.unpack s
@@ -273,7 +273,7 @@ instance Pretty OccInfo where
     pretty (OccLoopBreaker strong) =
       if strong then "Strong Loopbrk" else "Weak Loopbrk"
 
-pprTyCon (TyCon t _) = pretty t
+pprTyCon (TyCon' t) = pretty t
 
 -- some helpers
 
