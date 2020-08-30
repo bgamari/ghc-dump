@@ -37,6 +37,7 @@ data XBinder (a :: Variant)
 
 data XExpr (a :: Variant)
   = XVar (XBinder a)
+  -- TODO: Ersetzen durch ExternalName ohne Unique
   | XVarGlobal ExternalName
   | XLit Lit
   | XApp (XExpr a) (XExpr a)
@@ -59,6 +60,7 @@ data XAlt (a :: Variant)
 data XType (a :: Variant)
   = XVarTy (XBinder a)
   | XFunTy (XType a) (XType a)
+  -- TODO: Ersetzen durch TyCon ohne Unique
   | XTyConApp TyCon [XType a]
   | XAppTy (XType a) (XType a)
   | XForAllTy (XBinder a) (XType a)

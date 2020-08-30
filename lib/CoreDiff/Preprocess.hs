@@ -233,7 +233,7 @@ instance Swap (XExpr UD) where
   -- we won't even try to pair them up nicely; we will just apply the permutation
   swapNames (XCase match binder alts) (XCase match' binder' alts')
     | length alts == length alts' =
-      XCase <$> swapNames match match' <*> withBndr (swapNames binder binder') <*> zipWithM swapNames alts alts'
+      XCase <$> swapNames match match' <*> withBndr (swapNames binder binder') <*> withBndr (zipWithM swapNames alts alts')
     | otherwise =
       XCase <$> applyPerm match' <*> applyPerm binder' <*> mapM applyPerm alts'
     where withBndr = local (++ [(getUName binder, getUName binder')])

@@ -102,7 +102,6 @@ Then go to line 12682 by typing `:12682<ENTER>`.
 - [x] Prettyprinten mit Text.PrettyPrint.ANSI. ... (ist es möglich hier iwie `ppr :: Expr -> Reader Opts String` zu produzieren?)
 - [x] Alternativen zu De-Bruijn-Indizes testen
   - important and kind of a requirement for a nice pairing algo
-- [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
 - [x] diffmod Maths/1 und Maths/23 macht Fehler, liegt wahrscheinlich an fehlenden eingebundenen globals. Sollte ohne DB eig nicht auftreten
 - [x] floatIn-Funktion, die ausgewählte Binder aus let-blöcken entfernt und im Body substituiert.
   - "automatic float-in detection" ist nicht komplett trivial, da afaik user-definierte und compiler-erzeugte binder nicht unterscheidbar sind. heuristiken:
@@ -110,10 +109,14 @@ Then go to line 12682 by typing `:12682<ENTER>`.
     - [ ] Variablen, deren Name oft vorkommt, bspw. `main_r1332`, `main_s31666`, etc. => nicht user-definierbar, der Compiler hat Sachen gemacht => Wurzel finden
       - Wenn keine Wurzel: global reinfloaten, unterschied zw. bspw. `$trModule` und `lvl` bindern
       - Manchmal muss auch `$w...` beachtet werden.
-    - [ ] `$krep`? Das reinzufloaten ist wahrscheinlich nicht ganz richtig => Möglichkeit einbauen, das in der endansicht zu filtern.
+    - [x] `$krep`? Das reinzufloaten ist wahrscheinlich nicht ganz richtig
+      - [ ] Möglichkeit einbauen, das in der endansicht zu filtern.
 - [x] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
   - A: `TyCon`s und `ExternalName`s haben auch uniques drin, die aber für unseren Anwendungsfall irrelevant sein sollten. Die abgeleitete `Eq`-Instanz beachtet diese aber natürlich => selber implementieren, mindestens für `XExpr` und `XType`.
-- [ ] Eigene Implementierungen für `Ppr (Change x)` machen.
+- [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
+  - [ ] Eigene Implementierungen für `Ppr (Change x)` machen.
+  - [ ] Oder direkt im Diff machen
+- [ ] "diff/pair/diff" für pairings
 
 ### 2020-08-25
 
