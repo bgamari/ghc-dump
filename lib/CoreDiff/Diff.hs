@@ -1,11 +1,18 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module CoreDiff.Diff where
 
+import Control.Monad.Reader
+import Control.Monad.State
 import CoreDiff.XAst
+import CoreDiff.Preprocess (swapNames, getUName)
+import CoreDiff.PrettyPrint
 import Data.List
 import GhcDump.Ast (ExternalName(..), TyCon(..))
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 -- TODO: Sometimes we want to convert an XExpr UD to an XExpr Diff
 -- Since XExpr UD never has any extensions, this is a no-op
 -- The type system can't unify their types tho.
@@ -184,3 +191,169 @@ findPairings ls rs =
     allNames = nub $ union lNames rNames
 
     xb (XBinding binder _) = binder
+
+-- snaad
+-- swap names and add demands
+
+snaadIterate bindingsLeft bindingsRight =
+  runState snaadStep $ snaadInit bindingsLeft bindingsRight
+
+data SnaadS = SnaadS
+  { snaadUnified :: [(XBinding UD, XBinding UD)]
+  , snaadDemands :: [(XBinding UD, XBinding UD)]
+  , snaadLeft    :: [XBinding UD]
+  , snaadRight   :: [XBinding UD]
+  , snaadPairs   :: [(XBinding UD, XBinding UD)]
+  }
+
+instance Show SnaadS where
+  show s = show $ vsep
+    [ bold "Unified:" <+> list (map goP $ snaadUnified s)
+    , bold "Demands:" <+> list (map goP $ snaadDemands s)
+    , bold "Left:"    <+> list (map goS $ snaadLeft s)
+    , bold "Right:"   <+> list (map goS $ snaadRight s)
+    , bold "Pairs:"   <+> list (map goP $ snaadPairs s)
+    ]
+    where
+      goP (XBinding binder _, XBinding binder' _) =
+        runReader (ppr binder)  (pprDefaultOpts { pprShowIdInfo = False })
+        <+> equals <+>
+        runReader (ppr binder') (pprDefaultOpts { pprShowIdInfo = False })
+
+      goS (XBinding binder _) =
+        runReader (ppr binder) (pprDefaultOpts { pprShowIdInfo = False })
+
+snaadInit bindingsLeft bindingsRight =
+  SnaadS [] pairs lefts rights []
+  where
+    -- TODO: improve
+    (pairs, lefts, rights) =
+      foldl go ([], [], []) $ findPairings bindingsLeft bindingsRight
+    go (p, l, r) (Both a b) = (p ++ [(a, b)], l, r)
+    go (p, l, r) (OnlyLeft a) = (p, l ++ [a], r)
+    go (p, l, r) (OnlyRight b) = (p, l, r ++ [b])
+
+getUnified = snaadUnified <$> get
+addUnified l r = modify go
+  where go s = s { snaadUnified = snaadUnified s ++ [(l, r)] }
+
+getDemands = snaadDemands <$> get
+setDemands d = modify go
+  where go s = s { snaadDemands = d }
+
+addPair l r = modify go
+  where go s = s { snaadPairs = snaadPairs s ++ [(l, r)] }
+
+getLeft = snaadLeft <$> get
+setLeft l = modify go
+  where go s = s { snaadLeft = l }
+
+getRight = snaadRight <$> get
+setRight r = modify go
+  where go s = s { snaadRight = r }
+
+getSubst = do
+  u <- getUnified
+  d <- getDemands
+  return $ binderUNPairs $ u ++ d
+
+toDemands ::
+  [(XBinder UD, XBinder UD)] -> State SnaadS [(XBinding UD, XBinding UD)]
+toDemands bps = do
+  ls <- getLeft
+  rs <- getRight
+  let (dmds, ls', rs') = foldl go ([], ls, rs) bps
+  setLeft ls'
+  setRight rs'
+  return dmds
+  where
+    go (d, l, r) (bl, br) | bl `elem` bindersIn l && br `elem` bindersIn r =
+      (d ++ [(bnl, bnr)], l', r')
+      where
+        (bnl, l') = removeByBinder bl l
+        (bnr, r') = removeByBinder br r
+    go acc       _ =
+      acc
+
+    bindersIn = map go
+      where go (XBinding binder _) = binder
+
+    removeByBinder binder (b@(XBinding binder' _):rest) | binder == binder' =
+      (b, rest)
+    removeByBinder binder (b:rest) =
+      (b', b : rest')
+      where
+        (b', rest') = removeByBinder binder rest
+
+binderUNPairs = map go
+  where
+    go (XBinding binder _, XBinding binder' _) =
+      (getUName binder, getUName binder')
+
+
+snaadStep :: State SnaadS Bool
+snaadStep = do
+  d <- getDemands
+  case d of
+    [] -> return True
+    ((l, r) : rest) -> do
+      perm <- getSubst
+      let r' = runReader (swapNames l r) perm
+      newD <- toDemands $ disagreeingOccs l r'
+      let r'' = runReader (swapNames r r') $ binderUNPairs newD
+      
+      addUnified l r
+      setDemands (rest ++ newD)
+      addPair l r''
+      return False
+
+disagreeingOccs = dOccBinding
+  where
+    dOccBinding (XBinding binder expr) (XBinding binder' expr') =
+      dOccBinder binder binder' ++ dOccExpr expr expr'
+
+    dOccBinder b@XBinder{} b'@XBinder{} =
+      dOccType (xBinderType b) (xBinderType b')
+    dOccBinder b@XTyBinder{} b'@XTyBinder{} =
+      dOccType (xBinderKind b) (xBinderKind b')
+    dOccBinder _ _ =
+      []
+
+    -- even if two binder names disagree, check their types
+    -- for disagreeing (typevar-)occurrences too
+    dOccExpr (XVar binder) (XVar binder')
+      | getUName binder /= getUName binder' =
+        (binder, binder') : dOccBinder binder binder'
+      | otherwise =
+        dOccBinder binder binder'
+    dOccExpr (XApp f x) (XApp f' x') =
+      dOccExpr f f' ++ dOccExpr x x'
+    dOccExpr (XTyLam p b) (XTyLam p' b') =
+      dOccBinder p p' ++ dOccExpr b b'
+    dOccExpr (XLam p b) (XLam p' b') =
+      dOccBinder p p' ++ dOccExpr b b'
+    -- TODO: we should be very careful here...
+    -- TODO: document this (why and how we're being careful)
+    dOccExpr (XLet bindings expr) (XLet bindings' expr') =
+      concat (zipWith dOccBinding bindings bindings') ++ dOccExpr expr expr'
+    -- TODO: same here
+    dOccExpr (XCase match binder alts) (XCase match' binder' alts') =
+      dOccExpr match match' ++ dOccBinder binder binder' ++ concat (zipWith dOccAlt alts alts')
+    dOccExpr (XType ty) (XType ty') =
+      dOccType ty ty'
+    dOccExpr _ _ =
+      []
+
+    dOccAlt (XAlt con binders rhs) (XAlt con' binders' rhs') =
+      concat (zipWith dOccBinder binders binders') ++ dOccExpr rhs rhs'
+
+    dOccType (XVarTy binder) (XVarTy binder') =
+      dOccBinder binder binder'
+    dOccType (XFunTy l r) (XFunTy l' r') =
+      dOccType l l' ++ dOccType r r'
+    dOccType (XAppTy f x) (XAppTy f' x') =
+      dOccType f f' ++ dOccType x x'
+    dOccType (XTyConApp tc args) (XTyConApp tc' args') =
+      concat $ zipWith dOccType args args'
+    dOccType _ _ =
+      []

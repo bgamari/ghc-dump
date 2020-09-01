@@ -127,6 +127,35 @@ main' ["diffmod2", pathA, pathB, diffA, diffB] = do
 
   printPairingDiffs' pairings diffA diffB
 
+main' ["diffmod3", pathA, pathB] = do
+  modA <- readDump pathA
+  modB <- readDump pathB
+  let phaseA = T.unpack $ modulePhase modA
+  let phaseB = T.unpack $ modulePhase modB
+
+  print $ bold $ text $ "Comparing " ++ phaseA ++ " and " ++ phaseB ++ "..."
+
+  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+
+  let bindingsAFloatedIn = floatInTopLvl bindingsA
+  let bindingsBFloatedIn = floatInTopLvl bindingsB
+
+  let s = snaadInit bindingsAFloatedIn bindingsBFloatedIn
+  s' <- sIt s
+  print s'
+  where
+    sIt ps = do
+      print ps
+      let (done, ps') = runState snaadStep ps
+      print $ red $ bold $ text "***"
+      if done then
+        return ps'
+      else do
+        _ <- getLine
+        sIt ps'
+
+
 main' _ = putStrLn "Incorrect number of arguments, aborting."
 
 
