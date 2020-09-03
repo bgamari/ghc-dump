@@ -42,8 +42,12 @@ gcpBinder binder binder' =
 
 
 gcpExpr :: XExpr UD -> XExpr UD -> XExpr Diff
-gcpExpr (XVar binder) (XVar binder') =
-  XVar $ gcpBinder binder binder'
+gcpExpr (XVar binder) (XVar binder')
+  -- TODO: argue that this is correct because is it really?
+  | getUName binder == getUName binder' =
+    XVar $ unsafeCoerce binder
+  | otherwise =
+    XVar $ gcpBinder binder binder'
 gcpExpr (XVarGlobal extName) (XVarGlobal extName') | extName == extName' =
   XVarGlobal extName
 gcpExpr (XLit lit) (XLit lit') | lit == lit' =

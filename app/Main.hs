@@ -151,7 +151,7 @@ main' ["diffmod3", pathA, pathB] = do
       cmd <- prompt "> "
       handleCmd s $ splitOn ' ' cmd
 
-    handleCmd s (cmd:args) =
+    handleCmd s (cmd:args)
       | cmd `elem` ["step", "s"] = do
         let (_done, s') = runState snaadStep s
         print s'
