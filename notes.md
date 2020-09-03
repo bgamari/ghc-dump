@@ -113,10 +113,13 @@ Then go to line 12682 by typing `:12682<ENTER>`.
       - [ ] Möglichkeit einbauen, das in der endansicht zu filtern.
 - [x] diffmod ghc-8.8.3/Flags/0 ghc-8.11.0/Flags/0 zeigt manche binder und typen als unterschiedlich an, woran liegt das?
   - A: `TyCon`s und `ExternalName`s haben auch uniques drin, die aber für unseren Anwendungsfall irrelevant sein sollten. Die abgeleitete `Eq`-Instanz beachtet diese aber natürlich => selber implementieren, mindestens für `XExpr` und `XType`.
-- [ ] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
-  - [ ] Eigene Implementierungen für `Ppr (Change x)` machen.
+- [x] keinen unterschied zeigen wenn sich bei variablen nur der name geändert hat, hier werden ja die infos auch nich angezeigt
+  - [x] Eigene Implementierungen für `Ppr (Change x)` machen.
   - [ ] Oder direkt im Diff machen
 - [ ] "diff/pair/diff" für pairings
+- [ ] haskeline anschauen
+- [ ] globale binder unique? quelle
+  - [ ] 
 
 ### 2020-08-25
 
