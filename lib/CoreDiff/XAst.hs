@@ -67,6 +67,21 @@ data XAlt (a :: Variant)
     }
   | XXAlt (XAltExtension a)
 
+-- Getters and setters
+
+data XBinderUniqueName = XBinderUniqueName T.Text BinderId
+  deriving (Eq, Show)
+
+xBinderUName :: XBinder a -> XBinderUniqueName
+xBinderUName binder = XBinderUniqueName (xBinderName binder) (xBinderId binder)
+
+xBinderSetUName :: XBinder a -> XBinderUniqueName -> XBinder a
+xBinderSetUName binder (XBinderUniqueName name id) =
+  binder { xBinderName = name, xBinderId = id }
+
+xBinderTypeOrKind b@XBinder{}   = xBinderType b
+xBinderTypeOrKind b@XTyBinder{} = xBinderKind b
+
 -- TyCon from GhcDump.Ast without the Unique field.
 -- Provides a simple derived Eq instance.
 -- TODO: newtype?
@@ -147,15 +162,17 @@ cvtBinder :: Binder -> XBinder UD
 cvtBinder (Bndr b@Binder{}) = XBinder
   (binderName b)
   (binderId b)
-  (removeUnfolding $ binderIdInfo b) -- TODO: this should be temporary
+  (removeUnfolding $ binderIdInfo b)
   (cvtType $ binderType b)
+  where
+    -- TODO: Some people may want to diff for unfoldings.
+    -- In that case, we should not remove them here.
+    removeUnfolding idi@IdInfo{} =
+      idi { idiUnfolding = NoUnfolding }
 cvtBinder (Bndr b@TyBinder{}) = XTyBinder
   (binderName b)
   (binderId b)
   (cvtType $ binderKind b)
-
-removeUnfolding idi@IdInfo{} =
-  idi { idiUnfolding = NoUnfolding }
 
 cvtExpr :: Expr -> XExpr UD
 cvtExpr (EVar binder) = XVar $ cvtBinder binder

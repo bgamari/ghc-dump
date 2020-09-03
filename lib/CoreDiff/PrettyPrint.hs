@@ -20,57 +20,33 @@ import GhcDump.Ast
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
 import CoreDiff.XAst
--- TODO: move to ast
-import CoreDiff.Preprocess (getUName)
 
 data PprOptions = PprOptions
   { pprShowUniques :: Bool
   , pprShowIdInfo :: Bool
+  , pprShowTypes :: Bool
   }
 
 pprDefaultOpts = PprOptions
   { pprShowUniques = True
   , pprShowIdInfo = True
+  , pprShowTypes = True
   }
 
+dontShowIdInfo opts = opts { pprShowIdInfo = False }
+dontShowTypes  opts = opts { pprShowTypes = False }
 
 class PprOpts a where
   ppr :: a -> Reader PprOptions Doc
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XBinding a) where
-  {- Implementation as in ghc-dump-util (misses case for binder-hole
-  ppr (XBinding binder@XBinder{} expr) = do
-    typeSig <- pprTypeSig binder
-    idInfo <- pprIdInfo $ xBinderIdInfo binder
-    binderDoc <- ppr binder
-    exprDoc <- ppr expr
-    let assignment = hang' (binderDoc <+> equals) 2 exprDoc
-
-    return $ typeSig <$$> idInfo <$$> assignment
-
-  ppr (XBinding binder@XTyBinder{} expr) = do
-    binderDoc <- ppr binder
-    exprDoc <- ppr expr
-    let assignment = hang' (binderDoc <+> equals) 2 (exprDoc)
-
-    return assignment
-  -}
-
   ppr (XBinding binder expr) = do
     binderDoc <- ppr binder
     expr <- ppr expr
     return $ hang' (binderDoc <+> equals) 2 expr
 
   ppr (XXBinding extension) = ppr extension
-
-
-pprTypeSig :: ForAllExtensions PprOpts a => XBinder a -> Reader PprOptions Doc
-pprTypeSig binder@XBinder{} = do
-  binderDoc <- ppr binder
-  typeDoc <- ppr $ xBinderType binder
-
-  return $ binderDoc <+> dcolon <+> align typeDoc
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XBinder a) where
@@ -82,20 +58,22 @@ pprBinder (XXBinder extension) = ppr extension
 pprBinder (binder@XTyBinder{}) = pprBinderName binder
 pprBinder (binder@XBinder{})   = do
   opts <- ask
-  if not $ pprShowIdInfo opts then
-    pprBinderName binder
-  else do
-    nameDoc <- pprBinderName binder
-    tyDoc <- ppr $ xBinderType binder
-    infoDoc <- pprIdInfo $ xBinderIdInfo binder
-    return $ nameDoc <+> infoDoc <+> dcolon <+> tyDoc
+  nameDoc <- pprBinderName binder
+  tyDoc <- ppr $ xBinderType binder
+  infoDoc <- pprIdInfo $ xBinderIdInfo binder
+  return $ hsep $ catMaybes
+    [ Just nameDoc
+    , toMaybe (pprShowIdInfo opts) infoDoc
+    , toMaybe (pprShowTypes opts) tyDoc
+    ]
 
 
 instance ForAllExtensions PprOpts a => PprOpts (XExpr a) where
   ppr = pprExpr False
 
 pprExpr :: ForAllExtensions PprOpts a => Bool -> XExpr a -> Reader PprOptions Doc
-pprExpr _ (XVar binder) = local dontShowIdInfo $ ppr binder
+pprExpr _ (XVar binder) =
+  local (dontShowTypes . dontShowIdInfo) $ ppr binder
 pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
 pprExpr _ (XLit lit) = return $ pprLit lit
 pprExpr _ (XCoercion) = return "CO"
@@ -149,10 +127,11 @@ pprExpr' (XType ty) = do
 
 instance ForAllExtensions PprOpts a => PprOpts (XAlt a) where
   ppr (XAlt con binders rhs) = do
-    binderDocs <- mapM ppr binders
+    binderDocs <- local dontShowTypes $ mapM ppr binders
     rhsDoc <- pprExpr False rhs
-    
-    return $ hang' (hsep (pprAltCon con : binderDocs) <+> "->") 2 rhsDoc
+
+    let matchDoc = pprAltCon con <+> align (vsep binderDocs) <+> "->"
+    return $ hang' matchDoc 2 rhsDoc
 
   ppr (XXAlt extension) = ppr extension
 
@@ -200,10 +179,6 @@ instance PprOpts Void where
 
 diffDocs a b = "#" <> align (vsep [ "( " <> red a, "/ " <> green b, ")" ])
 
--- TODO: remove
-xBinderTyOrKind b@XBinder{} = xBinderType b
-xBinderTyOrKind b@XTyBinder{} = xBinderKind b
-
 
 instance PprOpts (XBinding UD) => PprOpts (Change (XBinding UD)) where
   ppr (Change (lhs, rhs)) = do
@@ -213,10 +188,10 @@ instance PprOpts (XBinding UD) => PprOpts (Change (XBinding UD)) where
 
 instance PprOpts (XBinder UD) => PprOpts (Change (XBinder UD)) where
   ppr (Change (lhs, rhs))
-    | getUName lhs == getUName rhs = do
+    | xBinderUName lhs == xBinderUName rhs = do
       name <- pprBinderName lhs
       let (lInfo, rInfo) = (xBinderIdInfo lhs, xBinderIdInfo rhs)
-      let (lType, rType) = (xBinderTyOrKind lhs, xBinderTyOrKind rhs)
+      let (lType, rType) = (xBinderTypeOrKind lhs, xBinderTypeOrKind rhs)
       lInfoDoc <- pprIdInfo lInfo
       rInfoDoc <- pprIdInfo rInfo
       lTypeDoc <- ppr lType
@@ -284,7 +259,6 @@ pprBinderName binder = do
 
 pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
 pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
-  -- TODO: don't show empty fields
   [ toMaybe (idiArity idi /= 0)               $ "arity=" <> pretty (idiArity idi)
   , toMaybe (idiInlinePragma idi /= "")       $ "inline=" <> pretty (idiInlinePragma idi)
   , Just $ "occ=" <> pretty (idiOccInfo idi)
@@ -294,8 +268,6 @@ pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   , toMaybe (idiUnfolding idi /= NoUnfolding) $ "unfolding=" <> pretty (idiUnfolding idi)
   , toMaybe (idiIsOneShot idi)                $ "one-shot"
   ]
-  where toMaybe True x = Just x
-        toMaybe _    _ = Nothing
 
 instance Pretty T.Text where
   pretty = text . T.unpack
@@ -321,7 +293,8 @@ pprTyCon (TyCon' t) = pretty t
 
 -- some helpers
 
-dontShowIdInfo opts = opts { pprShowIdInfo = False }
+toMaybe True x = Just x
+toMaybe _    _ = Nothing
 
 dcolon :: Doc
 dcolon = "::"

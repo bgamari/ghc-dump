@@ -8,7 +8,7 @@ module CoreDiff.Diff where
 import Control.Monad.Reader
 import Control.Monad.State
 import CoreDiff.XAst
-import CoreDiff.Preprocess (swapNames, getUName, applyPerm)
+import CoreDiff.Preprocess (swapNames, applyPerm)
 import CoreDiff.PrettyPrint
 import Data.List
 import GhcDump.Ast (ExternalName(..), TyCon(..))
@@ -44,7 +44,7 @@ gcpBinder binder binder' =
 gcpExpr :: XExpr UD -> XExpr UD -> XExpr Diff
 gcpExpr (XVar binder) (XVar binder')
   -- TODO: argue that this is correct because is it really?
-  | getUName binder == getUName binder' =
+  | xBinderUName binder == xBinderUName binder' =
     XVar $ unsafeCoerce binder
   | otherwise =
     XVar $ gcpBinder binder binder'
@@ -294,7 +294,7 @@ toDemands bps = do
 binderUNPairs = map go
   where
     go (XBinding binder _, XBinding binder' _) =
-      (getUName binder, getUName binder')
+      (xBinderUName binder, xBinderUName binder')
 
 
 snaadStep :: State SnaadS Bool
@@ -327,7 +327,7 @@ disagreeingOccs = dOccBinding
     -- even if two binder names disagree, check their types
     -- for disagreeing (typevar-)occurrences too
     dOccExpr (XVar binder) (XVar binder')
-      | getUName binder /= getUName binder' =
+      | xBinderUName binder /= xBinderUName binder' =
         (binder, binder') : dOccBinder binder binder'
       | otherwise =
         dOccBinder binder binder'

@@ -18,7 +18,7 @@ import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import Text.PrettyPrint.ANSI.Leijen
 
-import qualified CoreDiff.XAst as XAst
+import CoreDiff.XAst
 import CoreDiff.Diff
 import CoreDiff.Preprocess
 import CoreDiff.PrettyPrint
@@ -28,43 +28,12 @@ import CoreDiff.PrettyPrint
 main :: IO ()
 main = main' =<< getArgs
 
--- diff files on a specific binding
-main' ["debruijn", binding, pathA, pathB] = do
-  modA <- readDump pathA
-  modB <- readDump pathB
-
-  let Just bndgA = lookupBinding binding modA
-  let Just bndgB = lookupBinding binding modB
-
-  {-
-  putStrLn $ "Binding A (" ++ T.unpack (modulePhase modA) ++ "):"
-  print (bndrA, exprA)
-
-  putStrLn $ "Binding B (" ++ T.unpack (modulePhase modB) ++ "):"
-  print (bndrB, exprB)
-  -}
-
-  -- TODO: this is already implemented in ghc-dump-util. (reconModule)
-  let lhs@(XAst.XBinding lhsBinder _) = XAst.cvtBinding $ ignoreStats bndgA
-  let rhs@(XAst.XBinding rhsBinder _) = XAst.cvtBinding $ ignoreStats bndgB
-
-  let (dbLhs, lhsBinders) = runState (deBruijnIndex lhs) [lhsBinder]
-  let (dbRhs, rhsBinders) = runState (deBruijnIndex rhs) [rhsBinder]
-
-  putStrLn "Left binder after De-Bruijn:"
-  print $ runReader (ppr dbLhs) pprDefaultOpts
-  putStrLn "Right binder after De-Bruijn:"
-  print $ runReader (ppr dbRhs) pprDefaultOpts
-
-  putStrLn "Diff:"
-  print $ runReader (ppr $ diff dbLhs dbRhs) pprDefaultOpts
-
 main' ["pairings", pathA, pathB] = do
   modA <- readDump pathA
   modB <- readDump pathB
 
-  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+  let bindingsA = map (cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (cvtBinding . ignoreStats) $ moduleBindings modB
 
   print $ bold $ text $ "Binders in " ++ pathA ++ ":"
   printBinderNames bindingsA
@@ -94,21 +63,6 @@ main' ["pairings", pathA, pathB] = do
   let pairings = findPairings bindingsAFloatedIn bindingsBFloatedIn
   printPairings pairings
 
-main' ["diffmod", pathA, pathB] = do
-  modA <- readDump pathA
-  modB <- readDump pathB
-
-  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
-
-  -- print $ bold $ red $ text $ "Floating in..."
-
-  let bindingsAFloatedIn = floatInTopLvl bindingsA
-  let bindingsBFloatedIn = floatInTopLvl bindingsB
-  
-  let pairings = findPairings bindingsAFloatedIn bindingsBFloatedIn
-  printPairingDiffs pairings
-
 main' ["diffmod2", pathA, pathB, diffA, diffB] = do
   modA <- readDump pathA
   modB <- readDump pathB
@@ -118,8 +72,8 @@ main' ["diffmod2", pathA, pathB, diffA, diffB] = do
   let bindersA = map (fst . ignoreStats) $ moduleBindings modA
   let bindersB = map (fst . ignoreStats) $ moduleBindings modB
 
-  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+  let bindingsA = map (cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (cvtBinding . ignoreStats) $ moduleBindings modB
 
   let bindingsAFloatedIn = floatInTopLvl bindingsA
   let bindingsBFloatedIn = floatInTopLvl bindingsB
@@ -136,8 +90,8 @@ main' ["diffmod3", pathA, pathB] = do
 
   print $ bold $ text $ "Comparing " ++ phaseA ++ " and " ++ phaseB ++ "..."
 
-  let bindingsA = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modA
-  let bindingsB = map (XAst.cvtBinding . ignoreStats) $ moduleBindings modB
+  let bindingsA = map (cvtBinding . ignoreStats) $ moduleBindings modA
+  let bindingsB = map (cvtBinding . ignoreStats) $ moduleBindings modB
 
   let bindingsAFloatedIn = floatInTopLvl bindingsA
   let bindingsBFloatedIn = floatInTopLvl bindingsB
@@ -153,11 +107,11 @@ main' ["diffmod3", pathA, pathB] = do
 
     handleCmd s (cmd:args)
       | cmd `elem` ["step", "s"] = do
-        let (_done, s') = runState snaadStep s
+        let (_, s') = runState snaadStep s
         print s'
         snaadInteractive s'
       | cmd `elem` ["continue", "c"] = do
-        let s' = stepUntilDone s
+        let (_, s') = runState stepUntilDone s
         print s'
         snaadInteractive s'
       | cmd `elem` ["print1", "p1"] = do
@@ -166,15 +120,15 @@ main' ["diffmod3", pathA, pathB] = do
 
     handleCmd s _ = snaadInteractive s
 
-    stepUntilDone s =
-      case runState snaadStep s of
-        (True, s') -> s'
-        (False, s') -> stepUntilDone s'
+    stepUntilDone = do
+      done <- snaadStep
+      if done then return () else stepUntilDone
 
     print1 s = mapM printChg $ getPairs s
       where
-        printChg (lhs@(XAst.XBinding bndr _), rhs)
-          | lhs == rhs = putStrLn $ "No difference in " ++ T.unpack (XAst.xBinderName bndr)
+        printChg (lhs@(XBinding bndr _), rhs)
+          -- TODO: implement and use prettyprinting for XBinderUniqueName
+          | lhs == rhs = putStrLn $ "No difference in " ++ show (xBinderUName bndr)
           | otherwise =
             print $ runReader (ppr (diff lhs rhs)) pprDefaultOpts
 
@@ -216,28 +170,8 @@ printPairings = mapM_ go
       putStrLn $ "Dbg  : " ++ show (xb l)
 
     opts = pprDefaultOpts { pprShowIdInfo = True }
-    xb (XAst.XBinding b _) = b
+    xb (XBinding b _) = b
 
-printPairingDiffs pairings = mapM_ go pairings
-  where
-    go (OnlyLeft l) = do
-      putStrLn "Left only: "
-      print $ runReader (ppr l) opts
-    go (OnlyRight l) = do
-      putStrLn "Right only:"
-      print $ runReader (ppr l) opts
-    go (Both l r) = do
-      putStrLn "Both (assimilated):"
-      print $ runReader (ppr $ diff l r') opts
-      where
-        r' = runReader (swapNames l r) associatedBinderNames
-
-    opts = pprDefaultOpts { pprShowIdInfo = True }
-    xb (XAst.XBinding b _) = b
-    associatedBinderNames =
-      [ (getUName lBinder, getUName rBinder)
-      | Both (XAst.XBinding lBinder _) (XAst.XBinding rBinder _) <- pairings
-      ]
 
 printPairingDiffs' pairings diffL diffR = do
   writeFile diffL $ intercalate "\n" $ reverse lStrs
@@ -255,22 +189,22 @@ printPairingDiffs' pairings diffL diffR = do
 
     ppr' x = runReader (ppr x) pprDefaultOpts
     associatedBinderNames =
-      [ (getUName lBinder, getUName rBinder)
-      | Both (XAst.XBinding lBinder _) (XAst.XBinding rBinder _) <- pairings
+      [ (xBinderUName lBinder, xBinderUName rBinder)
+      | Both (XBinding lBinder _) (XBinding rBinder _) <- pairings
       ]
 
-printBinderNames :: [XAst.XBinding XAst.UD] -> IO ()
+printBinderNames :: [XBinding UD] -> IO ()
 printBinderNames bindings =
   print $ map go bindings
   where
-    go (XAst.XBinding binder _)= runReader (ppr binder) opts
+    go (XBinding binder _)= runReader (ppr binder) opts
     opts = pprDefaultOpts { pprShowIdInfo = False }
 
-printBinderNameCounts :: [XAst.XBinding XAst.UD] -> IO ()
+printBinderNameCounts :: [XBinding UD] -> IO ()
 printBinderNameCounts bindings = do
   mapM_ printRow $ sort binderCounts
   where
-    binderNames = map (\(XAst.XBinding bndr _) -> XAst.xBinderName bndr) bindings
+    binderNames = map (\(XBinding bndr _) -> xBinderName bndr) bindings
     binderNameSet = Set.fromList binderNames
     binderCounts = [(count name binderNames, name) | name <- Set.toList binderNameSet]
     count x list = length $ filter (== x) list
@@ -278,6 +212,6 @@ printBinderNameCounts bindings = do
     printRow (count, name) =
       putStrLn $ show count ++ "\t" ++ T.unpack name
 
-printBindings :: [XAst.XBinding XAst.UD] -> IO ()
+printBindings :: [XBinding UD] -> IO ()
 printBindings = print . vsep . intersperse hardline . map go
   where go binding = runReader (ppr binding) pprDefaultOpts
