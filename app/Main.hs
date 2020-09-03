@@ -171,10 +171,12 @@ main' ["diffmod3", pathA, pathB] = do
         (True, s') -> s'
         (False, s') -> stepUntilDone s'
 
-    print1 s = mapM printChg $ map (uncurry diff) $ getPairs s
+    print1 s = mapM printChg $ getPairs s
       where
-        printChg c =
-          print $ runReader (ppr c) pprDefaultOpts
+        printChg (lhs@(XAst.XBinding bndr _), rhs)
+          | lhs == rhs = putStrLn $ "No difference in " ++ T.unpack (XAst.xBinderName bndr)
+          | otherwise =
+            print $ runReader (ppr (diff lhs rhs)) pprDefaultOpts
 
     -- helpers
 

@@ -20,6 +20,8 @@ import GhcDump.Ast
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
 import CoreDiff.XAst
+-- TODO: move to ast
+import CoreDiff.Preprocess (getUName)
 
 data PprOptions = PprOptions
   { pprShowUniques :: Bool
@@ -196,13 +198,55 @@ instance PprOpts Void where
   ppr _ = error "Oh dear!"
 
 
--- todo: special instances
-instance PprOpts x => PprOpts (Change x) where
+diffDocs a b = "#" <> align (vsep [ "( " <> red a, "/ " <> green b, ")" ])
+
+-- TODO: remove
+xBinderTyOrKind b@XBinder{} = xBinderType b
+xBinderTyOrKind b@XTyBinder{} = xBinderKind b
+
+
+instance PprOpts (XBinding UD) => PprOpts (Change (XBinding UD)) where
   ppr (Change (lhs, rhs)) = do
     lhsDoc <- ppr lhs
     rhsDoc <- ppr rhs
-    -- TODO: nice indentation
-    return $ "#" <> align (vsep [ "( " <> red lhsDoc, "/ " <> green rhsDoc, ")" ])
+    return $ diffDocs lhsDoc rhsDoc
+
+instance PprOpts (XBinder UD) => PprOpts (Change (XBinder UD)) where
+  ppr (Change (lhs, rhs))
+    | getUName lhs == getUName rhs = do
+      name <- pprBinderName lhs
+      let (lInfo, rInfo) = (xBinderIdInfo lhs, xBinderIdInfo rhs)
+      let (lType, rType) = (xBinderTyOrKind lhs, xBinderTyOrKind rhs)
+      lInfoDoc <- pprIdInfo lInfo
+      rInfoDoc <- pprIdInfo rInfo
+      lTypeDoc <- ppr lType
+      rTypeDoc <- ppr rType
+      let infoDoc = if lInfo == rInfo then lInfoDoc else diffDocs lInfoDoc rInfoDoc
+      let typeDoc = if lType == rType then lTypeDoc else diffDocs lTypeDoc rTypeDoc
+
+      return $ name <+> infoDoc <+> typeDoc
+    | otherwise = do
+      lhsDoc <- ppr lhs
+      rhsDoc <- ppr rhs
+      return $ diffDocs lhsDoc rhsDoc
+
+instance PprOpts (XExpr UD) => PprOpts (Change (XExpr UD)) where
+  ppr (Change (lhs, rhs)) = do
+    lhsDoc <- ppr lhs
+    rhsDoc <- ppr rhs
+    return $ diffDocs lhsDoc rhsDoc
+
+instance PprOpts (XAlt UD) => PprOpts (Change (XAlt UD)) where
+  ppr (Change (lhs, rhs)) = do
+    lhsDoc <- ppr lhs
+    rhsDoc <- ppr rhs
+    return $ diffDocs lhsDoc rhsDoc
+
+instance PprOpts (XType UD) => PprOpts (Change (XType UD)) where
+  ppr (Change (lhs, rhs)) = do
+    lhsDoc <- ppr lhs
+    rhsDoc <- ppr rhs
+    return $ diffDocs lhsDoc rhsDoc
 
 -- terminals
 
