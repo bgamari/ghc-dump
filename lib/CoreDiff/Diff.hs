@@ -300,12 +300,15 @@ snaadStep = do
       perm <- getSubst
       let r' = runReader (swapNames l r) perm
       newD <- toDemands $ disagreeingOccs l r'
-      let r'' = runReader (swapNames r r') $ binderUNPairs newD
+      let r'' = runReader (swapNames l r') $ binderUNPairs newD
       
       addUnified l r
+      -- applyInPairs l r
       setDemands (rest ++ newD)
       addPair l r''
       return False
+
+-- applyInPairs :: State SnaadS
 
 disagreeingOccs = dOccBinding
   where

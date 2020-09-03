@@ -15,6 +15,7 @@ import qualified Data.Text as T
 import GhcDump.Ast
 import GhcDump.Util
 import System.Environment (getArgs)
+import System.IO (hFlush, stdout)
 import Text.PrettyPrint.ANSI.Leijen
 
 import qualified CoreDiff.XAst as XAst
@@ -142,18 +143,52 @@ main' ["diffmod3", pathA, pathB] = do
   let bindingsBFloatedIn = floatInTopLvl bindingsB
 
   let s = snaadInit bindingsAFloatedIn bindingsBFloatedIn
-  s' <- sIt s
-  print s'
+  print s
+  snaadInteractive s
   where
-    sIt ps = do
-      print ps
-      let (done, ps') = runState snaadStep ps
-      print $ red $ bold $ text "***"
-      if done then
-        return ps'
-      else do
-        _ <- getLine
-        sIt ps'
+    snaadInteractive s = do
+      -- TODO: short status line
+      cmd <- prompt "> "
+      handleCmd s $ splitOn ' ' cmd
+
+    handleCmd s (cmd:args) =
+      | cmd `elem` ["step", "s"] = do
+        let (_done, s') = runState snaadStep s
+        print s'
+        snaadInteractive s'
+      | cmd `elem` ["continue", "c"] = do
+        let s' = stepUntilDone s
+        print s'
+        snaadInteractive s'
+      | cmd `elem` ["print1", "p1"] = do
+        print1 s
+        snaadInteractive s
+
+    handleCmd s _ = snaadInteractive s
+
+    stepUntilDone s =
+      case runState snaadStep s of
+        (True, s') -> s'
+        (False, s') -> stepUntilDone s'
+
+    print1 s = mapM printChg $ map (uncurry diff) $ snaadPairs s
+      where
+        printChg c =
+          print $ runReader (ppr c) pprDefaultOpts
+
+    -- helpers
+
+    prompt str = do
+      putStr str
+      hFlush stdout
+      getLine
+
+    splitOn d list = splitOn' [] d list
+      where
+        splitOn' acc d [] = [reverse acc]
+        splitOn' acc d (x:xs)
+          | d == x    = reverse acc : splitOn' [] d xs
+          | otherwise = splitOn' (x:acc) d xs
 
 
 main' _ = putStrLn "Incorrect number of arguments, aborting."
