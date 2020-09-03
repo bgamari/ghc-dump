@@ -8,7 +8,7 @@ module CoreDiff.Diff where
 import Control.Monad.Reader
 import Control.Monad.State
 import CoreDiff.XAst
-import CoreDiff.Preprocess (swapNames, getUName)
+import CoreDiff.Preprocess (swapNames, getUName, applyPerm)
 import CoreDiff.PrettyPrint
 import Data.List
 import GhcDump.Ast (ExternalName(..), TyCon(..))
@@ -207,16 +207,15 @@ data SnaadS = SnaadS
   , snaadDemands :: [(XBinding UD, XBinding UD)]
   , snaadLeft    :: [XBinding UD]
   , snaadRight   :: [XBinding UD]
-  , snaadPairs   :: [(XBinding UD, XBinding UD)]
   }
 
 instance Show SnaadS where
   show s = show $ vsep
-    [ bold "Unified:" <+> list (map goP $ snaadUnified s)
-    , bold "Demands:" <+> list (map goP $ snaadDemands s)
+    [ bold "Demands:" <+> list (map goP $ snaadDemands s)
     , bold "Left:"    <+> list (map goS $ snaadLeft s)
     , bold "Right:"   <+> list (map goS $ snaadRight s)
-    , bold "Pairs:"   <+> list (map goP $ snaadPairs s)
+    , bold $ red "*"
+    , bold "Unified:" <+> list (map goP $ snaadUnified s)
     ]
     where
       goP (XBinding binder _, XBinding binder' _) =
@@ -228,10 +227,10 @@ instance Show SnaadS where
         runReader (ppr binder) (pprDefaultOpts { pprShowIdInfo = False })
 
 snaadInit bindingsLeft bindingsRight =
-  SnaadS [] pairs lefts rights []
+  SnaadS [] demands lefts rights
   where
     -- TODO: improve
-    (pairs, lefts, rights) =
+    (demands, lefts, rights) =
       foldl go ([], [], []) $ findPairings bindingsLeft bindingsRight
     go (p, l, r) (Both a b) = (p ++ [(a, b)], l, r)
     go (p, l, r) (OnlyLeft a) = (p, l ++ [a], r)
@@ -245,9 +244,6 @@ getDemands = snaadDemands <$> get
 setDemands d = modify go
   where go s = s { snaadDemands = d }
 
-addPair l r = modify go
-  where go s = s { snaadPairs = snaadPairs s ++ [(l, r)] }
-
 getLeft = snaadLeft <$> get
 setLeft l = modify go
   where go s = s { snaadLeft = l }
@@ -256,10 +252,16 @@ getRight = snaadRight <$> get
 setRight r = modify go
   where go s = s { snaadRight = r }
 
-getSubst = do
-  u <- getUnified
-  d <- getDemands
-  return $ binderUNPairs $ u ++ d
+getSubst = binderUNPairs <$> getUnified
+
+-- unified bindings, substitution applied
+-- TODO: redundant definition of getSubst
+getPairs s =
+  map go unified
+  where
+    go (lhs, rhs) = (lhs, runReader (swapNames lhs rhs) perm)
+    perm = binderUNPairs unified
+    unified = snaadUnified s
 
 toDemands ::
   [(XBinder UD, XBinder UD)] -> State SnaadS [(XBinding UD, XBinding UD)]
@@ -307,12 +309,8 @@ snaadStep = do
       let r'' = runReader (swapNames l r') $ binderUNPairs newD
       
       addUnified l r
-      -- applyInPairs l r
       setDemands (rest ++ newD)
-      addPair l r''
       return False
-
--- applyInPairs :: State SnaadS
 
 disagreeingOccs = dOccBinding
   where

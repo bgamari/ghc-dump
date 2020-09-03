@@ -171,7 +171,7 @@ main' ["diffmod3", pathA, pathB] = do
         (True, s') -> s'
         (False, s') -> stepUntilDone s'
 
-    print1 s = mapM printChg $ map (uncurry diff) $ snaadPairs s
+    print1 s = mapM printChg $ map (uncurry diff) $ getPairs s
       where
         printChg c =
           print $ runReader (ppr c) pprDefaultOpts
