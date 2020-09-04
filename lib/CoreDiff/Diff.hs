@@ -13,10 +13,6 @@ import CoreDiff.PrettyPrint
 import Data.List
 import GhcDump.Ast (ExternalName(..), TyCon(..))
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
--- TODO: Sometimes we want to convert an XExpr UD to an XExpr Diff
--- Since XExpr UD never has any extensions, this is a no-op
--- The type system can't unify their types tho.
-import Unsafe.Coerce
 
 -- Do some steppos
 
@@ -31,12 +27,11 @@ gcpBinding (XBinding binder expr) (XBinding binder' expr') =
 
 
 -- TODO: unfoldings?
--- TODO: Remove coercions
 gcpBinder :: XBinder UD -> XBinder UD -> XBinder Diff
 gcpBinder binder@XBinder{} binder'@XBinder{}
-  | binder == binder' = unsafeCoerce binder
+  | binder == binder' = fromUD binder
 gcpBinder binder@XTyBinder{} binder'@XTyBinder{}
-  | binder == binder' = unsafeCoerce binder
+  | binder == binder' = fromUD binder
 gcpBinder binder binder' =
   XXBinder $ Change (binder, binder')
 
@@ -45,7 +40,7 @@ gcpExpr :: XExpr UD -> XExpr UD -> XExpr Diff
 gcpExpr (XVar binder) (XVar binder')
   -- TODO: argue that this is correct because is it really?
   | xBinderUName binder == xBinderUName binder' =
-    XVar $ unsafeCoerce binder
+    XVar $ fromUD binder
   | otherwise =
     XVar $ gcpBinder binder binder'
 gcpExpr (XVarGlobal extName) (XVarGlobal extName') | extName == extName' =

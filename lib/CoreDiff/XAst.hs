@@ -16,6 +16,7 @@ import qualified Data.Text as T
 import Data.Kind (Constraint)
 import Data.Void (Void)
 import GhcDump.Ast
+import Unsafe.Coerce
 
 data XBinding (a :: Variant)
   = XBinding (XBinder a) (XExpr a)
@@ -149,6 +150,14 @@ type ForAllExtensions (constr :: * -> Constraint) a =
   , constr (XAltExtension a)
   , constr (XTypeExtension a)
   )
+
+
+-- we can convert any undecorated type into any other variant of the same type.
+-- we don't need to convert its extension since the extension constructor
+-- can't possibly be instantiated for undecorated types.
+-- The solution below feels dirty but works perfectly well.
+fromUD :: t UD -> t (a :: Variant)
+fromUD = unsafeCoerce
 
 
 newtype Change a = Change (a, a)
