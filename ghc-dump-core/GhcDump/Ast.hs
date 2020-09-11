@@ -77,6 +77,7 @@ data IdInfo bndr var
              , idiStrictnessSig :: !T.Text
              , idiDemandSig     :: !T.Text
              , idiCallArity     :: !Int
+             , idiCpr           :: !T.Text
              }
     deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (IdInfo bndr var)

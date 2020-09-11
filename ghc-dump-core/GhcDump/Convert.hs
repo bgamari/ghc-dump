@@ -128,6 +128,11 @@ cvtIdInfo i =
            , idiStrictnessSig = cvtSDoc $ ppr $ IdInfo.strictnessInfo i
            , idiDemandSig     = cvtSDoc $ ppr $ IdInfo.demandInfo i
            , idiCallArity     = IdInfo.callArityInfo i
+#if MIN_VERSION_ghc(9,0,0)
+           , idiCpr           = cvtSDoc $ ppr $ IdInfo.cprInfo i
+#else
+           , idiCpr           = T.pack ""
+#endif
            }
 
 cvtUnfolding :: CoreSyn.Unfolding -> Ast.Unfolding SBinder BinderId
