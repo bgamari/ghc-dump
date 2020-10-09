@@ -60,7 +60,7 @@ pprBinder (binder@XBinder{})   = do
   opts <- ask
   nameDoc <- pprBinderName binder
   tyDoc <- ppr $ xBinderType binder
-  infoDoc <- pprIdInfo $ xBinderIdInfo binder
+  infoDoc <- pprIdInfo binder
   return $ hsep $ catMaybes
     [ Just nameDoc
     , toMaybe (pprShowIdInfo opts) infoDoc
@@ -192,8 +192,8 @@ instance PprOpts (XBinder UD) => PprOpts (Change (XBinder UD)) where
       name <- pprBinderName lhs
       let (lInfo, rInfo) = (xBinderIdInfo lhs, xBinderIdInfo rhs)
       let (lType, rType) = (xBinderTypeOrKind lhs, xBinderTypeOrKind rhs)
-      lInfoDoc <- pprIdInfo lInfo
-      rInfoDoc <- pprIdInfo rInfo
+      lInfoDoc <- pprIdInfo lhs
+      rInfoDoc <- pprIdInfo rhs
       lTypeDoc <- ppr lType
       rTypeDoc <- ppr rType
       let infoDoc = if lInfo == rInfo then lInfoDoc else diffDocs lInfoDoc rInfoDoc
@@ -259,9 +259,10 @@ pprBinderName binder = do
 
 
 -- TODO: https://gitlab.haskell.org/ghc/ghc/blob/master/compiler/GHC/Core/Ppr.hs#L510
-pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
-pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
-  [ toMaybe (idiArity idi /= 0)               $ "arity=" <> pretty (idiArity idi)
+pprIdInfo :: XBinder a -> Reader PprOptions Doc
+pprIdInfo bndr = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
+  [ Just $ pprScope $ xBinderScope bndr
+  , toMaybe (idiArity idi /= 0)               $ "arity=" <> pretty (idiArity idi)
   , toMaybe (idiInlinePragma idi /= "")       $ "inline=" <> pretty (idiInlinePragma idi)
   , Just $ "occ=" <> pretty (idiOccInfo idi)
   , toMaybe (idiStrictnessSig idi /= "")      $ "str=" <> pretty (idiStrictnessSig idi)
@@ -271,6 +272,11 @@ pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   , toMaybe (idiUnfolding idi /= NoUnfolding) $ "unfolding=" <> pretty (idiUnfolding idi)
   , toMaybe (idiIsOneShot idi)                $ "one-shot"
   ]
+  where idi = xBinderIdInfo bndr
+
+pprScope GlobalId = "GblId"
+pprScope LocalIdX = "LclIdX"
+pprScope LocalId  = "LclId"
 
 instance Pretty T.Text where
   pretty = text . T.unpack

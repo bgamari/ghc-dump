@@ -28,6 +28,7 @@ data XBinder (a :: Variant)
   = XBinder
     { xBinderName :: T.Text
     , xBinderId :: BinderId
+    , xBinderScope :: IdScope
     , xBinderIdInfo :: IdInfo Binder Binder
     , xBinderType :: XType a
     }
@@ -178,6 +179,7 @@ cvtBinder :: Binder -> XBinder UD
 cvtBinder (Bndr b@Binder{}) = XBinder
   (binderName b)
   (binderId b)
+  (binderScope b)
   (removeUnfolding $ binderIdInfo b)
   (cvtType $ binderType b)
   where
