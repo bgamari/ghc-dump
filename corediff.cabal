@@ -63,8 +63,8 @@ library
 
   -- Other library packages from which modules are imported.
   build-depends:       base >=4.13,
-                       ghc-dump-core >=0.1.1.0,
-                       ghc-dump-util >=0.1.1.0,
+                       ghc-dump-core >=0.2.1.0,
+                       ghc-dump-util >=0.2.1.0,
                        text >=1.2.4.0,
                        mtl >=2.2.2,
                        ansi-wl-pprint >=0.6.9,
@@ -91,8 +91,8 @@ executable corediff
   -- Other library packages from which modules are imported.
   build-depends:       base >=4.13,
                        corediff,
-                       ghc-dump-core >=0.1.1.0,
-                       ghc-dump-util >=0.1.1.0,
+                       ghc-dump-core >=0.2.1.0,
+                       ghc-dump-util >=0.2.1.0,
                        serialise >=0.2.3.0,
                        bytestring >=0.10.9.0,
                        text >=1.2.4.0,

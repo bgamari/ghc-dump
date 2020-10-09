@@ -153,7 +153,7 @@ floatInTopLvl bindings =
   evalState (floatInTopLvl' p bindings) initFloatInState
   where
     p = filter go
-      where go (XBinding binder _ ) = xBinderName binder `elem` ["lvl", "$wlvl"]
+      where go (XBinding binder _ ) = xBinderName binder `elem` ["lvl", "$wlvl", "ds", "u", "l", "r"]
 
 -- Given a function that selects bindings to float in, this function
 -- replaces each occurrence of the given binders with their bound expr.
@@ -232,3 +232,84 @@ instance FloatIn (XType UD) where
 instance FloatIn (XAlt UD) where
   floatIn pred (XAlt con binders rhs) =
     XAlt con binders <$> floatIn pred rhs
+
+-- signature stuff, pairings
+
+instance Eq Signature where
+  (Signature (lBndr, lTy)) == (Signature (rBndr, rTy)) =
+    lBndr == rBndr && lTy == rTy'
+    where
+      rTy' = runReader (lTy `swapInto` rTy) Map.empty
+
+instance Ord Signature where
+  (Signature (lBndr, lTy)) <= (Signature (rBndr, rTy))
+    | lBndr == rBndr = lTy <= rTy'
+    | otherwise      = lBndr <= rBndr
+    where
+      rTy' = runReader (lTy `swapInto` rTy) Map.empty
+
+-- new swapping code, with maps
+
+withAssoc ::
+  XBinder UD -> XBinder UD ->
+  Reader (Map (XBinder UD) (XBinder UD)) a ->
+  Reader (Map (XBinder UD) (XBinder UD)) a
+withAssoc bndr bndr' = local $ Map.insert bndr bndr'
+
+swapInto :: XType UD -> XType UD -> Reader (Map (XBinder UD) (XBinder UD)) (XType UD)
+(XVarTy bndr) `swapInto` (XVarTy bndr') = do
+  env <- ask
+  return $ maybe (XVarTy bndr') XVarTy $ Map.lookup bndr' env
+(XFunTy t s) `swapInto` (XFunTy t' s') =
+  XFunTy <$> t `swapInto` t' <*> s `swapInto` s'
+(XTyConApp tc tys) `swapInto` (XTyConApp tc' tys') =
+  -- keep rhs type constructor but recurse
+  XTyConApp tc' <$> zipWithM swapInto tys tys'
+(XAppTy t s) `swapInto` (XAppTy t' s') =
+  XAppTy <$> t `swapInto` t' <*> s `swapInto` s'
+(XForAllTy bndr ty) `swapInto` (XForAllTy bndr' ty') =
+  XForAllTy bndr <$> withAssoc bndr' bndr (ty `swapInto` ty')
+(XLitTy) `swapInto` (XLitTy) =
+  return XLitTy
+(XCoercionTy) `swapInto` (XCoercionTy) =
+  return XCoercionTy
+_ `swapInto` r =
+  return r
+
+-- Free variables
+
+class Fv a where
+  fv :: a -> Set (XBinder UD)
+
+instance Fv (XBinder UD) where
+  fv = fv . xBinderTypeOrKind
+
+instance Fv (XType UD) where
+  fv (XVarTy b) = Set.singleton b
+  fv (XFunTy t s) = Set.union (fv t) (fv s)
+  fv (XTyConApp tc tys) = Set.unions (map fv tys)
+  fv (XAppTy t s) = Set.union (fv t) (fv s)
+  fv (XForAllTy b t) = Set.union (fv b) (Set.delete b $ fv t)
+  fv (XLitTy) = Set.empty
+  fv (XCoercionTy) = Set.empty
+
+instance Fv (XExpr UD) where
+  fv (XVar b) = Set.singleton b
+  -- technically a fv, but should be irrelevant
+  fv (XVarGlobal _) = Set.empty
+  fv (XLit _) = Set.empty
+  fv (XApp e a) = Set.union (fv e) (fv a)
+  fv (XTyLam b e) = Set.union (fv b) (Set.delete b $ fv e)
+  fv (XLam b e) = Set.union (fv b) (Set.delete b $ fv e)
+  fv (XLet bindings e) = Set.difference
+    (Set.unions $ fv e : [Set.union (fv binder) (fv expr) | XBinding binder expr <- bindings])
+    (Set.fromList $ map xBindingBinder bindings)
+  fv (XCase scrut bndr alts) = Set.union
+    (fv scrut)
+    (Set.delete bndr (Set.unions (fv bndr : map fv alts)))
+  fv (XType ty) = fv ty
+  fv (XCoercion) = Set.empty
+
+instance Fv (XAlt UD) where
+  fv (XAlt _ bndrs rhs) =
+    Set.union (Set.unions $ map fv bndrs) (Set.difference (fv rhs) (Set.fromList bndrs))

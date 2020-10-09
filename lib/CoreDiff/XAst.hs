@@ -22,6 +22,8 @@ data XBinding (a :: Variant)
   = XBinding (XBinder a) (XExpr a)
   | XXBinding (XBindingExtension a)
 
+xBindingBinder (XBinding bndr _) = bndr
+
 data XBinder (a :: Variant)
   = XBinder
     { xBinderName :: T.Text
@@ -71,7 +73,7 @@ data XAlt (a :: Variant)
 -- Getters and setters
 
 data XBinderUniqueName = XBinderUniqueName T.Text BinderId
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 xBinderUName :: XBinder a -> XBinderUniqueName
 xBinderUName binder = XBinderUniqueName (xBinderName binder) (xBinderId binder)
@@ -106,16 +108,21 @@ deriving instance ForAllExtensions Show a => Show (XAlt a)
 deriving instance ForAllExtensions Show a => Show (XType a)
 
 deriving instance ForAllExtensions Eq a => Eq (XBinding a)
-deriving instance ForAllExtensions Eq a => Eq (XBinder a)
 deriving instance ForAllExtensions Eq a => Eq (XExpr a)
 deriving instance ForAllExtensions Eq a => Eq (XAlt a)
 deriving instance ForAllExtensions Eq a => Eq (XType a)
 
 deriving instance ForAllExtensions Ord a => Ord (XBinding a)
-deriving instance ForAllExtensions Ord a => Ord (XBinder a)
 deriving instance ForAllExtensions Ord a => Ord (XExpr a)
 deriving instance ForAllExtensions Ord a => Ord (XAlt a)
 deriving instance ForAllExtensions Ord a => Ord (XType a)
+
+-- equality on binders is defined as the equality of their name and unique field only
+instance ForAllExtensions Eq a => Eq (XBinder a) where
+  b == b' = xBinderUName b == xBinderUName b'
+
+instance ForAllExtensions Ord a => Ord (XBinder a) where
+  b <= b' = xBinderUName b <= xBinderUName b'
 
 -- UD: Undecorated, "normal" expression without extension.
 -- Diff: Additional constructor for (Expr, Expr) holes.
@@ -223,3 +230,10 @@ xBinderUniqueName binder =
   xBinderName binder <> "_" <> T.pack (show uniq)
   where
     BinderId uniq = xBinderId binder
+
+-- signatures
+newtype Signature = Signature (T.Text, XType UD)
+
+signature :: XBinder UD -> Signature
+signature b@XBinder{}   = Signature (xBinderName b, xBinderType b)
+signature b@XTyBinder{} = Signature (xBinderName b, xBinderKind b)

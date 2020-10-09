@@ -64,7 +64,7 @@ pprBinder (binder@XBinder{})   = do
   return $ hsep $ catMaybes
     [ Just nameDoc
     , toMaybe (pprShowIdInfo opts) infoDoc
-    , toMaybe (pprShowTypes opts) tyDoc
+    , toMaybe (pprShowTypes opts) $ dcolon <+> tyDoc
     ]
 
 
@@ -257,6 +257,8 @@ pprBinderName binder = do
   else
     return $ pretty $ xBinderName binder
 
+
+-- TODO: https://gitlab.haskell.org/ghc/ghc/blob/master/compiler/GHC/Core/Ppr.hs#L510
 pprIdInfo :: IdInfo Binder Binder -> Reader PprOptions Doc
 pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   [ toMaybe (idiArity idi /= 0)               $ "arity=" <> pretty (idiArity idi)
@@ -264,6 +266,7 @@ pprIdInfo idi = return $ brackets $ align $ sep $ punctuate ", " $ catMaybes $
   , Just $ "occ=" <> pretty (idiOccInfo idi)
   , toMaybe (idiStrictnessSig idi /= "")      $ "str=" <> pretty (idiStrictnessSig idi)
   , toMaybe (idiDemandSig idi /= "")          $ "dmd=" <> pretty (idiDemandSig idi)
+  , toMaybe (idiCpr idi /= "")                $ "cpr=" <> pretty (idiCpr idi)
   , toMaybe (idiCallArity idi /= 0)           $ "call-arity=" <> pretty (idiCallArity idi)
   , toMaybe (idiUnfolding idi /= NoUnfolding) $ "unfolding=" <> pretty (idiUnfolding idi)
   , toMaybe (idiIsOneShot idi)                $ "one-shot"
@@ -273,7 +276,7 @@ instance Pretty T.Text where
   pretty = text . T.unpack
 
 instance Pretty BinderId where
-  pretty (BinderId (Unique c i)) = pretty c <> pretty i
+  pretty (BinderId uniq) = text $ show uniq
 
 instance Pretty (Unfolding Binder Binder) where
   pretty NoUnfolding = "NoUnfolding"
@@ -328,3 +331,8 @@ collectForAlls :: XType a -> ([XBinder a], XType a)
 collectForAlls = go []
   where go acc (XForAllTy binder ty) = go (binder : acc) ty
         go acc ty                   = (reverse acc, ty)
+
+instance Pretty Signature where
+  pretty (Signature (name, ty)) =
+    hang' (text (T.unpack name) <+> dcolon) 2
+      (runReader (ppr ty) pprDefaultOpts)
