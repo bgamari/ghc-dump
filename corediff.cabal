@@ -23,13 +23,15 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      CoreDiff.Convert
+      CoreDiff.Util
   other-modules:
       Paths_corediff
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , ghc-dump-core
     , ghc-dump-util
   default-language: Haskell2010
 
@@ -43,5 +45,7 @@ executable corediff-exe
   build-depends:
       base >=4.7 && <5
     , corediff
+    , ghc-dump-core
     , ghc-dump-util
+    , optparse-applicative
   default-language: Haskell2010
