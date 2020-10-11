@@ -17,7 +17,8 @@ showCommand = run <$> cborDumpFile
   where
     run filePath = do
       mod <- readXModule filePath
-      print mod
+      -- print mod
+      putStrLn "Hello, World!"
 
 -- Common argument types
 cborDumpFile :: Parser FilePath

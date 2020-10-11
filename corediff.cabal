@@ -25,6 +25,7 @@ library
   exposed-modules:
       CoreDiff.Convert
       CoreDiff.Util
+      CoreDiff.XAst
   other-modules:
       Paths_corediff
   hs-source-dirs:
@@ -33,6 +34,7 @@ library
       base >=4.7 && <5
     , ghc-dump-core
     , ghc-dump-util
+    , text >=1.2.4.0
   default-language: Haskell2010
 
 executable corediff-exe
@@ -48,4 +50,5 @@ executable corediff-exe
     , ghc-dump-core
     , ghc-dump-util
     , optparse-applicative
+    , text >=1.2.4.0
   default-language: Haskell2010
