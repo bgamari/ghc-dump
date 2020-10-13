@@ -92,7 +92,8 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinder a) where
   pprWithOpts binder = do
     opts <- ask
     if pprOptsDisplayUniques opts then
-      return $ text' $ xBinderName binder <> "_" <> T.pack (show $ xBinderId binder)
+      return $ text' $ xBinderName binder <> "_"
+                    <> T.pack (show $ xBinderId binder)
     else
       return $ text' $ xBinderName binder
 
@@ -130,7 +131,7 @@ pprType prec t@XForAllTy{} = do
 
 instance ForAllExtensions PprWithOpts a => PprWithOpts (XExpr a) where
   -- extension case is handled in pprExpr
-  pprWithOpts expr = pprExpr False expr
+  pprWithOpts = pprExpr False
 
 -- | Expressions can be printed with or without parentheses around them.
 -- @pprExpr@ prints terminal expressions without parens regardless.
@@ -140,6 +141,9 @@ pprExpr _ (XVar binder)        = pprWithOpts binder
 pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
 pprExpr _ (XLit lit)           = pprLit lit
 pprExpr _ (XCoercion)          = return "CO"
+pprExpr parens (XType ty) = do
+  tyDoc <- pprType (if parens then TyConPrec else TopPrec) ty
+  return $ "@" <+> tyDoc
 pprExpr parens expr = parensIf parens <$> pprExpr' expr
   where
     pprExpr' expr@(XApp{}) = do
@@ -177,10 +181,6 @@ pprExpr parens expr = parensIf parens <$> pprExpr' expr
         , "}"
         ]
 
-    pprExpr' (XType ty) = do
-      tyDoc <- pprWithOpts ty
-      return $ "@" <+> tyDoc
-
 instance ForAllExtensions PprWithOpts a => PprWithOpts (XAlt a) where
   pprWithOpts (XXAlt extension) = pprWithOpts extension
   pprWithOpts (XAlt con binders rhs) = do
@@ -194,6 +194,12 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XAlt a) where
 
 instance PprWithOpts Void where
   pprWithOpts _ = error "Something went terribly wrong! There is nothing to print."
+
+instance PprWithOpts a => PprWithOpts (Change a) where
+  pprWithOpts (Change (lhs, rhs)) = do
+    lhsDoc <- pprWithOpts lhs
+    rhsDoc <- pprWithOpts rhs
+    return $ "#( " <> lhsDoc <> ", " <> rhsDoc <> " )"
 
 -- Terminals
 
