@@ -26,6 +26,7 @@ dependencies:
 - ansi-wl-pprint >= 0.6.9
 - transformers
 - bytestring >= 0.10.10.1
+- containers >= 0.6.2.1
 
 library:
   source-dirs: src

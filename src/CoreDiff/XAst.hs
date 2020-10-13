@@ -1,7 +1,10 @@
  {-# LANGUAGE ConstraintKinds #-}
  {-# LANGUAGE DataKinds #-}
+ {-# LANGUAGE FlexibleContexts #-}
  {-# LANGUAGE KindSignatures #-}
+ {-# LANGUAGE StandaloneDeriving #-}
  {-# LANGUAGE TypeFamilies #-}
+ {-# LANGUAGE UndecidableInstances #-}
 
 module CoreDiff.XAst where
 
@@ -48,6 +51,11 @@ data XBinder (a :: Variant)
 -- | Map a binder to its type or kind.
 xBinderTypeOrKind binder@XBinder{}   = xBinderType binder
 xBinderTypeOrKind binder@XTyBinder{} = xBinderKind binder
+
+-- | Check whether a binder is marked as exported.
+xBinderIsExported binder@XBinder{} =
+  xbmScope (xBinderMeta binder) `elem` [GlobalId, LocalIdX]
+xBinderIsExported _ = False
 
 -- | A Core type.
 data XType (a :: Variant)
@@ -141,10 +149,12 @@ data XBinderMeta = XBinderMeta
   , xbmCpr           :: T.Text
   , xbmScope         :: IdScope
   }
+  deriving (Eq, Ord)
 
 -- | Type constructor.
 -- @GhcDump.Ast.TyCon@ without the unique field.
 data TyCon' = TyCon' T.Text
+  deriving (Eq, Ord)
 
 -- | A name referring to something in another module.
 -- @GhcDump.Ast.ExternalName@ without the unique field.
@@ -153,3 +163,19 @@ data ExternalName' = ExternalName'
   , externalName :: T.Text
   }
   | ForeignCall'
+  deriving (Eq, Ord)
+
+
+deriving instance ForAllExtensions Eq a => Eq (XBinding a)
+instance ForAllExtensions Eq a => Eq (XBinder a) where
+  binder == binder' = xBinderId binder == xBinderId binder'
+deriving instance ForAllExtensions Eq a => Eq (XType a)
+deriving instance ForAllExtensions Eq a => Eq (XExpr a)
+deriving instance ForAllExtensions Eq a => Eq (XAlt a)
+
+deriving instance ForAllExtensions Ord a => Ord (XBinding a)
+instance ForAllExtensions Ord a => Ord (XBinder a) where
+  binder <= binder' = xBinderId binder <= xBinderId binder'
+deriving instance ForAllExtensions Ord a => Ord (XType a)
+deriving instance ForAllExtensions Ord a => Ord (XExpr a)
+deriving instance ForAllExtensions Ord a => Ord (XAlt a)

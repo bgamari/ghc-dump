@@ -24,6 +24,7 @@ source-repository head
 library
   exposed-modules:
       CoreDiff.Convert
+      CoreDiff.Pairing
       CoreDiff.PrettyPrint
       CoreDiff.Util
       CoreDiff.XAst
@@ -35,6 +36,7 @@ library
       ansi-wl-pprint >=0.6.9
     , base >=4.7 && <5
     , bytestring >=0.10.10.1
+    , containers >=0.6.2.1
     , ghc-dump-core
     , ghc-dump-util
     , text >=1.2.4.0
@@ -52,6 +54,7 @@ executable corediff-exe
       ansi-wl-pprint >=0.6.9
     , base >=4.7 && <5
     , bytestring >=0.10.10.1
+    , containers >=0.6.2.1
     , corediff
     , ghc-dump-core
     , ghc-dump-util
