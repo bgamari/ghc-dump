@@ -5,6 +5,7 @@ module CoreDiff.PrettyPrint where
 
 import Control.Monad.Trans.Reader
 import qualified Data.ByteString.Char8 as BS
+import Data.List
 import Data.Maybe
 import Data.Ratio
 import qualified Data.Text as T
@@ -37,7 +38,7 @@ instance PprWithOpts XModule where
   pprWithOpts mod = do
     bindingDocs <- mapM pprWithOpts $ xModuleBindings mod
 
-    return $ vsep $
+    return $ vsep $ intersperse empty $
       [ text' $ "Phase: " <> xModulePhase mod
       , text' $ "module " <> xModuleName mod <> " where"
       ] ++ bindingDocs
