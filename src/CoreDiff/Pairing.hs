@@ -212,11 +212,13 @@ disExpr expr expr' =
 
 disAlts alts alts' = concat
   [ altDis (altConMap Map.! altCon) (altConMap' Map.! altCon)
-  | altCon <- toList $ Set.intersection (Map.keysSet altConMap) (Map.keysSet altConMap')
+  | altCon <- toList commonAltCons
   ]
   where
     altConMap  = toAltConMap alts
     altConMap' = toAltConMap alts'
+
+    commonAltCons = Set.intersection (Map.keysSet altConMap) (Map.keysSet altConMap')
 
     toAltConMap :: [XAlt UD] -> Map AltCon (XAlt UD)
     toAltConMap alts = Map.fromList
