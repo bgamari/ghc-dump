@@ -5,6 +5,7 @@
 module CoreDiff.Pairing where
 
 import Data.Foldable (toList)
+import Data.List (find)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe (catMaybes)
@@ -97,20 +98,42 @@ toBinderMap bindings = Map.fromList
 -- | Calculate trivial pairings of exported bindings in two lists of bindings.
 triv :: [XBinding UD] -> [XBinding UD] -> [(XBinding UD, XBinding UD)]
 triv bindings bindings' =
-  [ (binding, nameMap' Map.! xBinderName binder)
-  | binding@(XBinding binder _) <- bindings
-  , xBinderName binder `Map.member` nameMap'
-  , xBinderIsExported binder
-  ]
+  rmPair ++ triv' bindingsL bindingsR
   where
-    nameMap' :: Map T.Text (XBinding UD)
-    nameMap' = toNameMap bindings'
+    (rmPair, bindingsL, bindingsR) = pairRootMainIfExists bindings bindings'
 
-    toNameMap :: [XBinding UD] -> Map T.Text (XBinding UD)
-    toNameMap bindings = Map.fromList
-      [ (xBinderName binder, binding)
+    -- Modules with a main function also always have an additional *exported* main function that ALWAYS has the unique 01D (= tag:0, id:101, since it's base62).
+    -- The line where this binding's name is created is a whopping 8 years old!
+    -- https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Tc/Module.hs#L1794
+    -- https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Builtin/Names.hs#L2245
+    -- This confuses the "trivial pairings" algorithm, which assumes that exported binders have unambiguous names.
+    -- This code is very dirty and will probably be exchanged for a more general solution in the future.
+    pairRootMainIfExists bindings bindings' =
+      case (find isRootMain bindings, find isRootMain bindings') of
+        (Just rm, Just rm') ->
+          ([(rm, rm')], filter (not . isRootMain) bindings, filter (not . isRootMain) bindings')
+        _ ->
+          ([], bindings, bindings')
+
+    -- comparing the data types directly would mean we'd have to import Unique.mkUnique from ghc.
+    -- We'd rather only transitively depend on it through ghc-dump.
+    isRootMain (XBinding binder _) = show (xBinderId binder) == "01D"
+
+    triv' bindings bindings' =
+      [ (binding, nameMap' Map.! xBinderName binder)
       | binding@(XBinding binder _) <- bindings
+      , xBinderName binder `Map.member` nameMap'
+      , xBinderIsExported binder
       ]
+      where
+        nameMap' :: Map T.Text (XBinding UD)
+        nameMap' = toNameMap bindings'
+
+        toNameMap :: [XBinding UD] -> Map T.Text (XBinding UD)
+        toNameMap bindings = Map.fromList
+          [ (xBinderName binder, binding)
+          | binding@(XBinding binder _) <- bindings
+          ]
 
 -- | Repeatedly apply @step@ until @toPair@ is empty.
 iter :: PairingS -> PairingS
