@@ -23,6 +23,8 @@ dependencies:
 - ghc-dump-core
 - ghc-dump-util
 - text >= 1.2.4.0
+- ansi-wl-pprint >= 0.6.9
+- transformers
 
 library:
   source-dirs: src

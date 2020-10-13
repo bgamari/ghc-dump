@@ -6,6 +6,7 @@ module CoreDiff.XAst where
 
 import Data.Text as T
 import Data.Void
+import GhcDump.Ast
 
 
 -- | A Core module.
@@ -26,21 +27,55 @@ data XBinding (a :: Variant)
   = XBinding (XBinder a) (XExpr a)
   | XXBinding (XBindingExt a)
 
--- | A Core binder, consisting of a name, unique and some metadata.
+-- | A Core binder, consisting of a name, an unique and a type/kind.
+-- Term binders also have some metadata.
 data XBinder (a :: Variant)
-  = XXBinder (XBinderExt a)
+  = XBinder -- ^ For term variable binders.
+    { xBinderName :: T.Text
+    , xBinderId   :: Unique
+    , xBinderType :: XType a
+    , xBinderMeta :: BinderMeta
+    }
+  | XTyBinder -- ^ For type variable binders.
+    { xBinderName :: T.Text
+    , xBinderId   :: Unique
+    , xBinderKind :: XType a
+    }
+  | XXBinder (XBinderExt a)
 
 -- | A Core type.
 data XType (a :: Variant)
-  = XXType (XTypeExt a)
+  = XVarTy (XBinder a)
+  | XFunTy (XType a) (XType a)
+  | XTyConApp TyCon' [XType a]
+  | XAppTy (XType a) (XType a)
+  | XForAllTy (XBinder a) (XType a)
+  | XLitTy
+  | XCoercionTy
+  | XXType (XTypeExt a)
 
 -- | A Core expression.
 data XExpr (a :: Variant)
-  = XXExpr (XExprExt a)
+  = XVar (XBinder a)
+  | XVarGlobal ExternalName'
+  | XLit Lit
+  | XApp (XExpr a) (XExpr a)
+  | XTyLam (XBinder a) (XExpr a)
+  | XLam (XBinder a) (XExpr a)
+  | XLet [XBinding a] (XExpr a)
+  | XCase (XExpr a) (XBinder a) [XAlt a]
+  | XType (XType a)
+  | XCoercion
+  | XXExpr (XExprExt a)
 
 -- | A Core case alternative.
 data XAlt (a :: Variant)
-  = XXAlt (XAltExt a)
+  = XAlt
+  { xAltCon     :: AltCon
+  , xAltBinders :: [XBinder a]
+  , xAltRHS     :: XExpr a
+  }
+  | XXAlt (XAltExt a)
 
 
 -- | Newtype for a change.
@@ -49,6 +84,9 @@ newtype Change a = Change (a, a)
 
 
 -- | Extensions for bindings.
+-- Undecorated bindings can never contain an extension constructor.
+-- Diff bindings can contain changes.
+-- This works the same way for the other data types.
 type family XBindingExt a where
   XBindingExt UD   = Void
   XBindingExt Diff = Change (XBinding UD)
@@ -72,3 +110,28 @@ type family XExprExt a where
 type family XAltExt a where
   XAltExt UD = Void
   XAltExt Diff = Change (XAlt UD)
+
+
+-- | Binder metadata.
+data BinderMeta = BinderMeta
+  { bmArity         :: Int
+  , bmIsOneShot     :: Bool
+  , bmInlinePragma  :: T.Text
+  , bmOccInfo       :: OccInfo
+  , bmStrictnessSig :: T.Text
+  , bmDemandSig     :: T.Text
+  , bmCallArity     :: Int
+  , bmCpr           :: T.Text
+  }
+
+-- | Type constructor.
+-- @GhcDump.Ast.TyCon@ without the unique field.
+data TyCon' = TyCon' T.Text
+
+-- | A name referring to something in another module.
+-- @GhcDump.Ast.ExternalName@ without the unique field.
+data ExternalName' = ExternalName'
+  { externalModuleName :: T.Text
+  , externalName :: T.Text
+  }
+  | ForeignCall'

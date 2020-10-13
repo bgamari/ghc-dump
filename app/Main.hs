@@ -1,9 +1,11 @@
 module Main where
 
 import Control.Monad
+import Control.Monad.Trans.Reader
 import Options.Applicative
 
 import CoreDiff.Util
+import CoreDiff.PrettyPrint
 
 main :: IO ()
 main = join $ execParser $ info (helper <*> commands) mempty
@@ -17,8 +19,7 @@ showCommand = run <$> cborDumpFile
   where
     run filePath = do
       mod <- readXModule filePath
-      -- print mod
-      putStrLn "Hello, World!"
+      print $ runReader (pprWithOpts mod) pprOptsDefault
 
 -- Common argument types
 cborDumpFile :: Parser FilePath
