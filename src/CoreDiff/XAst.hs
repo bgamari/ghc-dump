@@ -1,9 +1,11 @@
+ {-# LANGUAGE ConstraintKinds #-}
  {-# LANGUAGE DataKinds #-}
  {-# LANGUAGE KindSignatures #-}
  {-# LANGUAGE TypeFamilies #-}
 
 module CoreDiff.XAst where
 
+import Data.Kind (Constraint)
 import Data.Text as T
 import Data.Void
 import GhcDump.Ast
@@ -114,6 +116,17 @@ type family XExprExt a where
 type family XAltExt a where
   XAltExt UD = Void
   XAltExt Diff = Change (XAlt UD)
+
+
+-- | This constraint makes writing instances a little shorter.
+-- Instead of writing (PprOpts (XBindingExtension a), PprOpts (XBinderExtension a), etc. we can just write ForAllExtensions PprOpts a.
+type ForAllExtensions (constr :: * -> Constraint) a =
+  ( constr (XBindingExt a)
+  , constr (XBinderExt a)
+  , constr (XTypeExt a)
+  , constr (XExprExt a)
+  , constr (XAltExt a)
+  )
 
 
 -- | Binder metadata.

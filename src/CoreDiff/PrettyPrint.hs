@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module CoreDiff.PrettyPrint where
 
@@ -9,6 +11,7 @@ import Data.List
 import Data.Maybe
 import Data.Ratio
 import qualified Data.Text as T
+import Data.Void
 import GhcDump.Ast (IdScope(..), OccInfo(..), Lit(..), AltCon(..))
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
@@ -44,10 +47,10 @@ instance PprWithOpts XModule where
       ] ++ bindingDocs
 
 
-instance PprWithOpts (XBinding a) where
+instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinding a) where
   -- big rule of thumb: each global function that uses ppr-functions other that pprWithOpts, which is guaranteed to handle extensions, must handle extensions itself.
   -- Also true for any functions that pattern-match. basically all PprWithOpts instances and then some.
-  pprWithOpts (XXBinding _) = error "stub"
+  pprWithOpts (XXBinding extension) = pprWithOpts extension
   pprWithOpts binding = do
     opts <- ask
     if pprOptsLongBindings opts then
@@ -55,8 +58,7 @@ instance PprWithOpts (XBinding a) where
     else
       pprShortBinding binding
     where
-      pprLongBinding :: XBinding a -> Reader PprOpts Doc
-      pprLongBinding (XXBinding _) = error "stub"
+      pprLongBinding :: ForAllExtensions PprWithOpts a => XBinding a -> Reader PprOpts Doc
       pprLongBinding (XBinding binder expr) = do
         sigDoc <- pprSignature binder
         binderNameDoc <- pprWithOpts binder
@@ -64,7 +66,7 @@ instance PprWithOpts (XBinding a) where
 
         return $ vsep [ sigDoc, hang' (binderNameDoc <+> equals) 2 exprDoc ]
 
-      pprSignature :: XBinder a -> Reader PprOpts Doc
+      pprSignature :: ForAllExtensions PprWithOpts a => XBinder a -> Reader PprOpts Doc
       pprSignature binder = do
         opts <- ask
         metaDoc <- pprBinderMeta $ xBinderMeta binder
@@ -76,7 +78,7 @@ instance PprWithOpts (XBinding a) where
           , Just $ hang' (nameDoc <+> dcolon) 2 typeDoc
           ]
 
-      pprShortBinding :: XBinding a -> Reader PprOpts Doc
+      pprShortBinding :: ForAllExtensions PprWithOpts a => XBinding a -> Reader PprOpts Doc
       pprShortBinding (XBinding binder expr) = do
         binderDoc <- pprWithOpts binder
         exprDoc <- pprWithOpts expr
@@ -85,8 +87,8 @@ instance PprWithOpts (XBinding a) where
 
 
 -- | Takes care of printing binders with or without uniques.
-instance PprWithOpts (XBinder a) where
-  pprWithOpts (XXBinder _) = error "stub"
+instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinder a) where
+  pprWithOpts (XXBinder extension) = pprWithOpts extension
   pprWithOpts binder = do
     opts <- ask
     if pprOptsDisplayUniques opts then
@@ -95,15 +97,15 @@ instance PprWithOpts (XBinder a) where
       return $ text' $ xBinderName binder
 
 
-instance PprWithOpts (XType a) where
-  pprWithOpts (XXType a) = error "stub"
+instance ForAllExtensions PprWithOpts a => PprWithOpts (XType a) where
+  -- extension case is handled in pprType
   pprWithOpts ty = pprType TopPrec ty
   
 data TyPrec = TopPrec | FunPrec | TyOpPrec | TyConPrec
   deriving (Eq, Ord)
 
-pprType :: TyPrec -> XType a -> Reader PprOpts Doc
-pprType _    (XXType _) = error "stub"
+pprType :: ForAllExtensions PprWithOpts a => TyPrec -> XType a -> Reader PprOpts Doc
+pprType _    (XXType extension) = pprWithOpts extension
 pprType _    (XVarTy binder) = pprWithOpts binder
 pprType prec t@XFunTy{} = do
   funTyDocs <- mapM (pprType FunPrec) funTys
@@ -126,14 +128,14 @@ pprType prec t@XForAllTy{} = do
   (binders, ty) = collectForAlls t
 
 
-instance PprWithOpts (XExpr a) where
-  pprWithOpts (XXExpr _) = error "stub"
+instance ForAllExtensions PprWithOpts a => PprWithOpts (XExpr a) where
+  -- extension case is handled in pprExpr
   pprWithOpts expr = pprExpr False expr
 
 -- | Expressions can be printed with or without parentheses around them.
 -- @pprExpr@ prints terminal expressions without parens regardless.
-pprExpr :: Bool -> XExpr a -> Reader PprOpts Doc
-pprExpr _ (XXExpr _)           = error "stub"
+pprExpr :: ForAllExtensions PprWithOpts a => Bool -> XExpr a -> Reader PprOpts Doc
+pprExpr _ (XXExpr extension)   = pprWithOpts extension
 pprExpr _ (XVar binder)        = pprWithOpts binder
 pprExpr _ (XVarGlobal extName) = return $ pprExtName extName
 pprExpr _ (XLit lit)           = pprLit lit
@@ -179,13 +181,19 @@ pprExpr parens expr = parensIf parens <$> pprExpr' expr
       tyDoc <- pprWithOpts ty
       return $ "@" <+> tyDoc
 
-instance PprWithOpts (XAlt a) where
-  pprWithOpts (XXAlt _) = error "stub"
+instance ForAllExtensions PprWithOpts a => PprWithOpts (XAlt a) where
+  pprWithOpts (XXAlt extension) = pprWithOpts extension
   pprWithOpts (XAlt con binders rhs) = do
     altConDoc <- pprAltCon con
     binderDocs <- mapM pprWithOpts binders
     rhsDoc <- pprWithOpts rhs
     return $ hang' (altConDoc <+> sep binderDocs <+> "->") 2 rhsDoc
+
+-- Pretty-printing of extensions
+
+
+instance PprWithOpts Void where
+  pprWithOpts _ = error "Something went terribly wrong! There is nothing to print."
 
 -- Terminals
 
