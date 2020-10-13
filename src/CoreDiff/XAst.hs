@@ -34,7 +34,7 @@ data XBinder (a :: Variant)
     { xBinderName :: T.Text
     , xBinderId   :: Unique
     , xBinderType :: XType a
-    , xBinderMeta :: BinderMeta
+    , xBinderMeta :: XBinderMeta
     }
   | XTyBinder -- ^ For type variable binders.
     { xBinderName :: T.Text
@@ -42,6 +42,10 @@ data XBinder (a :: Variant)
     , xBinderKind :: XType a
     }
   | XXBinder (XBinderExt a)
+
+-- | Map a binder to its type or kind.
+xBinderTypeOrKind binder@XBinder{}   = xBinderType binder
+xBinderTypeOrKind binder@XTyBinder{} = xBinderKind binder
 
 -- | A Core type.
 data XType (a :: Variant)
@@ -113,15 +117,16 @@ type family XAltExt a where
 
 
 -- | Binder metadata.
-data BinderMeta = BinderMeta
-  { bmArity         :: Int
-  , bmIsOneShot     :: Bool
-  , bmInlinePragma  :: T.Text
-  , bmOccInfo       :: OccInfo
-  , bmStrictnessSig :: T.Text
-  , bmDemandSig     :: T.Text
-  , bmCallArity     :: Int
-  , bmCpr           :: T.Text
+data XBinderMeta = XBinderMeta
+  { xbmArity         :: Int
+  , xbmIsOneShot     :: Bool
+  , xbmInlinePragma  :: T.Text
+  , xbmOccInfo       :: OccInfo
+  , xbmStrictnessSig :: T.Text
+  , xbmDemandSig     :: T.Text
+  , xbmCallArity     :: Int
+  , xbmCpr           :: T.Text
+  , xbmScope         :: IdScope
   }
 
 -- | Type constructor.

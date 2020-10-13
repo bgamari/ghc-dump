@@ -4,4 +4,4 @@ import GhcDump.Util
 
 import CoreDiff.Convert
 
-readXModule = fmap cvtXModule . readDump
+readXModule = fmap cvtModule . readDump
