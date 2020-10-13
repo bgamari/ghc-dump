@@ -106,6 +106,7 @@ triv bindings bindings' =
     -- The line where this binding's name is created is a whopping 8 years old!
     -- https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Tc/Module.hs#L1794
     -- https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Builtin/Names.hs#L2245
+    -- There is even a note about this here: https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Tc/Module.hs#L1893
     -- This confuses the "trivial pairings" algorithm, which assumes that exported binders have unambiguous names.
     -- This code is very dirty and will probably be exchanged for a more general solution in the future.
     pairRootMainIfExists bindings bindings' =
@@ -186,7 +187,7 @@ disExpr expr expr' =
       where
         (d, boundInB, boundInB') = disExpr' b b'
     disExpr' (XLet bindings expr) (XLet bindings' expr') =
-      ( concat disagreeings
+      ( concat disagreeings ++ disExpr expr expr'
       , Set.fromList [ binder  | XBinding binder  _ <- bindings  ]
       , Set.fromList [ binder' | XBinding binder' _ <- bindings' ]
       )
