@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Main where
 
 import Control.Monad
@@ -5,6 +7,10 @@ import Control.Monad.Trans.Reader
 import Data.List
 import Data.Maybe
 import Options.Applicative
+import System.IO
+import System.IO.Temp
+import System.Process
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
 import CoreDiff.Util
 import CoreDiff.Inline
@@ -43,11 +49,64 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
       modA <- readXModule pathA
       modB <- readXModule pathB
 
-      let inliningMode' = fromMaybe InliningEnabled inliningMode
+      let inliningMode' = fromMaybe InliningDisabled inliningMode
       let modA' = applyInlining inliningMode' modA
       let modB' = applyInlining inliningMode' modB
 
-      print $ runReader (pprWithOpts modA') pprOptsDefault
+      diffBindingByBinding pathA pathB pprOptsDefault $ pairProg modA modB
+
+    diffBindingByBinding modPath modPath' opts (PairingS _ unpairedL unpairedR paired) = do
+      mapM_ (uncurry $ printDiff modPath modPath' opts) paired
+      mapM_ (printLeft  modPath modPath' opts) unpairedL
+      mapM_ (printRight modPath modPath' opts) unpairedR
+
+    printDiff modPath modPath' opts binding@(XBinding binder _) binding'@(XBinding binder' _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  opts
+      let binderStr' = show $ runReader (pprWithOpts binder') opts
+      -- print $ bold $ text $ "Difference of " ++ binderStr ++ " and " ++ binderStr'
+      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
+      let bindingStr' = show $ runReader (pprWithOpts binding') opts
+      callDiff
+        (binderStr  ++ " from " ++ modPath)
+        (binderStr' ++ " from " ++ modPath')
+        bindingStr bindingStr'
+
+    printLeft modPath modPath' opts binding@(XBinding binder _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  opts
+      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
+      callDiff
+        (binderStr  ++ " from " ++ modPath)
+        ("No match in " ++ modPath')
+        bindingStr ""
+
+    printRight modPath modPath' opts binding@(XBinding binder _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  opts
+      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
+      callDiff
+        ("No match in " ++ modPath)
+        (binderStr  ++ " from " ++ modPath')
+        "" bindingStr
+  
+    callDiff :: String -> String -> String -> String -> IO ()
+    callDiff labelA labelB a b = do
+      withSystemTempFile "corediffa.txt" $ \pathA handleA ->
+        withSystemTempFile "corediffb.txt" $ \pathB handleB -> do
+          hPutStrLn handleA a
+          hFlush handleA
+          hPutStrLn handleB b
+          hFlush handleB
+          -- putStrLn $ diffCmd labelA labelB pathA pathB
+          system $ diffCmd labelA labelB pathA pathB
+          return ()
+      where
+        diffCmd labelA labelB pathA pathB = intercalate " "
+          [ "diff", "--color=always", "-u", "--report-identical-files"
+          , "--label", sQuote labelA
+          , pathA
+          , "--label", sQuote labelB
+          , pathB
+          ]
+        sQuote str = "'" ++ concat [ if c == '\'' then "'\"'\"'" else [c] | c <- str ] ++ "'"
 
 data InliningMode
   = InliningEnabled
