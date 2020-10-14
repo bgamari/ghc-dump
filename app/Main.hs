@@ -10,12 +10,14 @@ import Options.Applicative
 import System.IO
 import System.IO.Temp
 import System.Process
+import System.Exit
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
-import CoreDiff.Util
+import CoreDiff.Assimilate
 import CoreDiff.Inline
 import CoreDiff.Pairing
 import CoreDiff.PrettyPrint
+import CoreDiff.Util
 import CoreDiff.XAst
 
 main :: IO ()
@@ -53,7 +55,10 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
       let modA' = applyInlining inliningMode' modA
       let modB' = applyInlining inliningMode' modB
 
-      diffBindingByBinding pathA pathB pprOptsDefault $ pairProg modA modB
+      let pairings  = pairProg modA' modB'
+      let pairings' = permutePairingsInRhs pairings
+
+      diffBindingByBinding pathA pathB pprOptsDefault pairings'
 
     diffBindingByBinding modPath modPath' opts (PairingS _ unpairedL unpairedR paired) = do
       mapM_ (uncurry $ printDiff modPath modPath' opts) paired
@@ -96,11 +101,14 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
           hPutStrLn handleB b
           hFlush handleB
           -- putStrLn $ diffCmd labelA labelB pathA pathB
-          system $ diffCmd labelA labelB pathA pathB
-          return ()
+          exitCode <- system $ diffCmd labelA labelB pathA pathB
+          case exitCode of
+            ExitSuccess -> -- diff returns 0 if the files are the same
+              print $ bold $ text $ labelA ++ " and " ++ labelB ++ " are identical"
+            _ -> return ()
       where
         diffCmd labelA labelB pathA pathB = intercalate " "
-          [ "diff", "--color=always", "-u", "--report-identical-files"
+          [ "diff", "--color=always", "-u"
           , "--label", sQuote labelA
           , pathA
           , "--label", sQuote labelB

@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+      CoreDiff.Assimilate
       CoreDiff.Convert
       CoreDiff.Inline
       CoreDiff.Pairing
