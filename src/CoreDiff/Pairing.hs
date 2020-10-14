@@ -5,7 +5,7 @@
 module CoreDiff.Pairing where
 
 import Data.Foldable (toList)
-import Data.List (find)
+import Data.List (find, nub)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe (catMaybes)
@@ -73,7 +73,7 @@ pairLet (expr, expr') (bindings, bindings') = iter $ PairingS
   (bindingsMap' `Map.withoutKeys` Set.fromList rightPaired)
   []
   where
-    disagreeing = disExpr expr expr'
+    disagreeing = nub $ disExpr expr expr'
     disagreeingBindings =
       [ (bindingsMap Map.! binder, bindingsMap' Map.! binder')
       | (binder, binder') <- disagreeing
@@ -151,7 +151,7 @@ step (PairingS pq unpairedL unpairedR paired) = PairingS
   ((binding, binding') : paired)
   where
     (binding@(XBinding _ expr), binding'@(XBinding _ expr')) :<| pq' = pq
-    disagreeing = disExpr expr expr'
+    disagreeing = nub $ disExpr expr expr'
     newPairings = catMaybes $ map go disagreeing
       where
         go (binder, binder') =
@@ -163,6 +163,8 @@ step (PairingS pq unpairedL unpairedR paired) = PairingS
       | (XBinding binder _, XBinding binder' _) <- newPairings
       ]
 
+-- TODO: This should return a set, probably
+-- Actually not only the tuples should be unique, but each column.
 disExpr :: XExpr UD -> XExpr UD -> [(XBinder UD, XBinder UD)]
 disExpr expr expr' =
   [ (binder, binder')

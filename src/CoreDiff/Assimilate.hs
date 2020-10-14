@@ -8,6 +8,7 @@ import Control.Monad
 import Control.Monad.Trans.Reader
 
 import CoreDiff.Pairing
+import CoreDiff.PrettyPrint
 import CoreDiff.XAst
 
 type Permutation = [(XBinder UD, XBinder UD)]
@@ -30,9 +31,8 @@ permutePaired pairingS = pairingS { paired = map go $ paired pairingS }
     go (binding@(XBinding binder expr), XBinding binder' expr') =
       ( binding
       , XBinding
-        --(runReader (assimilate binder binder') [])
         binder
-        (runReader (assimilate expr   expr')   [])
+        (runReader (assimilate expr expr') [])
       )
 
 class Asim a where
@@ -45,16 +45,32 @@ instance Asim (XExpr UD) where
     XTyLam binder <$> local (++ [(binder, binder')]) (assimilate expr expr')
   assimilate (XLam binder expr) (XLam binder' expr') =
     XLam binder <$> local (++ [(binder, binder')]) (assimilate expr expr')
-  assimilate (XLet bindings expr) (XLet bindings' expr') = error "let stub"
-  assimilate (XCase scrut binder alts) (XCase scrut' binder' alts') =
-    XCase <$> assimilate scrut scrut' <*> return binder <*> local (++ [(binder, binder')]) (zipWithM assimilate alts alts')
+  assimilate a@(XLet bindings expr) b@(XLet bindings' expr')
+    -- TODO: this was just for debugging
+    | length (paired pairings) /= length bindings' = error $ show 
+      [ runReader (pprWithOpts a) pprOptsDefault
+      , runReader (pprWithOpts b) pprOptsDefault
+      , runReader (pprWithOpts pairings) pprOptsDefault
+      ]
+    | otherwise = XLet <$> zipWithM go bindings bindings' <*> local (++ newPerm) (assimilate expr expr')
+    where
+      pairings = pairLet (expr, expr') (bindings, bindings')
+      newPerm = [ (binder, binder') | (XBinding binder _, XBinding binder' _) <- paired pairings ]
+      go (XBinding binder expr) (XBinding binder' expr') =
+        XBinding binder' <$> local (++ newPerm) (assimilate expr expr')
+  assimilate (XCase scrut binder alts) (XCase scrut' binder' alts')
+    -- TODO: depends on ordering of case alternatives
+    | length alts /= length alts' = error "Mismatched number of alternatives"
+    | otherwise =
+      XCase <$> assimilate scrut scrut' <*> return binder <*> local (++ [(binder, binder')]) (zipWithM assimilate alts alts')
   assimilate _ x = applyPerm x
 
 instance Asim (XAlt UD) where
   -- TODO: as of right, this depends on the ordering of alternatives and that the number of their binders doesnt change.
-  assimilate (XAlt altCon binders rhs) (XAlt altCon' binders' rhs') =
-    -- TODO: what if 
-    XAlt altCon binders <$> local (++ (zip binders binders')) (assimilate rhs rhs')
+  assimilate (XAlt altCon binders rhs) (XAlt altCon' binders' rhs')
+    | length binders /= length binders' = error "Mismatched number of binders"
+    | otherwise =
+      XAlt altCon binders <$> local (++ (zip binders binders')) (assimilate rhs rhs')
 
 class Perm a where
   applyPerm :: a -> Reader Permutation a
