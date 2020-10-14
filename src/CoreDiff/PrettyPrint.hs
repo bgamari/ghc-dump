@@ -43,6 +43,7 @@ instance PprWithOpts XModule where
 
     return $ vsep $ intersperse empty $
       [ text' $ "Phase: " <> xModulePhase mod
+      , pretty (length $ xModuleBindings mod) <+> "bindings"
       , text' $ "module " <> xModuleName mod <> " where"
       ] ++ bindingDocs
 
@@ -69,12 +70,14 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinding a) where
       pprSignature :: ForAllExtensions PprWithOpts a => XBinder a -> Reader PprOpts Doc
       pprSignature binder = do
         opts <- ask
-        metaDoc <- pprBinderMeta $ xBinderMeta binder
+        metaDoc <- case (binder, pprOptsDisplayMeta opts) of
+          (XBinder{}, True) -> Just <$> pprBinderMeta (xBinderMeta binder)
+          _ ->                 return Nothing
         nameDoc <- pprWithOpts binder
         typeDoc <- pprWithOpts $ xBinderTypeOrKind binder
 
         return $ vsep $ catMaybes
-          [ toMaybe (pprOptsDisplayMeta opts) metaDoc
+          [ metaDoc
           , Just $ hang' (nameDoc <+> dcolon) 2 typeDoc
           ]
 
