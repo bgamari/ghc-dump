@@ -210,7 +210,7 @@ pprBinderMeta :: XBinderMeta -> Reader PprOpts Doc
 pprBinderMeta meta = do
   occInfoDoc <- pprOccInfo $ xbmOccInfo meta
 
-  return $ brackets $ align $ sep $ punctuate "," $ catMaybes $
+  return $ brackets $ align $ vsep $ punctuate "," $ catMaybes $
     [ Just $ pprScope $ xbmScope meta
     , toMaybe (xbmArity meta /= 0)               $ "arity=" <> pretty (xbmArity meta)
     , toMaybe (xbmInlinePragma meta /= "")       $ "inline=" <> text' (xbmInlinePragma meta)

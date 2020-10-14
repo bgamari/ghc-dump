@@ -128,12 +128,13 @@ triv bindings bindings' =
       ]
       where
         nameMap' :: Map T.Text (XBinding UD)
-        nameMap' = toNameMap bindings'
+        nameMap' = toExportedNameMap bindings'
 
-        toNameMap :: [XBinding UD] -> Map T.Text (XBinding UD)
-        toNameMap bindings = Map.fromList
+        toExportedNameMap :: [XBinding UD] -> Map T.Text (XBinding UD)
+        toExportedNameMap bindings = Map.fromList
           [ (xBinderName binder, binding)
           | binding@(XBinding binder _) <- bindings
+          , xBinderIsExported binder
           ]
 
 -- | Repeatedly apply @step@ until @toPair@ is empty.
