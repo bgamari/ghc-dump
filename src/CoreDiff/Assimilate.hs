@@ -4,6 +4,7 @@
 
 module CoreDiff.Assimilate where
 
+import Control.Monad
 import Control.Monad.Trans.Reader
 
 import CoreDiff.Pairing
@@ -23,6 +24,37 @@ permutePairingsInRhs (PairingS pq unpairedL unpairedR paired) = PairingS
     go t = runReader (applyPerm t) perm
     mapSnd f (a, b) = (a, f b)
 
+
+permutePaired pairingS = pairingS { paired = map go $ paired pairingS }
+  where
+    go (binding@(XBinding binder expr), XBinding binder' expr') =
+      ( binding
+      , XBinding
+        --(runReader (assimilate binder binder') [])
+        binder
+        (runReader (assimilate expr   expr')   [])
+      )
+
+class Asim a where
+  assimilate :: a -> a -> Reader Permutation a
+
+instance Asim (XExpr UD) where
+  assimilate (XApp f x) (XApp f' x') =
+    XApp <$> assimilate f f' <*> assimilate x x'
+  assimilate (XTyLam binder expr) (XTyLam binder' expr') =
+    XTyLam binder <$> local (++ [(binder, binder')]) (assimilate expr expr')
+  assimilate (XLam binder expr) (XLam binder' expr') =
+    XLam binder <$> local (++ [(binder, binder')]) (assimilate expr expr')
+  assimilate (XLet bindings expr) (XLet bindings' expr') = error "let stub"
+  assimilate (XCase scrut binder alts) (XCase scrut' binder' alts') =
+    XCase <$> assimilate scrut scrut' <*> return binder <*> local (++ [(binder, binder')]) (zipWithM assimilate alts alts')
+  assimilate _ x = applyPerm x
+
+instance Asim (XAlt UD) where
+  -- TODO: as of right, this depends on the ordering of alternatives and that the number of their binders doesnt change.
+  assimilate (XAlt altCon binders rhs) (XAlt altCon' binders' rhs') =
+    -- TODO: what if 
+    XAlt altCon binders <$> local (++ (zip binders binders')) (assimilate rhs rhs')
 
 class Perm a where
   applyPerm :: a -> Reader Permutation a

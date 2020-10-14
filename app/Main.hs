@@ -45,55 +45,81 @@ pairCommand = run <$> cborDumpFile <*> cborDumpFile
       let pairings = pairProg modA modB
       print $ runReader (pprWithOpts pairings) pprOptsDefault
 
-diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
+data DiffContext = DiffContext
+  { pathA :: FilePath
+  , pathB :: FilePath
+  , modA :: XModule
+  , modB :: XModule
+  , inliningMode :: InliningMode
+  , displayIdenticalBindings :: Bool
+  , opts :: PprOpts
+  }
+
+diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions <*> displayIdentical
   where
-    run pathA pathB inliningMode = do
+    displayIdentical = switch
+      (  long "display-identical"
+      <> help "Display identical bindings too."
+      )
+
+    run pathA pathB inliningMode displayIdentical = do
       modA <- readXModule pathA
       modB <- readXModule pathB
 
-      let inliningMode' = fromMaybe InliningDisabled inliningMode
-      let modA' = applyInlining inliningMode' modA
-      let modB' = applyInlining inliningMode' modB
+      run' $ DiffContext
+        pathA pathB
+        modA modB
+        (fromMaybe InliningDisabled inliningMode)
+        displayIdentical
+        pprOptsDefault
+
+    run' ctx = do
+      let modA' = applyInlining (inliningMode ctx) (modA ctx)
+      let modB' = applyInlining (inliningMode ctx) (modB ctx)
 
       let pairings  = pairProg modA' modB'
-      let pairings' = permutePairingsInRhs pairings
 
-      diffBindingByBinding pathA pathB pprOptsDefault pairings'
+      let pairings' = permutePaired $ permutePairingsInRhs pairings
 
-    diffBindingByBinding modPath modPath' opts (PairingS _ unpairedL unpairedR paired) = do
-      mapM_ (uncurry $ printDiff modPath modPath' opts) paired
-      mapM_ (printLeft  modPath modPath' opts) unpairedL
-      mapM_ (printRight modPath modPath' opts) unpairedR
+      diffBindingByBinding ctx pairings'
 
-    printDiff modPath modPath' opts binding@(XBinding binder _) binding'@(XBinding binder' _) = do
-      let binderStr  = show $ runReader (pprWithOpts binder)  opts
-      let binderStr' = show $ runReader (pprWithOpts binder') opts
+    diffBindingByBinding ctx (PairingS _ unpairedL unpairedR paired) = do
+      mapM_ (uncurry $ printDiff ctx) paired
+      mapM_ (printLeft  ctx) unpairedL
+      mapM_ (printRight ctx) unpairedR
+
+    printDiff ctx binding@(XBinding binder _) binding'@(XBinding binder' _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx
+      let binderStr' = show $ runReader (pprWithOpts binder') $ opts ctx
       -- print $ bold $ text $ "Difference of " ++ binderStr ++ " and " ++ binderStr'
-      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
-      let bindingStr' = show $ runReader (pprWithOpts binding') opts
+      let bindingStr  = show $ runReader (pprWithOpts binding)  $ opts ctx
+      let bindingStr' = show $ runReader (pprWithOpts binding') $ opts ctx
       callDiff
-        (binderStr  ++ " from " ++ modPath)
-        (binderStr' ++ " from " ++ modPath')
+        ctx
+        (binderStr  ++ " from " ++ pathA ctx)
+        (binderStr' ++ " from " ++ pathB ctx)
         bindingStr bindingStr'
 
-    printLeft modPath modPath' opts binding@(XBinding binder _) = do
-      let binderStr  = show $ runReader (pprWithOpts binder)  opts
-      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
+    printLeft ctx binding@(XBinding binder _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx
+      let bindingStr = show $ runReader (pprWithOpts binding) $ opts ctx
       callDiff
-        (binderStr  ++ " from " ++ modPath)
-        ("No match in " ++ modPath')
+        ctx
+        (binderStr  ++ " from " ++ pathA ctx)
+        ("No match in " ++ pathB ctx)
         bindingStr ""
 
-    printRight modPath modPath' opts binding@(XBinding binder _) = do
-      let binderStr  = show $ runReader (pprWithOpts binder)  opts
-      let bindingStr  = show $ runReader (pprWithOpts binding)  opts
+    printRight ctx binding@(XBinding binder _) = do
+      let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx
+      let bindingStr = show $ runReader (pprWithOpts binding) $ opts ctx
       callDiff
-        ("No match in " ++ modPath)
-        (binderStr  ++ " from " ++ modPath')
+        ctx
+        ("No match in " ++ pathA ctx)
+        (binderStr  ++ " from " ++ pathB ctx)
         "" bindingStr
   
-    callDiff :: String -> String -> String -> String -> IO ()
-    callDiff labelA labelB a b = do
+    callDiff :: DiffContext -> String -> String -> String -> String -> IO ()
+    callDiff ctx labelA labelB a b = do
       withSystemTempFile "corediffa.txt" $ \pathA handleA ->
         withSystemTempFile "corediffb.txt" $ \pathB handleB -> do
           hPutStrLn handleA a
@@ -102,10 +128,10 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
           hFlush handleB
           -- putStrLn $ diffCmd labelA labelB pathA pathB
           exitCode <- system $ diffCmd labelA labelB pathA pathB
-          case exitCode of
-            ExitSuccess -> -- diff returns 0 if the files are the same
-              print $ bold $ text $ labelA ++ " and " ++ labelB ++ " are identical"
-            _ -> return ()
+          when (exitCode == ExitSuccess) $ do -- diff returns 0 if the files are the same
+            print $ bold $ text $ labelA ++ " and " ++ labelB ++ " are identical"
+            when (displayIdenticalBindings ctx) $ do
+              putStrLn a
       where
         diffCmd labelA labelB pathA pathB = intercalate " "
           [ "diff", "--color=always", "-u"
