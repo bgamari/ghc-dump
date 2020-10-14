@@ -24,6 +24,7 @@ source-repository head
 library
   exposed-modules:
       CoreDiff.Convert
+      CoreDiff.Inline
       CoreDiff.Pairing
       CoreDiff.PrettyPrint
       CoreDiff.Util
