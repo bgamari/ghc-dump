@@ -24,13 +24,15 @@ text' = text . T.unpack
 
 -- | Options for pretty-printing Core terms.
 data PprOpts = PprOpts
-  { pprOptsDisplayUniques :: Bool -- ^ Whether uniques should be printed.
-  , pprOptsDisplayMeta    :: Bool -- ^ Whether metadata should be printed.
-  , pprOptsLongBindings   :: Bool -- ^ Whether bindings should be printed with a separate signature.
+  { pprOptsDisplayUniques      :: Bool -- ^ Whether uniques should be printed.
+  , pprOptsDisplayMeta         :: Bool -- ^ Whether metadata should be printed.
+  , pprOptsLongBindings        :: Bool -- ^ Whether bindings should be printed with a separate signature.
+
+  , pprOptsDisplayMetaInBinder :: Bool -- ^ Whether metadata should be printed after each binder. For internal use only.
   }
 
 -- | The default options for pretty-printing Core terms.
-pprOptsDefault = PprOpts True True True
+pprOptsDefault = PprOpts True True True False
 
 -- | Stuff that is pretty-printable in respect to some @PprOpts@.
 class PprWithOpts a where
@@ -83,10 +85,12 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinding a) where
 
       pprShortBinding :: ForAllExtensions PprWithOpts a => XBinding a -> Reader PprOpts Doc
       pprShortBinding (XBinding binder expr) = do
-        binderDoc <- pprWithOpts binder
+        binderDoc <- local showMeta $ pprWithOpts binder
         exprDoc <- pprWithOpts expr
 
         return $ hang' (binderDoc <+> equals) 2 exprDoc
+        where
+          showMeta opts = opts { pprOptsDisplayMetaInBinder = True }
 
 
 -- | Takes care of printing binders with or without uniques.
@@ -94,11 +98,12 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinder a) where
   pprWithOpts (XXBinder extension) = pprWithOpts extension
   pprWithOpts binder = do
     opts <- ask
-    if pprOptsDisplayUniques opts then
-      return $ text' $ xBinderName binder <> "_"
-                    <> T.pack (show $ xBinderId binder)
-    else
-      return $ text' $ xBinderName binder
+    metaDoc <- pprBinderMeta $ xBinderMeta binder
+    return $ hcat $ catMaybes
+      [ Just $ text' $ xBinderName binder
+      , toMaybe (pprOptsDisplayUniques opts) $ text' $ "_" <> T.pack (show $ xBinderId binder)
+      , toMaybe (pprOptsDisplayMetaInBinder opts) $ space <> metaDoc
+      ]
 
 
 instance ForAllExtensions PprWithOpts a => PprWithOpts (XType a) where
@@ -202,7 +207,11 @@ instance PprWithOpts a => PprWithOpts (Change a) where
   pprWithOpts (Change (lhs, rhs)) = do
     lhsDoc <- pprWithOpts lhs
     rhsDoc <- pprWithOpts rhs
-    return $ "#( " <> lhsDoc <> ", " <> rhsDoc <> " )"
+    return $ align $ vcat
+      [ "#( " <> red lhsDoc
+      , " , " <> green rhsDoc
+      , " )"
+      ]
 
 -- Terminals
 

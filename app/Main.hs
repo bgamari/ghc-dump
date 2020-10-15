@@ -102,7 +102,9 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
       mapM_ (printRight ctx) unpairedR
 
     structDiff ctx binding binding' = do
-      print $ runReader (pprWithOpts $ diff binding binding') $ opts ctx
+      print $ runReader (pprWithOpts $ diff binding binding') $ opts'
+      where
+        opts' = (opts ctx) { pprOptsLongBindings = False }
 
     printDiff ctx binding@(XBinding binder _) binding'@(XBinding binder' _) = do
       let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx

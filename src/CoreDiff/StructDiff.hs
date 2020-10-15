@@ -16,8 +16,18 @@ class Diffable (a :: Variant -> *) where
 
 
 instance Diffable XBinding where
-  gcp (XBinding binder expr) (XBinding binder' expr') =
-    XBinding (gcp binder binder') (gcp expr expr')
+  gcp (XBinding binder expr) (XBinding binder' expr')
+    -- if binder metadata and types mismatch, mark as change even if their uniques are equal
+    | binder ~/~ binder' =
+      XBinding (XXBinder (Change (binder, binder'))) (gcp expr expr')
+    | otherwise =
+      XBinding (gcp binder binder') (gcp expr expr')
+    where
+      (XBinder   name unique ty metadata) ~/~ (XBinder   name' unique' ty' metadata') =
+        ty /= ty' || metadata /= metadata'
+      (XTyBinder name unique kind)        ~/~ (XTyBinder name' unique' kind')         =
+        kind /= kind'
+      _ ~/~ _ = False
 
   mend (XBinding binder expr) =
     case XBinding (mend binder) (mend expr) of
@@ -31,14 +41,8 @@ instance Diffable XBinding where
 
 instance Diffable XBinder where
   gcp binder binder'
-    | binder ~~ binder' = unsafeCoerce binder
+    | binder == binder' = unsafeCoerce binder
     | otherwise         = XXBinder $ Change (binder, binder')
-    where
-      (XBinder   name unique ty metadata) ~~ (XBinder   name' unique' ty' metadata') =
-        name == name' && unique == unique' && ty == ty' && metadata == metadata'
-      (XTyBinder name unique kind)        ~~ (XTyBinder name' unique' kind')         =
-        name == name' && unique == unique' && kind == kind'
-      _ ~~ _ = False
   
   mend binder = binder
 
