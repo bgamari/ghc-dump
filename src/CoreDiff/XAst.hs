@@ -57,6 +57,18 @@ xBinderIsExported binder@XBinder{} =
   xbmScope (xBinderMeta binder) `elem` [GlobalId, LocalIdX]
 xBinderIsExported _ = False
 
+-- | This is only used for name permutations.
+data XBinderUniqueName = XBinderUniqueName T.Text Unique
+  deriving (Eq)
+
+-- | Retrieve a binder's name and unique id.
+xBinderUniqueName binder =
+  XBinderUniqueName (xBinderName binder) (xBinderId binder)
+
+-- | Override a binder's name and unique id.
+xBinderSetUniqueName (XBinderUniqueName name id) binder =
+  binder { xBinderName = name, xBinderId = id }
+
 -- | A Core type.
 data XType (a :: Variant)
   = XVarTy (XBinder a)
