@@ -5,7 +5,7 @@
 module CoreDiff.Pairing where
 
 import Data.Foldable (toList)
-import Data.List (find, nub)
+import Data.List (find, nubBy)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe (catMaybes)
@@ -73,7 +73,7 @@ pairLet (expr, expr') (bindings, bindings') = iter $ PairingS
   (bindingsMap' `Map.withoutKeys` Set.fromList rightPaired)
   []
   where
-    disagreeing = nub $ disExpr expr expr'
+    disagreeing = disExpr expr expr'
     disagreeingBindings =
       [ (bindingsMap Map.! binder, bindingsMap' Map.! binder')
       | (binder, binder') <- disagreeing
@@ -97,10 +97,11 @@ toBinderMap bindings = Map.fromList
 
 -- | Calculate trivial pairings of exported bindings in two lists of bindings.
 triv :: [XBinding UD] -> [XBinding UD] -> [(XBinding UD, XBinding UD)]
-triv bindings bindings' =
-  rmPair ++ triv' bindingsL bindingsR
+triv bindingsL bindingsR =
+  rootMainPair ++ triv' bindingsL' bindingsR'
   where
-    (rmPair, bindingsL, bindingsR) = pairRootMainIfExists bindings bindings'
+    (rootMainPair, bindingsL', bindingsR') =
+      pairRootMainIfExists bindingsL bindingsR
 
     -- Modules with a main function also always have an additional *exported* main function that ALWAYS has the unique 01D (= tag:0, id:101, since it's base62).
     -- The line where this binding's name is created is a whopping 8 years old!
@@ -144,29 +145,27 @@ iter s
   | otherwise       = iter $ step s
 
 step :: PairingS -> PairingS
-step (PairingS pq unpairedL unpairedR paired) = PairingS
-  (pq' >< Seq.fromList newPairings)
-  (unpairedL `Map.withoutKeys` Set.fromList newPairingBindersL)
-  (unpairedR `Map.withoutKeys` Set.fromList newPairingBindersR)
-  ((binding, binding') : paired)
-  where
+step (PairingS pq unpairedL unpairedR paired) =
+  let
     (binding@(XBinding _ expr), binding'@(XBinding _ expr')) :<| pq' = pq
-    disagreeing = nub $ disExpr expr expr'
-    newPairings = catMaybes $ map go disagreeing
-      where
-        go (binder, binder') =
-          case (unpairedL Map.!? binder, unpairedR Map.!? binder') of
-            (Just b, Just b') -> Just (b, b')
-            _                 -> Nothing
-    (newPairingBindersL, newPairingBindersR) = unzip
-      [ (binder, binder')
-      | (XBinding binder _, XBinding binder' _) <- newPairings
-      ]
+    disagreeing = disExpr expr expr'
+    newPairings = catMaybes $ map bothUnpaired disagreeing
+    bothUnpaired (binder, binder') =
+      case (unpairedL Map.!? binder, unpairedR Map.!? binder') of
+        (Just b, Just b') -> Just (b, b')
+        _                 -> Nothing
+    (newPairingBindersL, newPairingBindersR) =
+      deconPairings newPairings
+  in PairingS
+    (pq' >< Seq.fromList newPairings)
+    (unpairedL `Map.withoutKeys` Set.fromList newPairingBindersL)
+    (unpairedR `Map.withoutKeys` Set.fromList newPairingBindersR)
+    ((binding, binding') : paired)
 
 -- TODO: This should return a set, probably
 -- Actually not only the tuples should be unique, but each column.
 disExpr :: XExpr UD -> XExpr UD -> [(XBinder UD, XBinder UD)]
-disExpr expr expr' =
+disExpr expr expr' = nubBy columnsUnique
   [ (binder, binder')
   | (binder, binder') <- allDisagreeing
   , not $ binder `Set.member` boundInExpr
@@ -174,6 +173,9 @@ disExpr expr expr' =
   ]
   where
     (allDisagreeing, boundInExpr, boundInExpr') = disExpr' expr expr'
+
+    columnsUnique (binderL, binderR) (binderL', binderR') =
+      binderL == binderL' || binderR == binderR'
 
     disExpr' (XVar binder) (XVar binder') = ([(binder, binder')], Set.empty, Set.empty)
     disExpr' (XApp f x) (XApp f' x') =

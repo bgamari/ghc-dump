@@ -11,14 +11,16 @@ import qualified Data.Set as Set
 
 import CoreDiff.XAst
 
--- | Inlining without regard for preserving correctness.
--- Uses simple substitution.
--- The bindings for the binders to inline need to still be present in bindings.
--- We assume that the bindings are in dependency order, which means that we do not need to inline recursively.
+
 inline :: Set (XBinder UD) -> [XBinding UD] -> [XBinding UD]
 inline bindersToInline bindings =
   runReader (inline' bindings) (bindersToInline, Map.empty)
 
+
+-- | Inlining without regard for preserving correctness.
+-- Uses simple substitution.
+-- The bindings for the binders to inline need to still be present in bindings.
+-- We assume that the bindings are in dependency order, which means that we do not need to inline recursively.
 inline' :: [XBinding UD] ->
   Reader (Set (XBinder UD), Map (XBinder UD) (XExpr UD)) [XBinding UD]
 inline' [] = return []
