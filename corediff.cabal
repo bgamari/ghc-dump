@@ -28,6 +28,7 @@ library
       CoreDiff.Inline
       CoreDiff.Pairing
       CoreDiff.PrettyPrint
+      CoreDiff.StructDiff
       CoreDiff.Util
       CoreDiff.XAst
   other-modules:

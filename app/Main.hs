@@ -18,6 +18,7 @@ import CoreDiff.Assimilate
 import CoreDiff.Inline
 import CoreDiff.Pairing
 import CoreDiff.PrettyPrint
+import CoreDiff.StructDiff
 import CoreDiff.Util
 import CoreDiff.XAst
 
@@ -54,16 +55,22 @@ data DiffContext = DiffContext
   , inliningMode :: InliningMode
   , displayIdenticalBindings :: Bool
   , opts :: PprOpts
+  , useStructuralDiff :: Bool
   }
 
-diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions <*> displayIdentical
+diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions <*> displayIdentical <*> structural
   where
     displayIdentical = switch
       (  long "display-identical"
       <> help "Display identical bindings too."
       )
 
-    run pathA pathB inliningMode displayIdentical = do
+    structural = switch
+      (  long "structural"
+      <> help "Use structural differencing algorithm"
+      )
+
+    run pathA pathB inliningMode displayIdentical structural = do
       modA <- readXModule pathA
       modB <- readXModule pathB
 
@@ -73,6 +80,7 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
         (fromMaybe InliningDisabled inliningMode)
         displayIdentical
         pprOptsDefault
+        structural
 
     run' ctx = do
       let modA' = applyInlining (inliningMode ctx) (modA ctx)
@@ -85,9 +93,16 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
       diffBindingByBinding ctx pairings'
 
     diffBindingByBinding ctx (PairingS _ unpairedL unpairedR paired) = do
-      mapM_ (uncurry $ printDiff ctx) paired
+      if useStructuralDiff ctx then
+        mapM_ (uncurry $ structDiff ctx) paired
+      else do
+        mapM_ (uncurry $ printDiff ctx) paired
+
       mapM_ (printLeft  ctx) unpairedL
       mapM_ (printRight ctx) unpairedR
+
+    structDiff ctx binding binding' = do
+      print $ runReader (pprWithOpts $ diff binding binding') $ opts ctx
 
     printDiff ctx binding@(XBinding binder _) binding'@(XBinding binder' _) = do
       let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx
