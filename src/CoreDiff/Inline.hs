@@ -6,6 +6,7 @@ module CoreDiff.Inline where
 import Control.Monad.Trans.Reader
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Set (Set)
 import qualified Data.Set as Set
 
 import CoreDiff.XAst
@@ -14,10 +15,12 @@ import CoreDiff.XAst
 -- Uses simple substitution.
 -- The bindings for the binders to inline need to still be present in bindings.
 -- We assume that the bindings are in dependency order, which means that we do not need to inline recursively.
-inline :: [XBinder UD] -> [XBinding UD] -> [XBinding UD]
+inline :: Set (XBinder UD) -> [XBinding UD] -> [XBinding UD]
 inline bindersToInline bindings =
-  runReader (inline' bindings) $ (Set.fromList bindersToInline, Map.empty)
+  runReader (inline' bindings) (bindersToInline, Map.empty)
 
+inline' :: [XBinding UD] ->
+  Reader (Set (XBinder UD), Map (XBinder UD) (XExpr UD)) [XBinding UD]
 inline' [] = return []
 inline' (XBinding binder expr : rest) = do
   (binders, subst) <- ask

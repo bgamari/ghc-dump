@@ -6,6 +6,7 @@ import Control.Monad
 import Control.Monad.Trans.Reader
 import Data.List
 import Data.Maybe
+import qualified Data.Set as Set
 import Options.Applicative
 import System.IO
 import System.IO.Temp
@@ -171,7 +172,7 @@ applyInlining inliningMode mod =
   mod { xModuleBindings = inline bindersToInline bindings }
   where
     bindings = xModuleBindings mod
-    bindersToInline = [ binder | XBinding binder _ <- bindings, pred inliningMode binder ]
+    bindersToInline = Set.fromList [ binder | XBinding binder _ <- bindings, pred inliningMode binder ]
 
     pred InliningDisabled _      = False
     pred InliningEnabled  binder = not $ xBinderIsExported binder

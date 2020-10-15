@@ -68,7 +68,6 @@ xBinderUniqueName binder =
 -- | Override a binder's name and unique id.
 xBinderSetUniqueName (XBinderUniqueName name id) binder =
   binder { xBinderName = name, xBinderId = id }
-
 -- | A Core type.
 data XType (a :: Variant)
   = XVarTy (XBinder a)

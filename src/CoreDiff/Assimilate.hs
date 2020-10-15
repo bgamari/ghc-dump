@@ -94,7 +94,7 @@ instance Perm (XBinder UD) where
       go binder (a1, a2)
         | xBinderUniqueName binder == a1 = xBinderSetUniqueName a2 binder
         | xBinderUniqueName binder == a2 = xBinderSetUniqueName a1 binder
-        | otherwise                  = binder
+        | otherwise                      = binder
 
 instance Perm (XBinding UD) where
   applyPerm (XBinding binder expr) = XBinding <$> applyPerm binder <*> applyPerm expr

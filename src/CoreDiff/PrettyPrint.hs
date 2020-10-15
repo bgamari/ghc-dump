@@ -206,10 +206,11 @@ instance PprWithOpts a => PprWithOpts (Change a) where
 
 -- Terminals
 
+
+-- TODO: Make this more similar to https://gitlab.haskell.org/ghc/ghc/-/blob/a1f34d37b47826e86343e368a5c00f1a4b1f2bce/compiler/GHC/Core/Ppr.hs#L460
 pprBinderMeta :: XBinderMeta -> Reader PprOpts Doc
 pprBinderMeta meta = do
   occInfoDoc <- pprOccInfo $ xbmOccInfo meta
-
   return $ brackets $ align $ vsep $ punctuate "," $ catMaybes $
     [ Just $ pprScope $ xbmScope meta
     , toMaybe (xbmArity meta /= 0)               $ "arity=" <> pretty (xbmArity meta)
