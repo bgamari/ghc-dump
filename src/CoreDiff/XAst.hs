@@ -52,6 +52,9 @@ data XBinder (a :: Variant)
 xBinderTypeOrKind binder@XBinder{}   = xBinderType binder
 xBinderTypeOrKind binder@XTyBinder{} = xBinderKind binder
 
+xBinderSetTypeOrKind tyOrKind binder@XBinder{}   = binder { xBinderType = tyOrKind }
+xBinderSetTypeOrKind tyOrKind binder@XTyBinder{} = binder { xBinderKind = tyOrKind }
+
 -- | Check whether a binder is marked as exported.
 xBinderIsExported binder@XBinder{} =
   xbmScope (xBinderMeta binder) `elem` [GlobalId, LocalIdX]

@@ -88,7 +88,7 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
 
       let pairings  = pairProg modA' modB'
 
-      let pairings' = permutePaired $ permutePairingsInRhs pairings
+      let pairings' = assimilatePaired $ permutePairingsInRhs pairings
 
       diffBindingByBinding ctx pairings'
 

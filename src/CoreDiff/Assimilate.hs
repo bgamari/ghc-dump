@@ -33,7 +33,7 @@ permutePairingsInRhs (PairingS pq unpairedL unpairedR paired) = PairingS
     mapSnd f (a, b) = (a, f b)
 
 
-permutePaired pairingS = pairingS { paired = map go $ paired pairingS }
+assimilatePaired pairingS = pairingS { paired = map go $ paired pairingS }
   where
     go (XBinding binder expr, XBinding binder' expr') =
       ( XBinding binder expr
@@ -45,14 +45,14 @@ class Asim a where
 
 instance Asim (XExpr UD) where
   assimilate (XVar binder) (XVar binder') =
-    XVar <$> applyPerm binder'
+    XVar <$> assimilate binder binder'
   assimilate (XApp f x) (XApp f' x') =
     XApp <$> assimilate f f' <*> assimilate x x'
   assimilate (XTyLam binder expr) (XTyLam binder' expr') =
-    XTyLam <$> withPerm (applyPerm binder') <*> withPerm (assimilate expr expr')
+    XTyLam <$> withPerm (assimilate binder binder') <*> withPerm (assimilate expr expr')
     where withPerm = local (++ [mkPerm binder binder'])
   assimilate (XLam binder expr) (XLam binder' expr') =
-    XLam <$> withPerm (applyPerm binder') <*> withPerm (assimilate expr expr')
+    XLam <$> withPerm (assimilate binder binder') <*> withPerm (assimilate expr expr')
     where withPerm = local (++ [mkPerm binder binder'])
   assimilate a@(XLet bindings expr) b@(XLet bindings' expr')
     -- TODO: this is just for debugging
@@ -67,30 +67,57 @@ instance Asim (XExpr UD) where
       newPerm = [ mkPerm binder binder' | (XBinding binder _, XBinding binder' _) <- paired pairings ]
       withPerm = local (++ newPerm)
       go (XBinding binder expr) (XBinding binder' expr') =
-        XBinding <$> withPerm (applyPerm binder') <*> withPerm (assimilate expr expr')
+        XBinding <$> withPerm (assimilate binder binder') <*> withPerm (assimilate expr expr')
   assimilate (XCase scrut binder alts) (XCase scrut' binder' alts')
     -- TODO: depends on ordering of case alternatives
     | length alts /= length alts' = error "Mismatched number of alternatives"
     | otherwise =
-      XCase <$> assimilate scrut scrut' <*> withPerm (applyPerm binder') <*> withPerm (zipWithM assimilate alts alts')
-      where withPerm = local (++ [mkPerm binder binder'])
+      XCase <$> assimilate scrut scrut' <*> withPerm (assimilate binder binder') <*> withPerm (zipWithM assimilate alts alts')
+    where withPerm = local (++ [mkPerm binder binder'])
+  assimilate (XType ty) (XType ty') =
+    XType <$> assimilate ty ty'
   assimilate _ x = applyPerm x
-  -- TODO: types, cause they can contain tyvars
 
 instance Asim (XAlt UD) where
-  -- TODO: as of right, this depends on the ordering of alternatives and that the number of their binders doesnt change.
+  -- TODO: as of right now, this depends on the ordering of alternatives and that the number of their binders doesnt change.
   assimilate (XAlt altCon binders rhs) (XAlt altCon' binders' rhs')
     | length binders /= length binders' = error "Mismatched number of binders"
     | otherwise =
-      XAlt altCon binders <$> local (++ (zipWith mkPerm binders binders')) (assimilate rhs rhs')
+      XAlt altCon <$> withPerms (zipWithM assimilate binders binders') <*> withPerms (assimilate rhs rhs')
+    where withPerms = local (++ zipWith mkPerm binders binders')
+
+instance Asim (XBinder UD) where
+  assimilate binder binder' = do
+    tyOrKind'' <- assimilate tyOrKind tyOrKind'
+    xBinderSetTypeOrKind tyOrKind'' <$> applyPerm binder'
+    where
+      tyOrKind  = xBinderTypeOrKind binder
+      tyOrKind' = xBinderTypeOrKind binder'
+
+instance Asim (XType UD) where
+  assimilate (XVarTy binder) (XVarTy binder') =
+    XVarTy <$> assimilate binder binder'
+  assimilate (XFunTy l r) (XFunTy l' r') =
+    XFunTy <$> assimilate l l' <*> assimilate r r'
+  assimilate (XTyConApp tc tys) (XTyConApp tc' tys')
+    | length tys /= length tys' = error "Mismatched number of types"
+    | otherwise =
+      XTyConApp tc' <$> zipWithM assimilate tys tys'
+  assimilate (XAppTy l r) (XAppTy l' r') =
+    XAppTy <$> assimilate l l' <*> assimilate r r'
+  assimilate (XForAllTy binder ty) (XForAllTy binder' ty') =
+    XForAllTy <$> withPerm (assimilate binder binder') <*> withPerm (assimilate ty ty')
+    where withPerm = local (++ [mkPerm binder binder'])
+  assimilate _ ty = applyPerm ty
 
 class Perm a where
   applyPerm :: a -> Reader Permutation a
 
 instance Perm (XBinder UD) where
   applyPerm binder = do
-    perm <- ask
-    return $ foldl go binder perm
+    ty' <- applyPerm $ xBinderTypeOrKind binder
+    perms <- ask
+    return $ xBinderSetTypeOrKind ty' $ foldl go binder perms
     where
       go binder (a1, a2)
         | xBinderUniqueName binder == a1 = xBinderSetUniqueName a2 binder
@@ -109,6 +136,15 @@ instance Perm (XExpr UD) where
   applyPerm (XCase scrut binder alts) = XCase <$> applyPerm scrut <*> applyPerm binder <*> mapM go alts
     where go (XAlt altCon binders rhs) =
             XAlt altCon <$> mapM applyPerm binders <*> applyPerm rhs
-  -- Not yet implemented, possibly should be.
-  applyPerm (XType ty) = return $ XType ty
-  applyPerm x = return x
+  applyPerm (XType ty) = XType <$> applyPerm ty
+  -- Other cases without sub-terms or binders
+  applyPerm expr = return expr
+
+instance Perm (XType UD) where
+  applyPerm (XVarTy binder) = XVarTy <$> applyPerm binder
+  applyPerm (XFunTy l r) = XFunTy <$> applyPerm l <*> applyPerm r
+  applyPerm (XTyConApp tc tys) = XTyConApp tc <$> mapM applyPerm tys
+  applyPerm (XAppTy l r) = XAppTy <$> applyPerm l <*> applyPerm r
+  applyPerm (XForAllTy binder ty) = XForAllTy <$> applyPerm binder <*> applyPerm ty
+  -- Other cases without sub-terms or binders
+  applyPerm ty = return ty
