@@ -4,14 +4,15 @@
 
 module CoreDiff.Assimilate where
 
+import GhcDump.Ast
+import qualified Data.Map as Map
+
 import Control.Monad
 import Control.Monad.Trans.Reader
 
 import CoreDiff.Pairing
 import CoreDiff.PrettyPrint
 import CoreDiff.XAst
-
-import GhcDump.Ast
 
 type Permutation = [(XBinderUniqueName, XBinderUniqueName)]
 
@@ -21,7 +22,7 @@ permutePairingsInRhs :: PairingS -> PairingS
 permutePairingsInRhs (PairingS pq unpairedL unpairedR paired) = PairingS
   (fmap (mapSnd go) pq)
   unpairedL
-  (fmap go unpairedR)
+  (Map.mapKeys go (fmap go unpairedR))
   (map (mapSnd go) paired)
   where
     perm =

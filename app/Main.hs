@@ -101,6 +101,7 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
       mapM_ (printLeft  ctx) unpairedL
       mapM_ (printRight ctx) unpairedR
 
+    -- TODO: Move to CoreDiff.Diff along with callDiff
     structDiff ctx binding binding' = do
       print $ runReader (pprWithOpts $ diff binding binding') $ opts'
       where
