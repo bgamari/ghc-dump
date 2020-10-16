@@ -212,7 +212,7 @@ disExpr expr expr' = nubBy columnsUnique
       )
       where
         scrutDis = disExpr scrut scrut'
-    -- We don't handle types yet.
+    -- TODO: do we need to handle disagreements in types?
     disExpr' _             _              = ([], Set.empty, Set.empty)
 
 disAlts alts alts' = concat

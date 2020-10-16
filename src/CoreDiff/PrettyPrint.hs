@@ -222,14 +222,14 @@ pprBinderMeta meta = do
   occInfoDoc <- pprOccInfo $ xbmOccInfo meta
   return $ brackets $ align $ vsep $ punctuate "," $ catMaybes $
     [ Just $ pprScope $ xbmScope meta
-    , toMaybe (xbmArity meta /= 0)               $ "arity=" <> pretty (xbmArity meta)
-    , toMaybe (xbmInlinePragma meta /= "")       $ "inline=" <> text' (xbmInlinePragma meta)
-    , Just $ "occ=" <> occInfoDoc
-    , toMaybe (xbmStrictnessSig meta /= "")      $ "str=" <> text' (xbmStrictnessSig meta)
-    , toMaybe (xbmDemandSig meta /= "")          $ "dmd=" <> text' (xbmDemandSig meta)
-    , toMaybe (xbmCpr meta /= "")                $ "cpr=" <> text' (xbmCpr meta)
-    , toMaybe (xbmCallArity meta /= 0)           $ "call-arity=" <> pretty (xbmCallArity meta)
-    , toMaybe (xbmIsOneShot meta)                $ "one-shot"
+    , toMaybe (xbmArity meta /= 0)               $ "Arity=" <> pretty (xbmArity meta)
+    , toMaybe (xbmInlinePragma meta /= "")       $ "Inline=" <> text' (xbmInlinePragma meta)
+    , Just                                       $ "Occ=" <> occInfoDoc
+    , toMaybe (xbmStrictnessSig meta /= "")      $ "Str=" <> text' (xbmStrictnessSig meta)
+    , toMaybe (hasDemandSig meta)                $ "Dmd=" <> text' (xbmDemandSig meta)
+    , toMaybe (xbmCpr meta /= "")                $ "Cpr=" <> text' (xbmCpr meta)
+    , toMaybe (xbmCallArity meta /= 0)           $ "Call-arity=" <> pretty (xbmCallArity meta)
+    , toMaybe (xbmIsOneShot meta)                $ "One-shot"
     ]
   where
     pprScope GlobalId = "GblId"
@@ -241,6 +241,9 @@ pprBinderMeta meta = do
     pprOccInfo OccOneOcc = return "One"
     pprOccInfo (OccLoopBreaker isStrong) =
       return $ (if isStrong then "Strong" else "Weak") <+> "Loopbrk"
+
+    hasDemandSig meta =
+      not $ xbmDemandSig meta `elem` ["", "<L,U>"]
 
 pprLit :: Lit -> Reader PprOpts Doc
 pprLit = return . pprLit'
