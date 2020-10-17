@@ -141,9 +141,9 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
     callDiff ctx labelA labelB a b = do
       withSystemTempFile "corediffa.txt" $ \pathA handleA ->
         withSystemTempFile "corediffb.txt" $ \pathB handleB -> do
-          hPutStrLn handleA a
+          hPutStr' handleA a
           hFlush handleA
-          hPutStrLn handleB b
+          hPutStr' handleB b
           hFlush handleB
           -- putStrLn $ diffCmd labelA labelB pathA pathB
           exitCode <- system $ diffCmd labelA labelB pathA pathB
@@ -160,6 +160,9 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
           , pathB
           ]
         sQuote str = "'" ++ concat [ if c == '\'' then "'\"'\"'" else [c] | c <- str ] ++ "'"
+
+        hPutStr' handle ""  = hPutStr handle ""
+        hPutStr' handle str = hPutStrLn handle str
 
 data InliningMode
   = InliningEnabled
