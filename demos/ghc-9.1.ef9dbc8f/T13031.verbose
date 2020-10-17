@@ -1,0 +1,2567 @@
+[1 of 1] Compiling Foo              ( T13031.hs, T13031.o )
+
+==================== Desugar (before optimization) ====================
+Result size of Desugar (before optimization)
+  = {terms: 23, types: 33, coercions: 0, joins: 0/1}
+
+Rec {
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "Foo"#)
+
+-- RHS size: {terms: 16, types: 22, coercions: 0, joins: 0/1}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX]
+f = \ (@p_atO) (@p_atQ) (@a_atT) ->
+      letrec {
+        f_atU :: Bool -> p_atO -> p_atQ -> a_atT
+        [LclId]
+        f_atU
+          = \ (ds_duj :: Bool) ->
+              case ds_duj of wild_00 {
+                False ->
+                  \ (p_atA :: p_atO) (q_atB :: p_atQ) ->
+                    raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False;
+                True ->
+                  raise#
+                    @Bool
+                    @'GHC.Types.LiftedRep
+                    @(p_atO -> p_atQ -> a_atT)
+                    GHC.Types.True
+              }; } in
+      f_atU
+end Rec }
+
+
+
+
+==================== Desugar (after optimization) ====================
+Result size of Desugar (after optimization)
+  = {terms: 21, types: 29, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 14, types: 18, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [32] 44 60}]
+f = \ (@p_atO) (@p_atQ) (@a_atT) (ds_duj :: Bool) ->
+      case ds_duj of {
+        False ->
+          \ _ [Occ=Dead] _ [Occ=Dead] ->
+            raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False;
+        True ->
+          raise#
+            @Bool
+            @'GHC.Types.LiftedRep
+            @(p_atO -> p_atQ -> a_atT)
+            GHC.Types.True
+      }
+
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 70 10}]
+Foo.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "Foo"#)
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = InitialPhase [Gentle],
+             inline,
+             rules,
+             eta-expand,
+             no case-of-case}
+Result size of Simplifier
+  = {terms: 30, types: 36, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 15, types: 21, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      (eta_B0 [OS=OneShot] :: p_atO)
+      (eta_B1 [OS=OneShot] :: p_atQ) ->
+      case ds_duj of {
+        False -> raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False;
+        True ->
+          case raise#
+                 @Bool
+                 @'GHC.Types.LiftedRep
+                 @(p_atO -> p_atQ -> a_atT)
+                 GHC.Types.True
+          of wild_00 {
+          }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Specialise ====================
+Result size of Specialise
+  = {terms: 30, types: 36, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 15, types: 21, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      (eta_B0 [OS=OneShot] :: p_atO)
+      (eta_B1 [OS=OneShot] :: p_atQ) ->
+      case ds_duj of {
+        False -> raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False;
+        True ->
+          case raise#
+                 @Bool
+                 @'GHC.Types.LiftedRep
+                 @(p_atO -> p_atQ -> a_atT)
+                 GHC.Types.True
+          of wild_00 {
+          }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Levels added: ====================
+<Foo.f,<0,0>>
+<Foo.f,<0,0>>
+  = \ <p_atO,<1,0>>
+      <p_atQ,<1,0>>
+      <a_atT,<1,0>>
+      <ds_duj,<1,0>>
+      <eta_B0,<1,0>>
+      <eta_B1,<1,0>> ->
+      case ds_duj of <wild_X1,<1,2>> {
+        GHC.Types.False ->
+          let {
+            <lvl_sus,F<0,0>>
+            <lvl_sus,F<0,0>>
+              = \ <a_atT,<0,1>> ->
+                  GHC.Prim.raise#
+                    @GHC.Types.Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False } in
+          lvl_sus @a_atT;
+        GHC.Types.True ->
+          case let {
+                 <lvl_sut,F<0,0>>
+                 <lvl_sut,F<0,0>>
+                   = \ <a_atT,<0,1>> <p_atQ,<0,1>> <p_atO,<0,1>> ->
+                       GHC.Prim.raise#
+                         @GHC.Types.Bool
+                         @'GHC.Types.LiftedRep
+                         @(p_atO -> p_atQ -> a_atT)
+                         GHC.Types.True } in
+               lvl_sut @a_atT @p_atQ @p_atO
+          of <wild_00,<1,3>> {
+          }
+      }
+<$trModule_sum,<0,0>>
+<$trModule_sum,<0,0>> = "main"#
+<$trModule_sun,<0,0>>
+<$trModule_sun,<0,0>> = GHC.Types.TrNameS $trModule_sum
+<$trModule_suo,<0,0>>
+<$trModule_suo,<0,0>> = "Foo"#
+<$trModule_sup,<0,0>>
+<$trModule_sup,<0,0>> = GHC.Types.TrNameS $trModule_suo
+<Foo.$trModule,<0,0>>
+<Foo.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = False}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = False})
+  = {terms: 38, types: 60, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 17, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX, Arity=3, Str=<L,U><L,U><L,U>b, Cpr=b]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      (eta_B0 [OS=OneShot] :: p_atO)
+      (eta_B1 [OS=OneShot] :: p_atQ) ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut @a_atT @p_atQ @p_atO of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 2 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 1 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Called arity analysis ====================
+Result size of Called arity analysis
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-call-arity],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<B,1*U><B,A><B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj [Dmd=<B,1*U>] :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 [Dmd=<B,A>] { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Constructed Product Result analysis ====================
+Result size of Constructed Product Result analysis
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<B,1*U><B,A><B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj [Dmd=<B,1*U>] :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 [Dmd=<B,A>] { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Worker Wrapper binds ====================
+Result size of Worker Wrapper binds
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<B,1*U><B,A><B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj [Dmd=<B,U>] :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 [Dmd=<B,A>] { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-worker-wrapper],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Exitification transformation ====================
+Result size of Exitification transformation
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Levels added: ====================
+<lvl_sus,<0,0>>
+<lvl_sus,<0,0>>
+  = \ <a_atT,<0,1>> ->
+      GHC.Prim.raise#
+        @GHC.Types.Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+<lvl_sut,<0,0>>
+<lvl_sut,<0,0>>
+  = \ <a_atT,<0,1>> <p_atQ,<0,1>> <p_atO,<0,1>> ->
+      GHC.Prim.raise#
+        @GHC.Types.Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+<Foo.f,<0,0>>
+<Foo.f,<0,0>>
+  = \ <p_atO,<1,0>>
+      <p_atQ,<1,0>>
+      <a_atT,<1,0>>
+      <ds_duj,<1,0>>
+      <eta_B0,<1,0>>
+      <eta_B1,<1,0>> ->
+      case ds_duj of <wild_X1,<1,2>> {
+        GHC.Types.False -> lvl_sus @a_atT;
+        GHC.Types.True -> case lvl_sut of <wild_00,<1,3>> { }
+      }
+<$trModule_sum,<0,0>>
+<$trModule_sum,<0,0>> = "main"#
+<$trModule_sun,<0,0>>
+<$trModule_sun,<0,0>> = GHC.Types.TrNameS $trModule_sum
+<$trModule_suo,<0,0>>
+<$trModule_suo,<0,0>> = "Foo"#
+<$trModule_sup,<0,0>>
+<$trModule_sup,<0,0>> = GHC.Types.TrNameS $trModule_suo
+<Foo.$trModule,<0,0>>
+<Foo.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = True}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = True})
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of wild_X1 [Dmd=<B,A>] {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of wild_X1 [Dmd=<B,A>] {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [final],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Liberate case ====================
+Result size of Liberate case
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-liberate-case],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== SpecConstr ====================
+Result size of SpecConstr
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-spec-constr],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId, Str=b, Cpr=b]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId, Str=b, Cpr=b]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of wild_X1 [Dmd=<B,A>] {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-final-cse],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<L,U><L,U><L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+lvl_sus :: forall {a}. a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sus
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+lvl_sut :: forall {a} {p} {p}. p -> p -> a
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=NEVER}]
+lvl_sut
+  = \ (@a_atT) (@p_atQ) (@p_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p} {p} {a}. Bool -> p -> p -> a
+[LclIdX,
+ Arity=3,
+ Str=<B,1*U><B,A><B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> lvl_sus @a_atT;
+                   True -> case lvl_sut of { }
+                 }}]
+f = \ (@p_atO)
+      (@p_atQ)
+      (@a_atT)
+      (ds_duj [Dmd=<B,1*U>] :: Bool)
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot]
+      _ [Occ=Dead, Dmd=<B,A>, OS=OneShot] ->
+      case ds_duj of {
+        False -> lvl_sus @a_atT;
+        True -> case lvl_sut of wild_00 [Dmd=<B,A>] { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sum :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sum = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sun :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sun = GHC.Types.TrNameS $trModule_sum
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_suo :: Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_suo = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sup :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sup = GHC.Types.TrNameS $trModule_suo
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module $trModule_sun $trModule_sup
+
+
+
+
+==================== Tidy Core ====================
+Result size of Tidy Core
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+Foo.f2 :: forall {a}. a
+[GblId, Str=b, Cpr=b]
+Foo.f2
+  = \ (@a_atT) ->
+      raise# @Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+Foo.f1 :: forall {a} {p1} {p2}. p2 -> p1 -> a
+[GblId, Str=b, Cpr=b]
+Foo.f1
+  = \ (@a_atT) (@p_atQ) (@p1_atO) ->
+      raise#
+        @Bool
+        @'GHC.Types.LiftedRep
+        @(p1_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+f :: forall {p1} {p2} {a}. Bool -> p1 -> p2 -> a
+[GblId,
+ Arity=3,
+ Str=<B,1*U><B,A><B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
+         Tmpl= \ (@p_atO)
+                 (@p1_atQ)
+                 (@a_atT)
+                 (ds_duj [Occ=Once1!] :: Bool)
+                 _ [Occ=Dead, OS=OneShot]
+                 _ [Occ=Dead, OS=OneShot] ->
+                 case ds_duj of {
+                   False -> Foo.f2 @a_atT;
+                   True -> case Foo.f1 of { }
+                 }}]
+f = \ (@p_atO)
+      (@p1_atQ)
+      (@a_atT)
+      (ds_duj :: Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_duj of {
+        False -> Foo.f2 @a_atT;
+        True -> case Foo.f1 of wild1_00 { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule4 :: Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+Foo.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule3 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule3 = GHC.Types.TrNameS Foo.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule2 :: Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+Foo.$trModule2 = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule1 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule1 = GHC.Types.TrNameS Foo.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+Foo.$trModule = GHC.Types.Module Foo.$trModule3 Foo.$trModule1
+
+
+
+
+==================== CorePrep ====================
+Result size of CorePrep
+  = {terms: 38, types: 63, coercions: 0, joins: 0/0}
+
+-- RHS size: {terms: 3, types: 5, coercions: 0, joins: 0/0}
+Foo.f2 :: forall {a}. a
+[GblId, Str=b, Cpr=b]
+Foo.f2
+  = \ (@a_atT) ->
+      GHC.Prim.raise#
+        @GHC.Types.Bool @'GHC.Types.LiftedRep @a_atT GHC.Types.False
+
+-- RHS size: {terms: 5, types: 11, coercions: 0, joins: 0/0}
+Foo.f1 :: forall {a} {p1} {p2}. p2 -> p1 -> a
+[GblId, Str=b, Cpr=b]
+Foo.f1
+  = \ (@a_atT) (@p_atQ) (@p1_atO) ->
+      GHC.Prim.raise#
+        @GHC.Types.Bool
+        @'GHC.Types.LiftedRep
+        @(p1_atO -> p_atQ -> a_atT)
+        GHC.Types.True
+
+-- RHS size: {terms: 13, types: 20, coercions: 0, joins: 0/0}
+Foo.f :: forall {p1} {p2} {a}. GHC.Types.Bool -> p1 -> p2 -> a
+[GblId, Arity=3, Str=<B,1*U><B,A><B,A>b, Cpr=b, Unf=OtherCon []]
+Foo.f
+  = \ (@p_atO)
+      (@p1_atQ)
+      (@a_atT)
+      (ds_sxp [Occ=Once1!] :: GHC.Types.Bool)
+      _ [Occ=Dead, OS=OneShot]
+      _ [Occ=Dead, OS=OneShot] ->
+      case ds_sxp of {
+        GHC.Types.False -> Foo.f2 @a_atT;
+        GHC.Types.True -> case Foo.f1 of { }
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule4 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+Foo.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule3 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+Foo.$trModule3 = GHC.Types.TrNameS Foo.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule2 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+Foo.$trModule2 = "Foo"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule1 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+Foo.$trModule1 = GHC.Types.TrNameS Foo.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Foo.$trModule :: GHC.Types.Module
+[GblId, Unf=OtherCon []]
+Foo.$trModule = GHC.Types.Module Foo.$trModule3 Foo.$trModule1
+
+
+
