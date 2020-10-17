@@ -37,7 +37,7 @@ assimilatePaired pairingS = pairingS { paired = map go $ paired pairingS }
   where
     go (XBinding binder expr, XBinding binder' expr') =
       ( XBinding binder expr
-      , XBinding binder' (runReader (assimilate expr expr') [])
+      , XBinding (runReader (assimilate binder binder') []) (runReader (assimilate expr expr') [])
       )
 
 class Asim a where
