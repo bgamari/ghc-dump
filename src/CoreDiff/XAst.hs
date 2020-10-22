@@ -38,15 +38,22 @@ data XBinder (a :: Variant)
   = XBinder -- ^ For term variable binders.
     { xBinderName :: T.Text
     , xBinderId   :: Unique
+    , xBinderOldName :: T.Text
+    , xBinderOldId   :: Unique
     , xBinderType :: XType a
     , xBinderMeta :: XBinderMeta
     }
   | XTyBinder -- ^ For type variable binders.
     { xBinderName :: T.Text
     , xBinderId   :: Unique
+    , xBinderOldName :: T.Text
+    , xBinderOldId   :: Unique
     , xBinderKind :: XType a
     }
   | XXBinder (XBinderExt a)
+
+mkXBinder name id ty meta = XBinder name id name id ty meta
+mkXTyBinder name id kind  = XTyBinder name id name id kind
 
 -- | Map a binder to its type or kind.
 xBinderTypeOrKind binder@XBinder{}   = xBinderType binder

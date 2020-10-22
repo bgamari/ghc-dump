@@ -108,15 +108,14 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
         opts' = (opts ctx) { pprOptsLongBindings = False }
 
     printDiff ctx binding@(XBinding binder _) binding'@(XBinding binder' _) = do
-      let binderStr  = show $ runReader (pprWithOpts binder)  $ opts ctx
-      let binderStr' = show $ runReader (pprWithOpts binder') $ opts ctx
+      let binderStr  = show $ runReader (pprOldName binder)  $ opts ctx
+      let binderStr' = show $ runReader (pprOldName binder') $ opts ctx
       -- print $ bold $ text $ "Difference of " ++ binderStr ++ " and " ++ binderStr'
       let bindingStr  = show $ runReader (pprWithOpts binding)  $ opts ctx
       let bindingStr' = show $ runReader (pprWithOpts binding') $ opts ctx
       callDiff
         ctx
-        (binderStr  ++ " from " ++ pathA ctx)
-        (binderStr' ++ " from " ++ pathB ctx)
+        binderStr binderStr'
         bindingStr bindingStr'
 
     printLeft ctx binding@(XBinding binder _) = do
@@ -148,7 +147,7 @@ diffCommand = run <$> cborDumpFile <*> cborDumpFile <*> optional inliningOptions
           -- putStrLn $ diffCmd labelA labelB pathA pathB
           exitCode <- system $ diffCmd labelA labelB pathA pathB
           when (exitCode == ExitSuccess) $ do -- diff returns 0 if the files are the same
-            print $ bold $ text $ labelA ++ " and " ++ labelB ++ " are identical"
+            print $ bold $ text $ labelA ++ " and " ++ labelB ++ " are equivalent"
             when (displayIdenticalBindings ctx) $ do
               putStrLn a
       where

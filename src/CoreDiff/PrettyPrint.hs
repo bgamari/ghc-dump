@@ -105,6 +105,15 @@ instance ForAllExtensions PprWithOpts a => PprWithOpts (XBinder a) where
       , toMaybe (pprOptsDisplayMetaInBinder opts) $ space <> metaDoc
       ]
 
+-- | Prints the old/original name of a binder, which is not changed during assimilation.
+pprOldName :: XBinder UD -> Reader PprOpts Doc
+pprOldName binder = do
+    opts <- ask
+    return $ hcat $ catMaybes
+      [ Just $ text' $ xBinderOldName binder
+      , toMaybe (pprOptsDisplayUniques opts) $ text' $ "_" <> T.pack (show $ xBinderOldId binder)
+      ]
+
 
 instance ForAllExtensions PprWithOpts a => PprWithOpts (XType a) where
   -- extension case is handled in pprType

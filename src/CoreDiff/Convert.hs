@@ -18,12 +18,12 @@ cvtBinding :: (Binder, Expr) -> XBinding UD
 cvtBinding (binder, expr) = XBinding (cvtBinder binder) (cvtExpr expr)
 
 cvtBinder :: Binder -> XBinder UD
-cvtBinder b@(Bndr binder@Binder{}) = XBinder
+cvtBinder b@(Bndr binder@Binder{}) = mkXBinder
   (binderName binder)
   (cvtBinderId $ binderId binder)
   (cvtType $ binderType binder)
   (cvtMeta b)
-cvtBinder (Bndr binder@TyBinder{}) = XTyBinder
+cvtBinder (Bndr binder@TyBinder{}) = mkXTyBinder
   (binderName binder)
   (cvtBinderId $ binderId binder)
   (cvtType $ binderKind binder)

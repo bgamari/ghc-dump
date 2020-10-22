@@ -23,9 +23,9 @@ instance Diffable XBinding where
     | otherwise =
       XBinding (gcp binder binder') (gcp expr expr')
     where
-      (XBinder   name unique ty metadata) ~/~ (XBinder   name' unique' ty' metadata') =
+      (XBinder   name unique _ _ ty metadata) ~/~ (XBinder   name' unique' _ _ ty' metadata') =
         ty /= ty' || metadata /= metadata'
-      (XTyBinder name unique kind)        ~/~ (XTyBinder name' unique' kind')         =
+      (XTyBinder name unique _ _ kind)        ~/~ (XTyBinder name' unique' _ _ kind')         =
         kind /= kind'
       _ ~/~ _ = False
 
