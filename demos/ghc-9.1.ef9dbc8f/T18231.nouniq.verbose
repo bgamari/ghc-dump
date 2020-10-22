@@ -183,11 +183,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -257,11 +253,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -288,14 +280,7 @@ m = a'
       lvl x
       };
 <T18231.m,<0,0>>
-<T18231.m,<0,0>>
-  = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+<T18231.m,<0,0>> = a' `cast` <Co:5>
 
 
 
@@ -347,11 +332,7 @@ end Rec }
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
 m :: State Int ()
 [LclIdX, Arity=1, Str=<L,U>b, Cpr=b]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -434,11 +415,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -521,11 +498,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -608,11 +581,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -689,11 +658,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -771,11 +736,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -858,11 +819,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -942,11 +899,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -1026,11 +979,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a' `cast` <Co:5>
 
 
 
@@ -1100,8 +1049,7 @@ lvl [InlPrag=NOUSERINLINE[2]]
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=False)
-         Tmpl= \ _ [Occ=Dead, Dmd=<B,A>] -> $wlvl GHC.Prim.void#}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=False)}]
 lvl = \ (w [Dmd=<B,A>] :: GHC.Prim.Int#) -> $wlvl GHC.Prim.void#
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
@@ -1126,17 +1074,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1220,17 +1159,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1308,17 +1238,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1352,14 +1273,7 @@ m = a'
       lvl
       };
 <T18231.m,<0,0>>
-<T18231.m,<0,0>>
-  = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+<T18231.m,<0,0>> = a' `cast` <Co:5>
 
 
 
@@ -1428,17 +1342,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1506,17 +1411,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1584,17 +1480,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1677,17 +1564,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1764,17 +1642,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1857,17 +1726,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -1923,17 +1783,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -2016,17 +1867,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -2082,17 +1924,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -2175,17 +2008,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -2262,17 +2086,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a' `cast` <Co:5>
 
 
 
@@ -2338,17 +2153,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= T18231.m1
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = T18231.m1
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = T18231.m1 `cast` <Co:5>
 
 
 
@@ -2404,12 +2210,7 @@ T18231.m :: Control.Monad.Trans.State.Strict.State GHC.Types.Int ()
 [GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
 T18231.m
   = (\ (eta [Occ=Once1] :: GHC.Types.Int) -> T18231.m1 eta)
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+    `cast` <Co:5>
 
 
 

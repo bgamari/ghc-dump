@@ -1,0 +1,3014 @@
+[1 of 1] Compiling Fac              ( Fac.hs, Fac.o )
+
+==================== Desugar (before optimization) ====================
+Result size of Desugar (before optimization)
+  = {terms: 57, types: 46, coercions: 0, joins: 0/10}
+
+Rec {
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "Fac"#)
+
+-- RHS size: {terms: 50, types: 37, coercions: 0, joins: 0/10}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX]
+fac
+  = \ (@p_ahq) ($dEq_a1rC :: Eq p_ahq) ($dNum_a1rD :: Num p_ahq) ->
+      let {
+        $dNum_a1kD :: Num p_ahq
+        [LclId]
+        $dNum_a1kD = $dNum_a1rD } in
+      let {
+        $dEq_a1fJ :: Eq p_ahq
+        [LclId]
+        $dEq_a1fJ = $dEq_a1rC } in
+      let {
+        $dNum_a1kT :: Num p_ahq
+        [LclId]
+        $dNum_a1kT = $dNum_a1kD } in
+      let {
+        $dNum_a1kQ :: Num p_ahq
+        [LclId]
+        $dNum_a1kQ = $dNum_a1kD } in
+      let {
+        $dNum_a1kI :: Num p_ahq
+        [LclId]
+        $dNum_a1kI = $dNum_a1kD } in
+      let {
+        $dNum_a1kF :: Num p_ahq
+        [LclId]
+        $dNum_a1kF = $dNum_a1kD } in
+      letrec {
+        fac_ahm :: p_ahq -> p_ahq
+        [LclId]
+        fac_ahm
+          = \ (ds_d1s0 :: p_ahq) ->
+              let {
+                fail_d1s6 :: GHC.Prim.Void# -> p_ahq
+                [LclId]
+                fail_d1s6
+                  = \ (ds_d1s7 [OS=OneShot] :: GHC.Prim.Void#) ->
+                      Control.Exception.Base.patError
+                        @'GHC.Types.LiftedRep
+                        @p_ahq
+                        "Fac.hs:(3,1)-(4,21)|function fac"# } in
+              let {
+                n_ag7 :: p_ahq
+                [LclId]
+                n_ag7 = ds_d1s0 } in
+              let {
+                fail_d1s8 :: GHC.Prim.Void# -> p_ahq
+                [LclId]
+                fail_d1s8
+                  = \ (ds_d1s9 [OS=OneShot] :: GHC.Prim.Void#) ->
+                      * @p_ahq
+                        $dNum_a1kI
+                        n_ag7
+                        (fac_ahm
+                           (- @p_ahq $dNum_a1kQ n_ag7 (fromInteger @p_ahq $dNum_a1kT 1))) } in
+              case == @p_ahq $dEq_a1fJ ds_d1s0 (fromInteger @p_ahq $dNum_a1kD 0)
+              of wild_00 {
+                False -> fail_d1s8 GHC.Prim.void#;
+                True -> fromInteger @p_ahq $dNum_a1kF 1
+              }; } in
+      fac_ahm
+end Rec }
+
+
+
+
+==================== Desugar (after optimization) ====================
+Result size of Desugar (after optimization)
+  = {terms: 35, types: 25, coercions: 0, joins: 0/1}
+
+-- RHS size: {terms: 28, types: 16, coercions: 0, joins: 0/1}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150] 570 0}]
+fac
+  = \ (@p_ahq) ($dEq_a1rC :: Eq p_ahq) ($dNum_a1rD :: Num p_ahq) ->
+      letrec {
+        fac_ahm [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 550 0}]
+        fac_ahm
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 0)
+              of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_ahm
+                       (- @p_ahq $dNum_a1rD ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 1)));
+                True -> fromInteger @p_ahq $dNum_a1rD 1
+              }; } in
+      fac_ahm
+
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 70 30}]
+Fac.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "Fac"#)
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = InitialPhase [Gentle],
+             inline,
+             rules,
+             eta-expand,
+             no case-of-case}
+Result size of Simplifier
+  = {terms: 45, types: 30, coercions: 0, joins: 0/1}
+
+-- RHS size: {terms: 30, types: 17, coercions: 0, joins: 0/1}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 590 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      letrec {
+        fac_ahm [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 550 0}]
+        fac_ahm
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 0)
+              of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_ahm
+                       (- @p_ahq $dNum_a1rD ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 1)));
+                True -> fromInteger @p_ahq $dNum_a1rD 1
+              }; } in
+      fac_ahm eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Specialise ====================
+Result size of Specialise
+  = {terms: 45, types: 30, coercions: 0, joins: 0/1}
+
+-- RHS size: {terms: 30, types: 17, coercions: 0, joins: 0/1}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 590 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId, Arity=1]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 0)
+              of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk
+                       (- @p_ahq $dNum_a1rD ds_d1s0 (fromInteger @p_ahq $dNum_a1rD 1)));
+                True -> fromInteger @p_ahq $dNum_a1rD 1
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Levels added: ====================
+<Fac.fac,<0,0>>
+<Fac.fac,<0,0>>
+  = \ <p_ahq,<1,0>>
+      <$dEq_a1rC,<1,0>>
+      <$dNum_a1rD,<1,0>>
+      <eta_B1,<1,0>> ->
+      letrec {
+        <fac_s1sk,<1,2>>
+        <fac_s1sk,<1,2>>
+          = \ <ds_d1s0,<2,0>> ->
+              case GHC.Classes.==
+                     @p_ahq
+                     $dEq_a1rC
+                     ds_d1s0
+                     (let {
+                        <lvl_s1sm,F<1,0>>
+                        <lvl_s1sm,F<1,0>>
+                          = GHC.Num.fromInteger
+                              @p_ahq
+                              $dNum_a1rD
+                              (let {
+                                 <lvl_s1sl,F<0,0>>
+                                 <lvl_s1sl,F<0,0>> = 0 } in
+                               lvl_s1sl) } in
+                      lvl_s1sm)
+              of <wild_X1,<2,2>> {
+                GHC.Types.False ->
+                  GHC.Num.*
+                    @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk
+                       (GHC.Num.-
+                          @p_ahq
+                          $dNum_a1rD
+                          ds_d1s0
+                          (let {
+                             <lvl_s1so,F<1,0>>
+                             <lvl_s1so,F<1,0>>
+                               = GHC.Num.fromInteger
+                                   @p_ahq
+                                   $dNum_a1rD
+                                   (let {
+                                      <lvl_s1sn,F<0,0>>
+                                      <lvl_s1sn,F<0,0>> = 1 } in
+                                    lvl_s1sn) } in
+                           lvl_s1so)));
+                GHC.Types.True ->
+                  let {
+                    <lvl_s1sq,F<1,0>>
+                    <lvl_s1sq,F<1,0>>
+                      = GHC.Num.fromInteger
+                          @p_ahq
+                          $dNum_a1rD
+                          (let {
+                             <lvl_s1sp,F<0,0>>
+                             <lvl_s1sp,F<0,0>> = 1 } in
+                           lvl_s1sp) } in
+                  lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+<$trModule_s1sd,<0,0>>
+<$trModule_s1sd,<0,0>> = "main"#
+<$trModule_s1se,<0,0>>
+<$trModule_s1se,<0,0>> = GHC.Types.TrNameS $trModule_s1sd
+<$trModule_s1sf,<0,0>>
+<$trModule_s1sf,<0,0>> = "Fac"#
+<$trModule_s1sg,<0,0>>
+<$trModule_s1sg,<0,0>> = GHC.Types.TrNameS $trModule_s1sf
+<Fac.$trModule,<0,0>>
+<Fac.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = False}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = False})
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX, Arity=3]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1so :: p_ahq
+        [LclId]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId, Arity=1]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 2 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 1 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Called arity analysis ====================
+Result size of Called arity analysis
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         CallArity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [post-call-arity],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC :: Eq p_ahq)
+      ($dNum_a1rD :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC [Dmd=<S(C(C(S))L),U(C(C1(U)),A)>] :: Eq p_ahq)
+      ($dNum_a1rD [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>]
+         :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Str=<L,U> {a1rC-><S(C(C(S))L),U(C(C1(U)),A)>},
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Constructed Product Result analysis ====================
+Result size of Constructed Product Result analysis
+  = {terms: 57, types: 36, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 36, types: 20, coercions: 0, joins: 0/4}
+fac :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [30 150 0] 320 0}]
+fac
+  = \ (@p_ahq)
+      ($dEq_a1rC [Dmd=<S(C(C(S))L),U(C(C1(U)),A)>] :: Eq p_ahq)
+      ($dNum_a1rD [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>]
+         :: Num p_ahq)
+      (eta_B1 :: p_ahq) ->
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Str=<L,U> {a1rC-><S(C(C(S))L),U(C(C1(U)),A)>},
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Worker Wrapper binds ====================
+Result size of Worker Wrapper binds
+  = {terms: 83, types: 79, coercions: 0, joins: 0/9}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 50, types: 38, coercions: 0, joins: 0/9}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG [Dmd=<C(C(S)),C(C1(U))>] :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>] :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        ww_s1sH [Dmd=<L,A>] :: p_s1sA -> p_s1sA -> Bool
+        [LclId, Str=b, Cpr=b]
+        ww_s1sH
+          = Control.Exception.Base.absentError
+              @(p_s1sA -> p_s1sA -> Bool) "ww p -> p -> Bool"# } in
+      let {
+        w_s1sB [Dmd=<S(C(C(S))L),U(C(C1(U)),A)>] :: Eq p_s1sA
+        [LclId]
+        w_s1sB = GHC.Classes.C:Eq @p_s1sA ww_s1sG ww_s1sH } in
+      let {
+        @p_ahq
+        p_ahq = TYPE: p_s1sA } in
+      let {
+        $dEq_a1rC [Dmd=<S(C(C(S))L),U(C(C1(U)),A)>] :: Eq p_ahq
+        [LclId]
+        $dEq_a1rC = w_s1sB } in
+      let {
+        $dNum_a1rD [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>] :: Num p_ahq
+        [LclId]
+        $dNum_a1rD = w_s1sC } in
+      let {
+        eta_B1 :: p_ahq
+        [LclId]
+        eta_B1 = w_s1sD } in
+      let {
+        lvl_s1sm :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_ahq $dNum_a1rD lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_ahq $dNum_a1rD lvl_s1sp } in
+      let {
+        lvl_s1so :: p_ahq
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_ahq $dNum_a1rD lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_ahq -> p_ahq
+        [LclId,
+         Arity=1,
+         Str=<L,U>,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 160 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_ahq) ->
+              case == @p_ahq $dEq_a1rC ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_ahq
+                    $dNum_a1rD
+                    ds_d1s0
+                    (fac_s1sk (- @p_ahq $dNum_a1rD ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk eta_B1
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB [Dmd=<S(C(C(S))L),U(C(C1(U)),A)>] :: Eq p_s1sA)
+      (w_s1sC [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>] :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of ww_s1sF
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [post-worker-wrapper],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 68, types: 61, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 35, types: 20, coercions: 0, joins: 0/4}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 150 0] 310 0}]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sp } in
+      let {
+        lvl_s1so :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId,
+         Arity=1,
+         Str=<L,U>,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 150 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Exitification transformation ====================
+Result size of Exitification transformation
+  = {terms: 68, types: 61, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 35, types: 20, coercions: 0, joins: 0/4}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 150 0] 310 0}]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sp } in
+      let {
+        lvl_s1so :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1so = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId,
+         Arity=1,
+         Str=<L,U>,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 150 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Levels added: ====================
+<lvl_s1sn,<0,0>>
+<lvl_s1sn,<0,0>> = 1
+<lvl_s1sp,<0,0>>
+<lvl_s1sp,<0,0>> = 1
+<lvl_s1sl,<0,0>>
+<lvl_s1sl,<0,0>> = 0
+<$wfac_s1sJ,<0,0>>
+<$wfac_s1sJ,<0,0>>
+  = \ <p_s1sA,<1,0>> <ww_s1sG,<1,0>> <w_s1sC,<1,0>> <w_s1sD,<1,0>> ->
+      let {
+        <lvl_s1sm,<1,2>>
+        <lvl_s1sm,<1,2>> = GHC.Num.fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      let {
+        <lvl_s1sq,<1,3>>
+        <lvl_s1sq,<1,3>> = GHC.Num.fromInteger @p_s1sA w_s1sC lvl_s1sp } in
+      let {
+        <lvl_s1so,<1,4>>
+        <lvl_s1so,<1,4>> = GHC.Num.fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      letrec {
+        <fac_s1sk,<1,5>>
+        <fac_s1sk,<1,5>>
+          = \ <ds_d1s0,<2,0>> ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of <wild_X1,<2,2>> {
+                GHC.Types.False ->
+                  GHC.Num.*
+                    @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (GHC.Num.- @p_s1sA w_s1sC ds_d1s0 lvl_s1so));
+                GHC.Types.True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+<Fac.fac,<0,0>>
+<Fac.fac,<0,0>>
+  = \ <p_s1sA,<1,0>> <w_s1sB,<1,0>> <w_s1sC,<1,0>> <w_s1sD,<1,0>> ->
+      case w_s1sB of <ww_s1sF,<1,2>>
+      { GHC.Classes.C:Eq <ww_s1sG,<1,2>> <ww_s1sH,<1,2>> ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+<$trModule_s1sd,<0,0>>
+<$trModule_s1sd,<0,0>> = "main"#
+<$trModule_s1se,<0,0>>
+<$trModule_s1se,<0,0>> = GHC.Types.TrNameS $trModule_s1sd
+<$trModule_s1sf,<0,0>>
+<$trModule_s1sf,<0,0>> = "Fac"#
+<$trModule_s1sg,<0,0>>
+<$trModule_s1sg,<0,0>> = GHC.Types.TrNameS $trModule_s1sf
+<Fac.$trModule,<0,0>>
+<Fac.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = True}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = True})
+  = {terms: 68, types: 61, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId]
+lvl_s1sp = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 35, types: 20, coercions: 0, joins: 0/4}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sp } in
+      let {
+        lvl_s1so :: p_s1sA
+        [LclId]
+        lvl_s1so = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1so));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 66, types: 60, coercions: 0, joins: 0/4}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId]
+lvl_s1sp = lvl_s1sn
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 33, types: 19, coercions: 0, joins: 0/4}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1so :: p_s1sA
+        [LclId]
+        lvl_s1so = lvl_s1sq } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of wild_X1 {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of ww_s1sF
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 64, types: 59, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId]
+lvl_s1sp = lvl_s1sn
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of wild_X1 {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of ww_s1sF
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Liberate case ====================
+Result size of Liberate case
+  = {terms: 64, types: 59, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sp :: Integer
+[LclId]
+lvl_s1sp = lvl_s1sn
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of wild_X1 {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of ww_s1sF
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [post-liberate-case],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 120 0] 270 0}]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId,
+         Arity=1,
+         Str=<L,U>,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 150 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== SpecConstr ====================
+Result size of SpecConstr
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of wild_X1 {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of ww_s1sF
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [final],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 120 0] 270 0}]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId,
+         Arity=1,
+         Str=<L,U>,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 150 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w_s1sC :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sn :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sn = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_s1sl :: Integer
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+lvl_s1sl = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+$wfac_s1sJ [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[LclId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 120 0] 270 0}]
+$wfac_s1sJ
+  = \ (@p_s1sA)
+      (ww_s1sG [Dmd=<C(C(S)),C(C1(U))>] :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>] :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC lvl_s1sn } in
+      let {
+        lvl_s1sm :: p_s1sA
+        [LclId,
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=False, ConLike=False,
+                 WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 30 0}]
+        lvl_s1sm = fromInteger @p_s1sA w_s1sC lvl_s1sl } in
+      letrec {
+        fac_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId,
+         Arity=1,
+         Str=<L,U> {s1sG-><C(C(S)),C(C1(U))>},
+         Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                 WorkFree=True, Expandable=True, Guidance=IF_ARGS [0] 150 0}]
+        fac_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac_s1sk w_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[LclIdX,
+ Arity=3,
+ Str=<S(C(C(S))L),1*U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB [Dmd=<S(C(C(S))L),1*U(C(C1(U)),A)>] :: Eq p_s1sA)
+      (w_s1sC [Dmd=<L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))>] :: Num p_s1sA)
+      (w_s1sD :: p_s1sA) ->
+      case w_s1sB of
+      { GHC.Classes.C:Eq ww_s1sG [Dmd=<C(C(S)),C(C1(U))>]
+                         ww_s1sH [Dmd=<L,A>] ->
+      $wfac_s1sJ @p_s1sA ww_s1sG w_s1sC w_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sd :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sd = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1se :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1se = GHC.Types.TrNameS $trModule_s1sd
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sf :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_s1sf = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_s1sg :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+$trModule_s1sg = GHC.Types.TrNameS $trModule_s1sf
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module $trModule_s1se $trModule_s1sg
+
+
+
+
+==================== Tidy Core ====================
+Result size of Tidy Core
+  = {terms: 62, types: 58, coercions: 0, joins: 0/3}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.fac2 :: Integer
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+Fac.fac2 = 1
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.fac1 :: Integer
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 100 0}]
+Fac.fac1 = 0
+
+-- RHS size: {terms: 31, types: 18, coercions: 0, joins: 0/3}
+Fac.$wfac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (p -> p -> Bool) -> Num p => p -> p
+[GblId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [60 120 0] 270 0}]
+Fac.$wfac
+  = \ (@p_s1sA)
+      (ww_s1sG :: p_s1sA -> p_s1sA -> Bool)
+      (w_s1sC :: Num p_s1sA)
+      (w1_s1sD :: p_s1sA) ->
+      let {
+        lvl_s1sq :: p_s1sA
+        [LclId]
+        lvl_s1sq = fromInteger @p_s1sA w_s1sC Fac.fac2 } in
+      let {
+        lvl1_s1sm :: p_s1sA
+        [LclId]
+        lvl1_s1sm = fromInteger @p_s1sA w_s1sC Fac.fac1 } in
+      letrec {
+        fac3_s1sk [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>, Unf=OtherCon []]
+        fac3_s1sk
+          = \ (ds_d1s0 :: p_s1sA) ->
+              case ww_s1sG ds_d1s0 lvl1_s1sm of {
+                False ->
+                  * @p_s1sA
+                    w_s1sC
+                    ds_d1s0
+                    (fac3_s1sk (- @p_s1sA w_s1sC ds_d1s0 lvl_s1sq));
+                True -> lvl_s1sq
+              }; } in
+      fac3_s1sk w1_s1sD
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (Eq p, Num p) => p -> p
+[GblId,
+ Arity=3,
+ Str=<S(C(C(S))L),1*U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=False)}]
+fac
+  = \ (@p_s1sA)
+      (w_s1sB :: Eq p_s1sA)
+      (w1_s1sC :: Num p_s1sA)
+      (w2_s1sD :: p_s1sA) ->
+      case w_s1sB of { GHC.Classes.C:Eq ww1_s1sG ww2_s1sH ->
+      Fac.$wfac @p_s1sA ww1_s1sG w1_s1sC w2_s1sD
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule4 :: GHC.Prim.Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+Fac.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule3 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+Fac.$trModule3 = GHC.Types.TrNameS Fac.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule2 :: GHC.Prim.Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+Fac.$trModule2 = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule1 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
+Fac.$trModule1 = GHC.Types.TrNameS Fac.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
+Fac.$trModule = GHC.Types.Module Fac.$trModule3 Fac.$trModule1
+
+
+
+
+==================== CorePrep ====================
+Result size of CorePrep
+  = {terms: 68, types: 60, coercions: 0, joins: 0/5}
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.fac2 :: GHC.Integer.Type.Integer
+[GblId, Unf=OtherCon []]
+Fac.fac2 = GHC.Integer.Type.S# 1#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.fac1 :: GHC.Integer.Type.Integer
+[GblId, Unf=OtherCon []]
+Fac.fac1 = GHC.Integer.Type.S# 0#
+
+-- RHS size: {terms: 35, types: 20, coercions: 0, joins: 0/5}
+Fac.$wfac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}.
+     (p -> p -> GHC.Types.Bool) -> GHC.Num.Num p => p -> p
+[GblId,
+ Arity=3,
+ Str=<C(C(S)),C(C1(U))><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=OtherCon []]
+Fac.$wfac
+  = \ (@p_s1sA)
+      (ww_s1te [Occ=OnceL!] :: p_s1sA -> p_s1sA -> GHC.Types.Bool)
+      (w_s1tf :: GHC.Num.Num p_s1sA)
+      (w1_s1tg [Occ=Once] :: p_s1sA) ->
+      let {
+        lvl_s1th [Occ=OnceL*] :: p_s1sA
+        [LclId]
+        lvl_s1th = GHC.Num.fromInteger @p_s1sA w_s1tf Fac.fac2 } in
+      let {
+        lvl1_s1ti [Occ=OnceL] :: p_s1sA
+        [LclId]
+        lvl1_s1ti = GHC.Num.fromInteger @p_s1sA w_s1tf Fac.fac1 } in
+      letrec {
+        fac3_s1tj [Occ=LoopBreaker] :: p_s1sA -> p_s1sA
+        [LclId, Arity=1, Str=<L,U>, Unf=OtherCon []]
+        fac3_s1tj
+          = \ (ds_s1tk :: p_s1sA) ->
+              case ww_s1te ds_s1tk lvl1_s1ti of {
+                GHC.Types.False ->
+                  let {
+                    sat_s1tn [Occ=Once] :: p_s1sA
+                    [LclId]
+                    sat_s1tn
+                      = let {
+                          sat_s1tm [Occ=Once] :: p_s1sA
+                          [LclId]
+                          sat_s1tm = GHC.Num.- @p_s1sA w_s1tf ds_s1tk lvl_s1th } in
+                        fac3_s1tj sat_s1tm } in
+                  GHC.Num.* @p_s1sA w_s1tf ds_s1tk sat_s1tn;
+                GHC.Types.True -> lvl_s1th
+              }; } in
+      fac3_s1tj w1_s1tg
+
+-- RHS size: {terms: 11, types: 16, coercions: 0, joins: 0/0}
+Fac.fac [InlPrag=NOUSERINLINE[2]]
+  :: forall {p}. (GHC.Classes.Eq p, GHC.Num.Num p) => p -> p
+[GblId,
+ Arity=3,
+ Str=<S(C(C(S))L),1*U(C(C1(U)),A)><L,U(A,C(C1(U)),C(C1(U)),A,A,A,C(U))><L,U>,
+ Unf=OtherCon []]
+Fac.fac
+  = \ (@p_s1sA)
+      (w_s1to [Occ=Once!] :: GHC.Classes.Eq p_s1sA)
+      (w1_s1tp [Occ=Once] :: GHC.Num.Num p_s1sA)
+      (w2_s1tq [Occ=Once] :: p_s1sA) ->
+      case w_s1to of
+      { GHC.Classes.C:Eq ww1_s1ts [Occ=Once] _ [Occ=Dead] ->
+      Fac.$wfac @p_s1sA ww1_s1ts w1_s1tp w2_s1tq
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule4 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+Fac.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule3 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+Fac.$trModule3 = GHC.Types.TrNameS Fac.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule2 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+Fac.$trModule2 = "Fac"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule1 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+Fac.$trModule1 = GHC.Types.TrNameS Fac.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+Fac.$trModule :: GHC.Types.Module
+[GblId, Unf=OtherCon []]
+Fac.$trModule = GHC.Types.Module Fac.$trModule3 Fac.$trModule1
+
+
+

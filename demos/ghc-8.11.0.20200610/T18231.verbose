@@ -6,37 +6,37 @@ Result size of Desugar (before optimization)
 
 Rec {
 -- RHS size: {terms: 3, types: 2, coercions: 0, joins: 0/0}
-$dApplicative_aFZ
+$dApplicative_aG5
   :: Applicative (StateT Int Data.Functor.Identity.Identity)
 [LclId]
-$dApplicative_aFZ
+$dApplicative_aG5
   = Control.Monad.Trans.State.Strict.$fApplicativeStateT
-      @Data.Functor.Identity.Identity @Int $dFunctor_aLk $dMonad_aLl
+      @Data.Functor.Identity.Identity @Int $dFunctor_aLq $dMonad_aLr
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$dFunctor_aLk :: Functor Data.Functor.Identity.Identity
+$dFunctor_aLq :: Functor Data.Functor.Identity.Identity
 [LclId]
-$dFunctor_aLk = Data.Functor.Identity.$fFunctorIdentity
+$dFunctor_aLq = Data.Functor.Identity.$fFunctorIdentity
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$dMonad_aG8 :: Monad Data.Functor.Identity.Identity
+$dMonad_aGe :: Monad Data.Functor.Identity.Identity
 [LclId]
-$dMonad_aG8 = $dMonad_aLl
+$dMonad_aGe = $dMonad_aLr
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$dMonad_aLl :: Monad Data.Functor.Identity.Identity
+$dMonad_aLr :: Monad Data.Functor.Identity.Identity
 [LclId]
-$dMonad_aLl = Data.Functor.Identity.$fMonadIdentity
+$dMonad_aLr = Data.Functor.Identity.$fMonadIdentity
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$dNum_aL6 :: Num Int
+$dNum_aLc :: Num Int
 [LclId]
-$dNum_aL6 = $dNum_aGd
+$dNum_aLc = $dNum_aGj
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$dNum_aGd :: Num Int
+$dNum_aGj :: Num Int
 [LclId]
-$dNum_aGd = GHC.Num.$fNumInt
+$dNum_aGj = GHC.Num.$fNumInt
 
 -- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
@@ -55,16 +55,16 @@ m = $ @'GHC.Types.LiftedRep
          @(StateT Int Data.Functor.Identity.Identity)
          @()
          @()
-         $dApplicative_aFZ)
+         $dApplicative_aG5)
       (modify'
          @Data.Functor.Identity.Identity
          @Int
-         $dMonad_aG8
+         $dMonad_aGe
          (let {
-            ds_dM0 :: Int
+            ds_dM5 :: Int
             [LclId]
-            ds_dM0 = GHC.Types.I# 1# } in
-          \ (ds_dLZ :: Int) -> + @Int $dNum_aGd ds_dLZ ds_dM0))
+            ds_dM5 = GHC.Types.I# 1# } in
+          \ (ds_dM4 :: Int) -> + @Int $dNum_aGj ds_dM4 ds_dM5))
 end Rec }
 
 
@@ -105,12 +105,12 @@ m = $ @'GHC.Types.LiftedRep
          @Int
          Data.Functor.Identity.$fMonadIdentity
          (let {
-            ds_dM0 :: Int
+            ds_dM5 :: Int
             [LclId,
              Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
                      WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-            ds_dM0 = GHC.Types.I# 1# } in
-          \ (ds_dLZ :: Int) -> + @Int GHC.Num.$fNumInt ds_dLZ ds_dM0))
+            ds_dM5 = GHC.Types.I# 1# } in
+          \ (ds_dM4 :: Int) -> + @Int GHC.Num.$fNumInt ds_dM4 ds_dM5))
 
 
 
@@ -126,52 +126,52 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -182,11 +182,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -196,52 +192,52 @@ Result size of Specialise
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -252,42 +248,31 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
 
 ==================== Levels added: ====================
-<$trModule_sMw,<0,0>>
-<$trModule_sMw,<0,0>> = "main"#
-<$trModule_sMx,<0,0>>
-<$trModule_sMx,<0,0>> = GHC.Types.TrNameS $trModule_sMw
-<$trModule_sMy,<0,0>>
-<$trModule_sMy,<0,0>> = "T18231"#
-<$trModule_sMz,<0,0>>
-<$trModule_sMz,<0,0>> = GHC.Types.TrNameS $trModule_sMy
+<$trModule_sMB,<0,0>>
+<$trModule_sMB,<0,0>> = "main"#
+<$trModule_sMC,<0,0>>
+<$trModule_sMC,<0,0>> = GHC.Types.TrNameS $trModule_sMB
+<$trModule_sMD,<0,0>>
+<$trModule_sMD,<0,0>> = "T18231"#
+<$trModule_sME,<0,0>>
+<$trModule_sME,<0,0>> = GHC.Types.TrNameS $trModule_sMD
 <T18231.$trModule,<0,0>>
 <T18231.$trModule,<0,0>>
-  = GHC.Types.Module $trModule_sMx $trModule_sMz
-<a'_sNw,<0,0>>
-<a'_sNw,<0,0>>
-  = \ <s1_aN0,<1,0>> ->
-      case s1_aN0 of <wild_aNf,<1,2>> { GHC.Types.I# <x_aNg,<1,2>> ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+  = GHC.Types.Module $trModule_sMC $trModule_sME
+<a'_sNB,<0,0>>
+<a'_sNB,<0,0>>
+  = \ <s1_aN5,<1,0>> ->
+      case s1_aN5 of <wild_aNk,<1,2>> { GHC.Types.I# <x_aNl,<1,2>> ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       };
 <T18231.m,<0,0>>
-<T18231.m,<0,0>>
-  = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+<T18231.m,<0,0>> = a'_sNB `cast` <Co:5>
 
 
 
@@ -298,50 +283,46 @@ Result size of Float out(FOS {Lam = Just 0,
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
 m :: State Int ()
 [LclIdX, Arity=1]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -357,52 +338,52 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -413,11 +394,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -433,52 +410,52 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -489,11 +466,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -509,52 +482,52 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -565,11 +538,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -579,52 +548,52 @@ Result size of Float inwards
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -635,11 +604,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -649,52 +614,52 @@ Result size of Called arity analysis
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -705,11 +670,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -725,52 +686,52 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -781,11 +742,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -795,53 +752,53 @@ Result size of Demand analysis
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
  Str=<B,1*H>b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 [Dmd=<B,1*H>] :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 [Dmd=<B,1*H>] :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -853,11 +810,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -867,43 +820,43 @@ Result size of Constructed Product Result analysis
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -911,10 +864,10 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 [Dmd=<B,1*H>] :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 [Dmd=<B,1*H>] :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -927,11 +880,7 @@ m :: State Int ()
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
          Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -941,43 +890,43 @@ Result size of Worker Wrapper binds
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -985,10 +934,10 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [20] 41 0}]
-a'_sNw
-  = \ (s1_aN0 [Dmd=<B,H>] :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 [Dmd=<B,H>] :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -1000,17 +949,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1026,43 +966,43 @@ Result size of Simplifier
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1070,10 +1010,10 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -1085,17 +1025,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1105,43 +1036,43 @@ Result size of Exitification transformation
   = {terms: 26, types: 16, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1149,10 +1080,10 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
       }
 end Rec }
 
@@ -1164,53 +1095,37 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
 
 ==================== Levels added: ====================
-<$trModule_sMw,<0,0>>
-<$trModule_sMw,<0,0>> = "main"#
-<$trModule_sMx,<0,0>>
-<$trModule_sMx,<0,0>> = GHC.Types.TrNameS $trModule_sMw
-<$trModule_sMy,<0,0>>
-<$trModule_sMy,<0,0>> = "T18231"#
-<$trModule_sMz,<0,0>>
-<$trModule_sMz,<0,0>> = GHC.Types.TrNameS $trModule_sMy
+<$trModule_sMB,<0,0>>
+<$trModule_sMB,<0,0>> = "main"#
+<$trModule_sMC,<0,0>>
+<$trModule_sMC,<0,0>> = GHC.Types.TrNameS $trModule_sMB
+<$trModule_sMD,<0,0>>
+<$trModule_sMD,<0,0>> = "T18231"#
+<$trModule_sME,<0,0>>
+<$trModule_sME,<0,0>> = GHC.Types.TrNameS $trModule_sMD
 <T18231.$trModule,<0,0>>
 <T18231.$trModule,<0,0>>
-  = GHC.Types.Module $trModule_sMx $trModule_sMz
-<a'_sNw,<0,0>>
-<a'_sNw,<0,0>>
-  = \ <s1_aN0,<1,0>> ->
-      case s1_aN0 of <wild_aNf,<1,2>> { GHC.Types.I# <x_aNg,<1,2>> ->
+  = GHC.Types.Module $trModule_sMC $trModule_sME
+<a'_sNB,<0,0>>
+<a'_sNB,<0,0>>
+  = \ <s1_aN5,<1,0>> ->
+      case s1_aN5 of <wild_aNk,<1,2>> { GHC.Types.I# <x_aNl,<1,2>> ->
       let {
-        <lvl_sNP,F<0,0>>
-        <lvl_sNP,F<0,0>>
-          = \ <x_aNg,<1,0>> ->
-              a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#)) } in
-      lvl_sNP x_aNg
+        <lvl_sNU,F<0,0>>
+        <lvl_sNU,F<0,0>>
+          = \ <x_aNl,<1,0>> ->
+              a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#)) } in
+      lvl_sNU x_aNl
       };
 <T18231.m,<0,0>>
-<T18231.m,<0,0>>
-  = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+<T18231.m,<0,0>> = a'_sNB `cast` <Co:5>
 
 
 
@@ -1221,46 +1136,46 @@ Result size of Float out(FOS {Lam = Just 0,
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] -> lvl_sNP x_aNg }
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] -> lvl_sNU x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1271,17 +1186,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1291,48 +1197,48 @@ Result size of Common sub-expression
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of wild_aNf [Dmd=<B,A>]
-      { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      lvl_sNP x_aNg
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of wild_aNk [Dmd=<B,A>]
+      { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      lvl_sNU x_aNl
       }
 end Rec }
 
@@ -1344,17 +1250,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1364,48 +1261,48 @@ Result size of Float inwards
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of wild_aNf [Dmd=<B,A>]
-      { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      lvl_sNP x_aNg
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of wild_aNk [Dmd=<B,A>]
+      { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      lvl_sNU x_aNl
       }
 end Rec }
 
@@ -1417,17 +1314,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1437,48 +1325,48 @@ Result size of Liberate case
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of wild_aNf [Dmd=<B,A>]
-      { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      lvl_sNP x_aNg
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of wild_aNk [Dmd=<B,A>]
+      { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      lvl_sNU x_aNl
       }
 end Rec }
 
@@ -1490,17 +1378,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1516,43 +1395,43 @@ Result size of Simplifier
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1560,12 +1439,12 @@ lvl_sNP
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1573,9 +1452,9 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] -> lvl_sNP x_aNg }
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] -> lvl_sNU x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1586,17 +1465,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1606,46 +1476,46 @@ Result size of SpecConstr
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] -> lvl_sNP x_aNg }
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] -> lvl_sNU x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1656,17 +1526,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1676,48 +1537,48 @@ Result size of Common sub-expression
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId, Arity=1, Str=<L,U>b, Cpr=b]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of wild_aNf [Dmd=<B,A>]
-      { GHC.Types.I# x_aNg [Dmd=<B,A>] ->
-      lvl_sNP x_aNg
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of wild_aNk [Dmd=<B,A>]
+      { GHC.Types.I# x_aNl [Dmd=<B,A>] ->
+      lvl_sNU x_aNl
       }
 end Rec }
 
@@ -1729,17 +1590,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1755,43 +1607,43 @@ Result size of Simplifier
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1799,12 +1651,12 @@ lvl_sNP
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-lvl_sNP
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1812,9 +1664,9 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-a'_sNw
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] -> lvl_sNP x_aNg }
+a'_sNB
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] -> lvl_sNU x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1825,17 +1677,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1845,43 +1688,43 @@ Result size of Demand analysis
   = {terms: 30, types: 22, coercions: 5, joins: 0/0}
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMw :: GHC.Prim.Addr#
+$trModule_sMB :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
-$trModule_sMw = "main"#
+$trModule_sMB = "main"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMx :: GHC.Types.TrName
+$trModule_sMC :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMx = GHC.Types.TrNameS $trModule_sMw
+$trModule_sMC = GHC.Types.TrNameS $trModule_sMB
 
 -- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMy :: GHC.Prim.Addr#
+$trModule_sMD :: GHC.Prim.Addr#
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
-$trModule_sMy = "T18231"#
+$trModule_sMD = "T18231"#
 
 -- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
-$trModule_sMz :: GHC.Types.TrName
+$trModule_sME :: GHC.Types.TrName
 [LclId,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 20}]
-$trModule_sMz = GHC.Types.TrNameS $trModule_sMy
+$trModule_sME = GHC.Types.TrNameS $trModule_sMD
 
 -- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
 T18231.$trModule :: GHC.Types.Module
 [LclIdX,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 30}]
-T18231.$trModule = GHC.Types.Module $trModule_sMx $trModule_sMz
+T18231.$trModule = GHC.Types.Module $trModule_sMC $trModule_sME
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_sNP
+lvl_sNU
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1889,12 +1732,12 @@ lvl_sNP
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-lvl_sNP
-  = \ (x_aNg [Dmd=<B,A>] :: GHC.Prim.Int#) ->
-      a'_sNw (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_sNU
+  = \ (x_aNl [Dmd=<B,A>] :: GHC.Prim.Int#) ->
+      a'_sNB (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
-a'_sNw [Occ=LoopBreaker]
+a'_sNB [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [LclId,
  Arity=1,
@@ -1902,9 +1745,9 @@ a'_sNw [Occ=LoopBreaker]
  Cpr=b,
  Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True, Guidance=NEVER}]
-a'_sNw
-  = \ (s1_aN0 [Dmd=<B,1*H>] :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg [Dmd=<B,A>] -> lvl_sNP x_aNg }
+a'_sNB
+  = \ (s1_aN5 [Dmd=<B,1*H>] :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl [Dmd=<B,A>] -> lvl_sNU x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1915,17 +1758,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= a'_sNw
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = a'_sNw
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sNB `cast` <Co:5>
 
 
 
@@ -1972,20 +1806,20 @@ T18231.$trModule
 
 Rec {
 -- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
-lvl_rNY
+lvl_rLG
   :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
 [GblId, Arity=1, Str=<B,A>b, Cpr=b, Unf=OtherCon []]
-lvl_rNY
-  = \ (x_aNg :: GHC.Prim.Int#) ->
-      T18231.m1 (GHC.Types.I# (GHC.Prim.+# x_aNg 1#))
+lvl_rLG
+  = \ (x_aNl :: GHC.Prim.Int#) ->
+      T18231.m1 (GHC.Types.I# (GHC.Prim.+# x_aNl 1#))
 
 -- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
 T18231.m1 [Occ=LoopBreaker]
   :: Int -> Data.Functor.Identity.Identity ((), Int)
 [GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
 T18231.m1
-  = \ (s1_aN0 :: Int) ->
-      case s1_aN0 of { GHC.Types.I# x_aNg -> lvl_rNY x_aNg }
+  = \ (s1_aN5 :: Int) ->
+      case s1_aN5 of { GHC.Types.I# x_aNl -> lvl_rLG x_aNl }
 end Rec }
 
 -- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
@@ -1996,17 +1830,8 @@ m :: State Int ()
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)
-         Tmpl= T18231.m1
-               `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                                <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-                       :: (Int -> Data.Functor.Identity.Identity ((), Int))
-                          ~R# StateT Int Data.Functor.Identity.Identity ())}]
-m = T18231.m1
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (Int -> Data.Functor.Identity.Identity ((), Int))
-               ~R# StateT Int Data.Functor.Identity.Identity ())
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = T18231.m1 `cast` <Co:5>
 
 
 
@@ -2043,11 +1868,11 @@ T18231.$trModule
 
 Rec {
 -- RHS size: {terms: 11, types: 3, coercions: 0, joins: 0/1}
-lvl_rNY
+lvl_rLG
   :: GHC.Prim.Int#
      -> Data.Functor.Identity.Identity ((), GHC.Types.Int)
 [GblId, Arity=1, Str=<B,A>b, Cpr=b, Unf=OtherCon []]
-lvl_rNY
+lvl_rLG
   = \ (x_sOF [Occ=Once] :: GHC.Prim.Int#) ->
       case GHC.Prim.+# x_sOF 1# of sat_sOG [Occ=Once] { __DEFAULT ->
       let {
@@ -2064,7 +1889,7 @@ T18231.m1 [Occ=LoopBreaker]
 [GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
 T18231.m1
   = \ (s1_sOI [Occ=Once!] :: GHC.Types.Int) ->
-      case s1_sOI of { GHC.Types.I# x_sOK [Occ=Once] -> lvl_rNY x_sOK }
+      case s1_sOI of { GHC.Types.I# x_sOK [Occ=Once] -> lvl_rLG x_sOK }
 end Rec }
 
 -- RHS size: {terms: 3, types: 1, coercions: 5, joins: 0/0}
@@ -2072,12 +1897,7 @@ T18231.m :: Control.Monad.Trans.State.Strict.State GHC.Types.Int ()
 [GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
 T18231.m
   = (\ (eta_B1 [Occ=Once] :: GHC.Types.Int) -> T18231.m1 eta_B1)
-    `cast` (Sym (Control.Monad.Trans.State.Strict.N:StateT[0]
-                     <GHC.Types.Int>_N <Data.Functor.Identity.Identity>_R <()>_N)
-            :: (GHC.Types.Int
-                -> Data.Functor.Identity.Identity ((), GHC.Types.Int))
-               ~R# Control.Monad.Trans.State.Strict.StateT
-                     GHC.Types.Int Data.Functor.Identity.Identity ())
+    `cast` <Co:5>
 
 
 

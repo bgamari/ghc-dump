@@ -54,14 +54,18 @@ instance Asim (XExpr UD) where
   assimilate (XLam binder expr) (XLam binder' expr') =
     XLam <$> withPerm (assimilate binder binder') <*> withPerm (assimilate expr expr')
     where withPerm = local (++ [mkPerm binder binder'])
+  assimilate (XLet [XBinding binder bound] expr) (XLet [XBinding binder' bound'] expr') =
+    XLet <$> binding <*> withPerm (assimilate expr expr')
+    where
+      withPerm = local (++ [mkPerm binder binder'])
+      binding =
+        fmap (: []) $ XBinding <$> withPerm (assimilate binder binder') <*> withPerm (assimilate bound bound')
+
   assimilate a@(XLet bindings expr) b@(XLet bindings' expr')
-    -- TODO: this is just for debugging
-    | length (paired pairings) /= length bindings' = error $ show 
-      [ runReader (pprWithOpts a) pprOptsDefault
-      , runReader (pprWithOpts b) pprOptsDefault
-      , runReader (pprWithOpts pairings) pprOptsDefault
-      ]
-    | otherwise = XLet <$> zipWithM go bindings bindings' <*> withPerm (assimilate expr expr')
+    -- TODO: Figure out what to do if the number of bindings doesn't match.
+    | length bindings /= length bindings' = error "Mismatched number of bindings"
+    | otherwise =
+      XLet <$> zipWithM go bindings bindings' <*> withPerm (assimilate expr expr')
     where
       pairings = pairLet (expr, expr') (bindings, bindings')
       newPerm = [ mkPerm binder binder' | (XBinding binder _, XBinding binder' _) <- paired pairings ]
@@ -69,7 +73,7 @@ instance Asim (XExpr UD) where
       go (XBinding binder expr) (XBinding binder' expr') =
         XBinding <$> withPerm (assimilate binder binder') <*> withPerm (assimilate expr expr')
   assimilate (XCase scrut binder alts) (XCase scrut' binder' alts')
-    -- TODO: depends on ordering of case alternatives
+    -- TODO: Figure out what to do if the number of alternatives doesn't match.
     | length alts /= length alts' = error "Mismatched number of alternatives"
     | otherwise =
       XCase <$> assimilate scrut scrut' <*> withPerm (assimilate binder binder') <*> withPerm (zipWithM assimilate alts alts')
@@ -79,7 +83,7 @@ instance Asim (XExpr UD) where
   assimilate _ x = applyPerm x
 
 instance Asim (XAlt UD) where
-  -- TODO: as of right now, this depends on the ordering of alternatives and that the number of their binders doesnt change.
+  -- TODO: Figure out what to do if the number of binders doesn't match
   assimilate (XAlt altCon binders rhs) (XAlt altCon' binders' rhs')
     | length binders /= length binders' = error "Mismatched number of binders"
     | otherwise =

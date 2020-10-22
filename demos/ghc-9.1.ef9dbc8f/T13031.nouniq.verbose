@@ -1028,17 +1028,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1127,17 +1117,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1220,17 +1200,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1343,17 +1313,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1418,17 +1378,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1493,17 +1443,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1582,17 +1522,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1675,17 +1605,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1774,17 +1694,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1859,17 +1769,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -1948,17 +1848,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -2033,17 +1923,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -2122,17 +2002,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -2215,17 +2085,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> lvl @a;
-                   True -> case lvl of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p)
       (@a)
@@ -2300,17 +2160,7 @@ f :: forall {p1} {p2} {a}. Bool -> p1 -> p2 -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p)
-                 (@p1)
-                 (@a)
-                 (ds [Occ=Once1!] :: Bool)
-                 _ [Occ=Dead, OS=OneShot]
-                 _ [Occ=Dead, OS=OneShot] ->
-                 case ds of {
-                   False -> Foo.f2 @a;
-                   True -> case Foo.f1 of { }
-                 }}]
+         Guidance=ALWAYS_IF(arity=3,unsat_ok=True,boring_ok=True)}]
 f = \ (@p)
       (@p1)
       (@a)

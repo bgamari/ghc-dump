@@ -956,9 +956,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -985,12 +983,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds [Dmd=<S,U>] :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1053,9 +1046,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1082,12 +1073,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1144,9 +1130,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1173,12 +1157,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1268,9 +1247,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1293,12 +1270,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1345,9 +1317,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1370,12 +1340,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of wild [Dmd=<L,A>] {
         False -> lvl @p @a @p;
@@ -1422,9 +1387,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1447,12 +1410,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of wild [Dmd=<L,A>] {
         False -> lvl @p @a @p;
@@ -1499,9 +1457,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1524,12 +1480,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of wild [Dmd=<L,A>] {
         False -> lvl @p @a @p;
@@ -1582,9 +1533,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1611,12 +1560,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1673,9 +1617,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1698,12 +1640,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1750,9 +1687,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1775,12 +1710,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of wild [Dmd=<L,A>] {
         False -> lvl @p @a @p;
@@ -1833,9 +1763,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1862,12 +1790,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -1924,9 +1847,7 @@ lvl :: forall {p} {a} {p}. p -> p -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 lvl
   = \ (@p)
       (@a)
@@ -1953,12 +1874,7 @@ f :: forall {p} {p} {a}. Bool -> p -> p -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> lvl @p @a @p;
-                   True -> lvl @a @p @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p) (@a) (ds [Dmd=<S,1*U>] :: Bool) ->
       case ds of {
         False -> lvl @p @a @p;
@@ -2015,9 +1931,7 @@ Foo.f2 :: forall {p1} {a} {p2}. p1 -> p2 -> a
  Cpr=b,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@a) (@p1) _ [Occ=Dead] _ [Occ=Dead] ->
-                 raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False}]
+         Guidance=ALWAYS_IF(arity=2,unsat_ok=True,boring_ok=True)}]
 Foo.f2
   = \ (@p) (@a) (@p1) _ [Occ=Dead] _ [Occ=Dead] ->
       raise# @Bool @'GHC.Types.LiftedRep @a GHC.Types.False
@@ -2036,12 +1950,7 @@ f :: forall {p1} {p2} {a}. Bool -> p1 -> p2 -> a
  Str=<S,1*U>,
  Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
          WorkFree=True, Expandable=True,
-         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)
-         Tmpl= \ (@p) (@p1) (@a) (ds [Occ=Once!] :: Bool) ->
-                 case ds of {
-                   False -> Foo.f2 @p @a @p1;
-                   True -> Foo.f1 @a @p1 @p
-                 }}]
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
 f = \ (@p) (@p1) (@a) (ds :: Bool) ->
       case ds of {
         False -> Foo.f2 @p @a @p1;
