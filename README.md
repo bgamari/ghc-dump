@@ -15,8 +15,10 @@ CoreDiff expects two CBOR files exported by [ghc-dump][1] as its input:
 $ mkdir ghcX ghcY
 $ ghcX -O2 Fac.hs -fplugin GhcDump.Plugin -dumpdir ghcX
 $ ghcY -O2 Fac.hs -fplugin GhcDump.Plugin -dumpdir ghcY
-corediff diff ghcX/Fac.pass-0000.cbor ghcY/Fac.pass-0000.cbor
+$ corediff diff ghcX/Fac.pass-0000.cbor ghcY/Fac.pass-0000.cbor
 ...
 ```
 
 For playing around, there is a bunch of CBOR files in the `demos` directory of this repo.
+
+[1]: https://github.com/bgamari/ghc-dump
