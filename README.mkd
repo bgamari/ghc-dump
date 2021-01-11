@@ -2,7 +2,7 @@
 
 `ghc-dump` is a library, GHC plugin, and set of tools for recording and
 analysing GHC's Core representation. The plugin is compatible with GHC 7.10
-through 8.3, exporting a consistent (albeit somewhat lossy) representation
+through 8.10, exporting a consistent (albeit somewhat lossy) representation
 across these versions. The AST is encoded as CBOR, which is small and easy to
 deserialise.
 
