@@ -1,5 +1,5 @@
 name:                ghc-dump-util
-version:             0.1.1.0
+version:             0.2.0.0
 synopsis:            Handy tools for working with ghc-dump dumps
 description:
   @ghc-dump@ is a library, GHC plugin, and set of tools for recording and
