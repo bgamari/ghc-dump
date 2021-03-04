@@ -104,7 +104,7 @@ modes = subparser
 
         run filterFn sortBindings opts fname = do
             dump <- filterFn <$> GhcDump.Util.readDump fname
-            let table = [ Col 20 "Name"   (pprBinder opts . getBinder)
+            let table = [ Col 30 "Name"   (pprBinder opts . getBinder)
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
                         , Col 6  "Coerc." (pretty . csCoercions . getStats)
