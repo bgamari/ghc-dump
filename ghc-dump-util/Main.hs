@@ -7,8 +7,8 @@ import Data.Monoid
 import Data.Ord
 
 import Options.Applicative
-import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (<>))
-import qualified Text.PrettyPrint.ANSI.Leijen as PP
+import Prettyprinter as PP
+import Prettyprinter.Render.Terminal as PP
 
 import Text.Regex.TDFA
 import Text.Regex.TDFA.Common (Regex)
@@ -18,20 +18,23 @@ import GhcDump.Pretty
 import GhcDump.Util
 import GhcDump.Ast
 
-data Column a = Col { colWidth :: Int, colHeader :: String, colGet :: (a -> Doc) }
+data Column a = Col { colWidth :: Int
+                    , colHeader :: String
+                    , colGet :: a -> Doc AnsiStyle
+                    }
 
 type Table a = [Column a]
 
-renderTable :: forall a. Table a -> [a] -> Doc
+renderTable :: forall a. Table a -> [a] -> Doc AnsiStyle
 renderTable cols xs =
-         row (PP.bold . text . colHeader)
+         row (PP.annotate PP.bold . pretty . colHeader)
     <$$> vcat [ row (flip colGet x) | x <- xs ]
   where
-    row :: (Column a -> Doc) -> Doc
+    row :: (Column a -> Doc AnsiStyle) -> Doc AnsiStyle
     row toCell = go cols
       where
-        go :: [Column a] -> Doc
-        go []           = PP.empty
+        go :: [Column a] -> Doc AnsiStyle
+        go []           = mempty
         go [col]        = align $ toCell col
         go (col : rest) = fillBreak (colWidth col) (align $ toCell col) PP.<+> go rest
 
@@ -104,7 +107,7 @@ modes = subparser
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
                         , Col 6  "Coerc." (pretty . csCoercions . getStats)
-                        , Col 300 "Type"  (pprType opts . binderType . unBndr . getBinder)
+                        , Col 3000 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
             print $ renderTable table (sortBindings $ moduleBindings dump)
 
@@ -116,7 +119,7 @@ modes = subparser
                                        return (fname, mod)) fnames
             let totalSize :: Module -> CoreStats
                 totalSize = foldMap getStats . moduleBindings
-            let table = [ Col 35 "Name" (text . fst)
+            let table = [ Col 35 "Name" (pretty . fst)
                         , Col 8  "Terms" (pretty . csTerms . totalSize . snd)
                         , Col 8  "Types" (pretty . csTypes . totalSize . snd)
                         , Col 8  "Coerc." (pretty . csCoercions . totalSize . snd)
