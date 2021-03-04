@@ -5,6 +5,31 @@ import Data.Bifunctor
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
+#if MIN_VERSION_ghc(9,0,0)
+import GHC.Types.Literal (Literal(..))
+import qualified GHC.Types.Literal as Literal
+import GHC.Types.Var (Var(..))
+import qualified GHC.Types.Var as Var
+import GHC.Types.Id (isFCallId)
+import GHC.Unit.Module as Module (moduleName)
+import GHC.Unit.Module.Name as Module (ModuleName, moduleNameFS)
+import GHC.Types.Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
+import qualified GHC.Types.Id.Info as IdInfo
+import qualified GHC.Types.Basic as OccInfo (OccInfo(..), isStrongLoopBreaker)
+import qualified GHC.Core.Stats as CoreStats
+import qualified GHC.Core as CoreSyn
+import GHC.Core (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
+import GHC.Driver.Types (ModGuts(..))
+import GHC.Data.FastString (FastString)
+import qualified GHC.Data.FastString as FastString
+import qualified GHC.Core.TyCo.Rep as Type
+import GHC.Core.TyCon as TyCon (TyCon, tyConUnique)
+import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
+import GHC.Types.Unique as Unique (Unique, getUnique, unpkUnique)
+import GHC.Driver.Session (unsafeGlobalDynFlags)
+
+#else
+
 import Literal (Literal(..))
 #if MIN_VERSION_ghc(8,6,0)
 import qualified Literal
@@ -41,6 +66,7 @@ import TyCon (TyCon, tyConUnique)
 
 import Outputable (ppr, showSDoc, SDoc)
 import DynFlags (unsafeGlobalDynFlags)
+#endif
 
 import GhcDump.Ast as Ast
 
@@ -218,7 +244,11 @@ cvtLit l =
       Literal.MachLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
 #endif
 #if MIN_VERSION_ghc(8,6,0)
+#if MIN_VERSION_ghc(9,0,0)
+      Literal.LitNumber numty n ->
+#else
       Literal.LitNumber numty n _ ->
+#endif
         case numty of
           Literal.LitNumInt -> Ast.MachInt n
           Literal.LitNumInt64 -> Ast.MachInt64 n
@@ -243,7 +273,9 @@ cvtModuleName :: Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
 cvtType :: Type.Type -> Ast.SType
-#if MIN_VERSION_ghc(8,10,0)
+#if MIN_VERSION_ghc(9,0,0)
+cvtType (Type.FunTy _flag _ a b) = Ast.FunTy (cvtType a) (cvtType b)
+#elif MIN_VERSION_ghc(8,10,0)
 cvtType (Type.FunTy _flag a b) = Ast.FunTy (cvtType a) (cvtType b)
 #elif MIN_VERSION_ghc(8,2,0)
 cvtType (Type.FunTy a b) = Ast.FunTy (cvtType a) (cvtType b)
