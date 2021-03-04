@@ -5,6 +5,7 @@ import Data.Maybe
 import Data.List (sortBy)
 import Data.Monoid
 import Data.Ord
+import System.IO (stdout)
 
 import Options.Applicative
 import Prettyprinter as PP
@@ -109,7 +110,8 @@ modes = subparser
                         , Col 6  "Coerc." (pretty . csCoercions . getStats)
                         , Col 3000 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
-            print $ renderTable table (sortBindings $ moduleBindings dump)
+            let layoutOpts = PP.defaultLayoutOptions { layoutPageWidth = Unbounded }
+            PP.renderIO stdout $ PP.layoutPretty layoutOpts $ renderTable table (sortBindings $ moduleBindings dump)
 
     summarizeMode =
         run <$> some dumpFile
