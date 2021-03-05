@@ -15,6 +15,7 @@ import Text.Regex.TDFA
 import Text.Regex.TDFA.Common (Regex)
 import Text.Regex.TDFA.Text ()
 
+import GhcDump.ToHtml
 import GhcDump.Pretty
 import GhcDump.Util
 import GhcDump.Ast
@@ -82,11 +83,14 @@ modes = subparser
           <*> switch (short 'U' <> long "show-unfoldings" <> help "Show unfolding templates")
 
     showMode =
-        run <$> filterCond <*> prettyOpts <*> dumpFile
+        run <$> filterCond <*> prettyOpts <*> html <*> dumpFile
       where
-        run filterFn opts fname = do
+        html = switch (short 'H' <> long "html" <> help "Render to HTML")
+        run filterFn opts html fname = do
             dump <- filterFn <$> GhcDump.Util.readDump fname
-            print $ pprModule opts dump
+            if html
+              then writeFile "out.html" $ show $ topBindingsToHtml (moduleTopBindings dump)
+              else print $ pprModule opts dump
 
     listBindingsMode =
         run <$> filterCond <*> sortField <*> prettyOpts <*> dumpFile

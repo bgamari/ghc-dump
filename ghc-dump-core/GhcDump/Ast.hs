@@ -46,6 +46,10 @@ newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
                deriving (Eq, Ord, Generic, Show)
 instance Serialise Binder
 
+isTyBinder :: Binder -> Bool
+isTyBinder (Bndr (TyBinder{})) = True
+isTyBinder _ = False
+
 binderUniqueName :: Binder -> T.Text
 binderUniqueName (Bndr b) =
     binderName b <> T.pack "_" <> T.pack (show u)

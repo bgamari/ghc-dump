@@ -169,7 +169,7 @@ pprExpr' opts parens  x@(ETyLam _ _)   = let (bs, x') = collectTyBinders x
 pprExpr' opts parens  x@(ELam _ _)     = let (bs, x') = collectBinders x
                                          in maybeParens parens
                                             $ hang' ("λ" <+> sep (map (pprBinder opts) bs) <+> smallRArrow) 2 (pprExpr' opts False x')
-pprExpr' opts parens  (ELet xs y)      = maybeParens parens $ "let" <+> (align $ vcat $ map (uncurry (pprBinding opts)) xs)
+pprExpr' opts parens  (ELet xs y)      = maybeParens parens $ "let" <> (align $ vcat $ map (uncurry (pprBinding opts)) xs)
                                          <$$> "in" <+> align (pprExpr' opts False y)
   where pprBind (b, rhs) = pprBinder opts b <+> equals <+> align (pprExpr' opts False rhs)
 pprExpr' opts parens  (ECase x b alts) = maybeParens parens
