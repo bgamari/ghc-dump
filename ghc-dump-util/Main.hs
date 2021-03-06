@@ -115,7 +115,10 @@ modes = subparser
                         , Col 3000 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
             let layoutOpts = PP.defaultLayoutOptions { layoutPageWidth = Unbounded }
-            PP.renderIO stdout $ PP.layoutPretty layoutOpts $ renderTable table (sortBindings $ moduleBindings dump)
+            PP.renderIO stdout $ PP.layoutPretty layoutOpts $ vcat
+              [ pretty (modulePhase dump)
+              , renderTable table (sortBindings $ moduleBindings dump)
+              ]
 
     summarizeMode =
         run <$> some dumpFile
