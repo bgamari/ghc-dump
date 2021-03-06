@@ -48,6 +48,7 @@ executable ghc-dump
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        ghc-dump-util,
+                       ansi-terminal,
                        prettyprinter,
                        prettyprinter-ansi-terminal,
                        regex-tdfa >= 1.3.1.0,

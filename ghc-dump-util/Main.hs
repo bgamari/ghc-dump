@@ -10,6 +10,7 @@ import System.IO (stdout)
 import Options.Applicative
 import Prettyprinter as PP
 import Prettyprinter.Render.Terminal as PP
+import qualified System.Console.ANSI
 
 import Text.Regex.TDFA
 import Text.Regex.TDFA.Common (Regex)
@@ -54,6 +55,14 @@ filterBindings re m =
 
     nameMatches :: Binder -> Bool
     nameMatches b = matchTest re (binderUniqueName b)
+
+renderIOTerm :: PP.LayoutOptions -> Doc AnsiStyle -> IO ()
+renderIOTerm layoutOpts doc = do
+    supportsANSI <- System.Console.ANSI.hSupportsANSI System.IO.stdout
+    let doc' = if supportsANSI
+                 then doc
+                 else PP.unAnnotate doc
+    PP.renderIO stdout $ PP.layoutPretty layoutOpts doc'
 
 modes :: Parser (IO ())
 modes = subparser
@@ -107,7 +116,7 @@ modes = subparser
             dump <- sortBindings . filterFn <$> GhcDump.Util.readDump fname
             if html
               then writeFile "out.html" $ show $ topBindingsToHtml (moduleTopBindings dump)
-              else print $ pprModule opts dump
+              else renderIOTerm PP.defaultLayoutOptions $ pprModule opts dump
 
     listBindingsMode =
         run <$> filterCond <*> bindingsSort <*> prettyOpts <*> dumpFile
@@ -121,7 +130,7 @@ modes = subparser
                         , Col 3000 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
             let layoutOpts = PP.defaultLayoutOptions { layoutPageWidth = Unbounded }
-            PP.renderIO stdout $ PP.layoutPretty layoutOpts $ vcat
+            renderIOTerm layoutOpts $ vcat
               [ pretty (modulePhase dump)
               , renderTable table (moduleBindings dump)
               ]
