@@ -74,6 +74,23 @@ modes = subparser
       where
         makeRegexM' = makeRegexM :: String -> ReadM Regex
 
+    bindingsSort :: Parser (Module -> Module)
+    bindingsSort =
+        option (str >>= readSortField)
+               (long "sort" <> short 's' <> value id
+                <> help "Sort by (accepted values: none, terms, types, coercions, type)")
+      where
+        readSortField "none"      = return $ id
+        readSortField "terms"     = return $ onBinds $ sortBy (flip $ comparing $ csTerms . getStats)
+        readSortField "types"     = return $ onBinds $ sortBy (flip $ comparing $ csTypes . getStats)
+        readSortField "coercions" = return $ onBinds $ sortBy (flip $ comparing $ csCoercions . getStats)
+        readSortField "type"      = return $ onBinds $ sortBy (comparing $ binderType . unBndr . getBinder)
+        readSortField f           = fail $ "unknown sort field "++f
+
+        onBinds :: ([(Binder, CoreStats, Expr)] -> [(Binder, CoreStats, Expr)])
+                -> Module -> Module
+        onBinds f mod = mod { moduleTopBindings = [RecTopBinding $ f $ moduleBindings mod] }
+
     prettyOpts :: Parser PrettyOpts
     prettyOpts =
         PrettyOpts
@@ -83,31 +100,20 @@ modes = subparser
           <*> switch (short 'U' <> long "show-unfoldings" <> help "Show unfolding templates")
 
     showMode =
-        run <$> filterCond <*> prettyOpts <*> html <*> dumpFile
+        run <$> filterCond <*> bindingsSort <*> prettyOpts <*> html <*> dumpFile
       where
         html = switch (short 'H' <> long "html" <> help "Render to HTML")
-        run filterFn opts html fname = do
-            dump <- filterFn <$> GhcDump.Util.readDump fname
+        run filterFn sortBindings opts html fname = do
+            dump <- sortBindings . filterFn <$> GhcDump.Util.readDump fname
             if html
               then writeFile "out.html" $ show $ topBindingsToHtml (moduleTopBindings dump)
               else print $ pprModule opts dump
 
     listBindingsMode =
-        run <$> filterCond <*> sortField <*> prettyOpts <*> dumpFile
+        run <$> filterCond <*> bindingsSort <*> prettyOpts <*> dumpFile
       where
-        sortField =
-            option (str >>= readSortField)
-                   (long "sort" <> short 's' <> value id
-                    <> help "Sort by (accepted values: terms, types, coercions, type)")
-          where
-            readSortField "terms"     = return $ sortBy (flip $ comparing $ csTerms . getStats)
-            readSortField "types"     = return $ sortBy (flip $ comparing $ csTypes . getStats)
-            readSortField "coercions" = return $ sortBy (flip $ comparing $ csCoercions . getStats)
-            readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
-            readSortField f           = fail $ "unknown sort field "++f
-
         run filterFn sortBindings opts fname = do
-            dump <- filterFn <$> GhcDump.Util.readDump fname
+            dump <- sortBindings . filterFn <$> GhcDump.Util.readDump fname
             let table = [ Col 30 "Name"   (pprBinder opts . getBinder)
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
@@ -117,7 +123,7 @@ modes = subparser
             let layoutOpts = PP.defaultLayoutOptions { layoutPageWidth = Unbounded }
             PP.renderIO stdout $ PP.layoutPretty layoutOpts $ vcat
               [ pretty (modulePhase dump)
-              , renderTable table (sortBindings $ moduleBindings dump)
+              , renderTable table (moduleBindings dump)
               ]
 
     summarizeMode =
