@@ -179,8 +179,13 @@ pprExpr' opts parens  (ECase x b alts) = maybeParens parens
                                                , "}"
                                                ]
   where pprAlt (Alt con bndrs rhs) = hang' (hsep (pretty con : map (pprBinder opts) bndrs) <+> smallRArrow) 2 (pprExpr' opts False rhs)
+pprExpr' opts parens  (ETick tick e)   = maybeParens parens
+                                         $ sep [ "<" <> pprTick tick <> ">", pprExpr' opts parens e ]
 pprExpr' opts parens  (EType t)        = maybeParens parens $ "TYPE:" <+> pprType opts t
 pprExpr' opts parens  ECoercion        = "CO"
+
+pprTick :: Tick -> Doc ann
+pprTick (SourceNote n) = "srcnote"
 
 instance Pretty AltCon where
     pretty (AltDataCon t) = pretty $ T.unpack t

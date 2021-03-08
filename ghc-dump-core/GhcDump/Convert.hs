@@ -27,6 +27,8 @@ import GHC.Core.TyCon as TyCon (TyCon, tyConUnique)
 import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
 import GHC.Types.Unique as Unique (Unique, getUnique, unpkUnique)
 import GHC.Driver.Session (unsafeGlobalDynFlags)
+import GHC.Driver.Session (unsafeGlobalDynFlags)
+import qualified GHC.Types.SrcLoc as SrcLoc
 
 #else
 
@@ -40,6 +42,7 @@ import Id (isFCallId)
 import Module (ModuleName, moduleNameFS, moduleName)
 import Unique (Unique, getUnique, unpkUnique)
 import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
+import qualified SrcLoc
 import qualified IdInfo
 import qualified BasicTypes as OccInfo (OccInfo(..), isStrongLoopBreaker)
 #if MIN_VERSION_ghc(8,0,0)
@@ -48,7 +51,7 @@ import qualified CoreStats
 import qualified CoreUtils as CoreStats
 #endif
 import qualified CoreSyn
-import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
+import CoreSyn (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..), Tickish(..))
 import HscTypes (ModGuts(..))
 import FastString (FastString)
 import qualified FastString
@@ -212,9 +215,19 @@ cvtExpr expr =
     Let (Rec bs) body -> ELet (map (bimap cvtBinder cvtExpr) bs) (cvtExpr body)
     Case e x _ as     -> ECase (cvtExpr e) (cvtBinder x) (map cvtAlt as)
     Cast x _          -> cvtExpr x
-    Tick _ e          -> cvtExpr e
+    Tick tick e
+      | CoreSyn.SourceNote sspan _name <- tick
+                      -> ETick (Ast.SourceNote $ cvtRealSrcSpan sspan) (cvtExpr e)
+      | otherwise     -> cvtExpr e
     Type t            -> EType $ cvtType t
     Coercion _        -> ECoercion
+
+cvtRealSrcSpan :: SrcLoc.RealSrcSpan -> SrcSpan
+cvtRealSrcSpan span =
+  Ast.SrcSpan { spanFile  = T.pack $ show $ SrcLoc.srcSpanFile span
+              , spanStart = LineCol (SrcLoc.srcSpanStartLine span) (SrcLoc.srcSpanStartCol span)
+              , spanEnd   = LineCol (SrcLoc.srcSpanEndLine span) (SrcLoc.srcSpanEndCol span)
+              }
 
 cvtAlt :: CoreAlt -> Ast.SAlt
 cvtAlt (con, bs, e) = Alt (cvtAltCon con) (map cvtBinder bs) (cvtExpr e)

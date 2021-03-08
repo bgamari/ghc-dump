@@ -68,6 +68,9 @@ exprToHtml (ECase scrut b alts) = divClass "case" $ do
     divClass "scrut" $ exprToHtml scrut
     keyword " of "
     divClass "alts" $ mapM_ altToHtml alts
+exprToHtml (ETick tick e) = divClass "tick" $ do
+    keyword "tick "
+    exprToHtml e
 exprToHtml (EType ty) = divClass "type" $ typeToHtml ty
 exprToHtml (ECoercion) = "$co"
 

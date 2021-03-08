@@ -189,6 +189,7 @@ data Expr' bndr var
     | ELam bndr (Expr' bndr var)
     | ELet [(bndr, Expr' bndr var)] (Expr' bndr var)
     | ECase (Expr' bndr var) bndr [Alt' bndr var]
+    | ETick Tick (Expr' bndr var)
     | EType (Type' bndr var)
     | ECoercion
     deriving (Eq, Ord, Generic, Show)
@@ -209,6 +210,22 @@ data AltCon = AltDataCon !T.Text
             | AltDefault
             deriving (Eq, Ord, Generic, Show)
 instance Serialise AltCon
+
+data LineCol = LineCol { row, column :: !Int }
+            deriving (Eq, Ord, Generic, Show)
+instance Serialise LineCol
+
+data SrcSpan = SrcSpan { spanFile  :: !T.Text
+                       , spanStart :: !LineCol
+                       , spanEnd   :: !LineCol
+                       }
+                  deriving (Eq, Ord, Generic, Show)
+instance Serialise SrcSpan
+
+data Tick = SourceNote { sourceTickSpan :: !SrcSpan
+                       }
+                  deriving (Eq, Ord, Generic, Show)
+instance Serialise Tick
 
 type STopBinding = TopBinding' SBinder BinderId
 type TopBinding = TopBinding' Binder Binder
