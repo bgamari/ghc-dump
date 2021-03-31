@@ -27,7 +27,6 @@ import GHC.Core.TyCon as TyCon (TyCon, tyConUnique)
 import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
 import GHC.Types.Unique as Unique (Unique, getUnique, unpkUnique)
 import GHC.Driver.Session (unsafeGlobalDynFlags)
-import GHC.Driver.Session (unsafeGlobalDynFlags)
 import qualified GHC.Types.SrcLoc as SrcLoc
 
 #else
