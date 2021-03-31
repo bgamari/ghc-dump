@@ -5,33 +5,39 @@ import Data.Maybe
 import Data.List (sortBy)
 import Data.Monoid
 import Data.Ord
+import System.IO (stdout)
 
 import Options.Applicative
-import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (<>))
-import qualified Text.PrettyPrint.ANSI.Leijen as PP
+import Prettyprinter as PP
+import Prettyprinter.Render.Terminal as PP
+import qualified System.Console.ANSI
 
 import Text.Regex.TDFA
 import Text.Regex.TDFA.Common (Regex)
 import Text.Regex.TDFA.Text ()
 
+import GhcDump.ToHtml
 import GhcDump.Pretty
 import GhcDump.Util
 import GhcDump.Ast
 
-data Column a = Col { colWidth :: Int, colHeader :: String, colGet :: (a -> Doc) }
+data Column a = Col { colWidth :: Int
+                    , colHeader :: String
+                    , colGet :: a -> Doc AnsiStyle
+                    }
 
 type Table a = [Column a]
 
-renderTable :: forall a. Table a -> [a] -> Doc
+renderTable :: forall a. Table a -> [a] -> Doc AnsiStyle
 renderTable cols xs =
-         row (PP.bold . text . colHeader)
+         row (PP.annotate PP.bold . pretty . colHeader)
     <$$> vcat [ row (flip colGet x) | x <- xs ]
   where
-    row :: (Column a -> Doc) -> Doc
+    row :: (Column a -> Doc AnsiStyle) -> Doc AnsiStyle
     row toCell = go cols
       where
-        go :: [Column a] -> Doc
-        go []           = PP.empty
+        go :: [Column a] -> Doc AnsiStyle
+        go []           = mempty
         go [col]        = align $ toCell col
         go (col : rest) = fillBreak (colWidth col) (align $ toCell col) PP.<+> go rest
 
@@ -49,6 +55,14 @@ filterBindings re m =
 
     nameMatches :: Binder -> Bool
     nameMatches b = matchTest re (binderUniqueName b)
+
+renderIOTerm :: PP.LayoutOptions -> Doc AnsiStyle -> IO ()
+renderIOTerm layoutOpts doc = do
+    supportsANSI <- System.Console.ANSI.hSupportsANSI System.IO.stdout
+    let doc' = if supportsANSI
+                 then doc
+                 else PP.unAnnotate doc
+    PP.renderIO stdout $ PP.layoutPretty layoutOpts doc'
 
 modes :: Parser (IO ())
 modes = subparser
@@ -69,6 +83,23 @@ modes = subparser
       where
         makeRegexM' = makeRegexM :: String -> ReadM Regex
 
+    bindingsSort :: Parser (Module -> Module)
+    bindingsSort =
+        option (str >>= readSortField)
+               (long "sort" <> short 's' <> value id
+                <> help "Sort by (accepted values: none, terms, types, coercions, type)")
+      where
+        readSortField "none"      = return $ id
+        readSortField "terms"     = return $ onBinds $ sortBy (flip $ comparing $ csTerms . getStats)
+        readSortField "types"     = return $ onBinds $ sortBy (flip $ comparing $ csTypes . getStats)
+        readSortField "coercions" = return $ onBinds $ sortBy (flip $ comparing $ csCoercions . getStats)
+        readSortField "type"      = return $ onBinds $ sortBy (comparing $ binderType . unBndr . getBinder)
+        readSortField f           = fail $ "unknown sort field "++f
+
+        onBinds :: ([(Binder, CoreStats, Expr)] -> [(Binder, CoreStats, Expr)])
+                -> Module -> Module
+        onBinds f mod = mod { moduleTopBindings = [RecTopBinding $ f $ moduleBindings mod] }
+
     prettyOpts :: Parser PrettyOpts
     prettyOpts =
         PrettyOpts
@@ -78,35 +109,31 @@ modes = subparser
           <*> switch (short 'U' <> long "show-unfoldings" <> help "Show unfolding templates")
 
     showMode =
-        run <$> filterCond <*> prettyOpts <*> dumpFile
+        run <$> filterCond <*> bindingsSort <*> prettyOpts <*> html <*> dumpFile
       where
-        run filterFn opts fname = do
-            dump <- filterFn <$> GhcDump.Util.readDump fname
-            print $ pprModule opts dump
+        html = switch (short 'H' <> long "html" <> help "Render to HTML")
+        run filterFn sortBindings opts html fname = do
+            dump <- sortBindings . filterFn <$> GhcDump.Util.readDump fname
+            if html
+              then writeFile "out.html" $ show $ topBindingsToHtml (moduleTopBindings dump)
+              else renderIOTerm PP.defaultLayoutOptions $ pprModule opts dump
 
     listBindingsMode =
-        run <$> filterCond <*> sortField <*> prettyOpts <*> dumpFile
+        run <$> filterCond <*> bindingsSort <*> prettyOpts <*> dumpFile
       where
-        sortField =
-            option (str >>= readSortField)
-                   (long "sort" <> short 's' <> value id
-                    <> help "Sort by (accepted values: terms, types, coercions, type)")
-          where
-            readSortField "terms"     = return $ sortBy (flip $ comparing $ csTerms . getStats)
-            readSortField "types"     = return $ sortBy (flip $ comparing $ csTypes . getStats)
-            readSortField "coercions" = return $ sortBy (flip $ comparing $ csCoercions . getStats)
-            readSortField "type"      = return $ sortBy (comparing $ binderType . unBndr . getBinder)
-            readSortField f           = fail $ "unknown sort field "++f
-
         run filterFn sortBindings opts fname = do
-            dump <- filterFn <$> GhcDump.Util.readDump fname
-            let table = [ Col 20 "Name"   (pprBinder opts . getBinder)
+            dump <- sortBindings . filterFn <$> GhcDump.Util.readDump fname
+            let table = [ Col 30 "Name"   (pprBinder opts . getBinder)
                         , Col 6  "Terms"  (pretty . csTerms . getStats)
                         , Col 6  "Types"  (pretty . csTypes . getStats)
                         , Col 6  "Coerc." (pretty . csCoercions . getStats)
-                        , Col 300 "Type"  (pprType opts . binderType . unBndr . getBinder)
+                        , Col 3000 "Type"  (pprType opts . binderType . unBndr . getBinder)
                         ]
-            print $ renderTable table (sortBindings $ moduleBindings dump)
+            let layoutOpts = PP.defaultLayoutOptions { layoutPageWidth = Unbounded }
+            renderIOTerm layoutOpts $ vcat
+              [ pretty (modulePhase dump)
+              , renderTable table (moduleBindings dump)
+              ]
 
     summarizeMode =
         run <$> some dumpFile
@@ -116,7 +143,7 @@ modes = subparser
                                        return (fname, mod)) fnames
             let totalSize :: Module -> CoreStats
                 totalSize = foldMap getStats . moduleBindings
-            let table = [ Col 35 "Name" (text . fst)
+            let table = [ Col 35 "Name" (pretty . fst)
                         , Col 8  "Terms" (pretty . csTerms . totalSize . snd)
                         , Col 8  "Types" (pretty . csTypes . totalSize . snd)
                         , Col 8  "Coerc." (pretty . csCoercions . totalSize . snd)

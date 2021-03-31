@@ -1,5 +1,7 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module GhcDump.Ast where
 
 import GHC.Generics
@@ -10,7 +12,11 @@ import qualified Data.ByteString as BS
 import Codec.Serialise
 import qualified Data.Text as T
 
+#if MIN_VERSION_ghc(9,0,0)
+import GHC.Types.Unique (mkUnique)
+#else
 import Unique (mkUnique)
+#endif
 import Prelude
 
 data Unique = Unique !Char !Int
@@ -39,6 +45,10 @@ instance Serialise SBinder
 newtype Binder = Bndr { unBndr :: Binder' Binder Binder }
                deriving (Eq, Ord, Generic, Show)
 instance Serialise Binder
+
+isTyBinder :: Binder -> Bool
+isTyBinder (Bndr (TyBinder{})) = True
+isTyBinder _ = False
 
 binderUniqueName :: Binder -> T.Text
 binderUniqueName (Bndr b) =
@@ -179,6 +189,7 @@ data Expr' bndr var
     | ELam bndr (Expr' bndr var)
     | ELet [(bndr, Expr' bndr var)] (Expr' bndr var)
     | ECase (Expr' bndr var) bndr [Alt' bndr var]
+    | ETick Tick (Expr' bndr var)
     | EType (Type' bndr var)
     | ECoercion
     deriving (Eq, Ord, Generic, Show)
@@ -199,6 +210,22 @@ data AltCon = AltDataCon !T.Text
             | AltDefault
             deriving (Eq, Ord, Generic, Show)
 instance Serialise AltCon
+
+data LineCol = LineCol { row, column :: !Int }
+            deriving (Eq, Ord, Generic, Show)
+instance Serialise LineCol
+
+data SrcSpan = SrcSpan { spanFile  :: !T.Text
+                       , spanStart :: !LineCol
+                       , spanEnd   :: !LineCol
+                       }
+                  deriving (Eq, Ord, Generic, Show)
+instance Serialise SrcSpan
+
+data Tick = SourceNote { sourceTickSpan :: !SrcSpan
+                       }
+                  deriving (Eq, Ord, Generic, Show)
+instance Serialise Tick
 
 type STopBinding = TopBinding' SBinder BinderId
 type TopBinding = TopBinding' Binder Binder

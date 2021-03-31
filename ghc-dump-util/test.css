@@ -1,0 +1,96 @@
+div {
+  word-spacing: 0.8em;
+}
+
+.case {
+  display: block;
+}
+
+.let {
+  display: block;
+}
+
+.tycon {
+  display: inline;
+  color: orange;
+  font-family: mono;
+}
+
+.bind {
+  display: block;
+  padding-bottom: 0.75em;
+  border-left: #ccc solid 1px;
+}
+
+.scrut {
+  display: inline;
+}
+
+.binds {
+  padding-left: 1em;
+}
+
+.bndrs {
+  display: inline;
+}
+
+.mod {
+  display: inline;
+  font-family: mono;
+}
+
+.datacon {
+  display: inline;
+  font-family: mono;
+}
+
+.ext-name {
+  font-family: mono;
+  color: green;
+}
+
+.type {
+  display: inline;
+}
+
+/*
+.app {
+  display: inline;
+}
+*/
+
+.app {
+  display: flex;
+}
+
+.app > * {
+  padding-left: 1em;
+}
+
+.kw {
+  display: inline;
+  color: purple;
+  font-family: mono;
+}
+
+.bndr {
+  display: inline;
+  color: blue;
+  font-family: mono;
+}
+
+.rhs {
+  padding-left: 1em;
+}
+
+.body {
+  padding-left: 1em;
+}
+
+.alts {
+  padding-left: 1em;
+}
+
+.lam {
+  display: inline;
+}

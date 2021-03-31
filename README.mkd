@@ -2,7 +2,7 @@
 
 `ghc-dump` is a library, GHC plugin, and set of tools for recording and
 analysing GHC's Core representation. The plugin is compatible with GHC 7.10
-through 8.10, exporting a consistent (albeit somewhat lossy) representation
+through 9.0, exporting a consistent (albeit somewhat lossy) representation
 across these versions. The AST is encoded as CBOR, which is small and easy to
 deserialise.
 
@@ -10,25 +10,67 @@ deserialise.
 
 The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
 representation of the Core AST to a file after every Core-to-Core pass. To use
-it, first install the `ghc-dump-core` package,
+it on a `cabal` package add the following to the relevant stanza of your cabal
+file (e.g. the `library` stanza in the case of a library):
 ```
-$ cabal install ghc-dump-core
+build-depends: ghc-dump-core
+ghc-options: -fplugin GhcDump.Plugin
 ```
-And then invoke GHC with the `-fplugin GhcDump.Plugin` flag,
+
+Now building the project will produce a number of `.cbor` files in the
+`dist-newstyle` directory, one for each step of GHC's Core-to-Core pipeline.
+
 ```
-$ ghc -fplugin GhcDump.Plugin -dumpdir=dump -O Test.hs
-[1 of 1] Compiling Main             ( Test.hs, Test.o )
-Linking Test ...
-$ cd dump
-$ ls
-Test                 Test.pass-0011.cbor  Test.pass-0017.cbor  Test.pass-0006.cbor
-Test.hi              Test.pass-0012.cbor  Test.pass-0001.cbor  Test.pass-0007.cbor
-Test.hs              Test.pass-0013.cbor  Test.pass-0002.cbor  Test.pass-0008.cbor
-Test.o               Test.pass-0014.cbor  Test.pass-0003.cbor  Test.pass-0009.cbor
-Test.pass-0000.cbor  Test.pass-0015.cbor  Test.pass-0004.cbor
-Test.pass-0010.cbor  Test.pass-0016.cbor  Test.pass-0005.cbor
+$ cabal build
+$ ls **/*.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0000.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0001.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0002.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0003.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0004.cbor
+dist-newstyle/build/x86_64-linux/ghc-8.10.4/aeson-1.5.6.0/build/attoparsec-iso8601/src/Data/Attoparsec/Time/Internal.pass-0005.cbor
+...
 ```
+
 Here we see a `pass-N.cbor` file was produced for each Core-to-Core pass.
+
+We can produce a brief summary of these files using the `summarize` mode of the `ghc-dump`
+CLI tool:
+```
+Name                                Terms    Types    Coerc.   Previous phase
+Data/Attoparsec/Time/Internal.pass-0000.cbor
+                                    124      63       9        desugar
+Data/Attoparsec/Time/Internal.pass-0001.cbor
+                                    138      59       38       Simplifier: Max iterations = 4
+                                                                           SimplMode {Phase = InitialPhase [Gentle],
+                                                                                      inline,
+                                                                                      rules,
+                                                                                      eta-expand,
+                                                                                      no case-of-case}
+Data/Attoparsec/Time/Internal.pass-0002.cbor
+                                    138      59       38       Specialise:
+Data/Attoparsec/Time/Internal.pass-0003.cbor
+                                    142      59       38       Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = False}):
+Data/Attoparsec/Time/Internal.pass-0004.cbor
+                                    118      41       38       Simplifier: Max iterations = 4
+                                                                           SimplMode {Phase = 2 [main],
+                                                                                      inline,
+                                                                                      rules,
+                                                                                      eta-expand,
+                                                                                      case-of-case}
+Data/Attoparsec/Time/Internal.pass-0005.cbor
+                                    112      32       38       Simplifier: Max iterations = 4
+                                                                           SimplMode {Phase = 1 [main],
+                                                                                      inline,
+                                                                                      rules,
+                                                                                      eta-expand,
+                                                                                      case-of-case}
+```
+Here we see for each dump file:
+
+ * the file name
+ * the size of the program measured in terms, types, and coercions
+ * the name of the phase that produced the program
 
 ## Analysis in GHCi
 
