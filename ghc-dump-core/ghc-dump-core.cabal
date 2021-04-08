@@ -1,5 +1,6 @@
+cabal-version:       3.0
 name:                ghc-dump-core
-version:             0.1.1.0
+version:             0.1.2.0
 synopsis:            An AST and compiler plugin for dumping GHC's Core representation.
 description:
   @ghc-dump@ is a library, GHC plugin, and set of tools for recording and
@@ -20,15 +21,21 @@ description:
   command-line. See the [README](https://github.com/bgamari/ghc-dump)
   for further analysis tips.
 
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Ben Gamari
 maintainer:          ben@well-typed.com
 copyright:           (c) 2017 Ben Gamari
 category:            Development
+tested-with:         GHC==7.10.3,
+                     GHC==8.0.2,
+                     GHC==8.2.2,
+                     GHC==8.4.4,
+                     GHC==8.6.5,
+                     GHC==8.8.3,
+                     GHC==8.10.4,
+                     GHC==9.0.1
 build-type:          Simple
-tested-with:         GHC==7.10.3, GHC==8.0.2, GHC==8.2.2, GHC==8.4.4, GHC==8.6.5, GHC==8.8.3, GHC==8.10.1
-cabal-version:       >=1.10
 
 source-repository head
   type: git
