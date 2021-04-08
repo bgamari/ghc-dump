@@ -39,6 +39,7 @@ library
                        GhcDump.Reconstruct,
                        GhcDump.ToHtml
   hs-source-dirs:      src
+  ghc-options:         -Wall
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        bytestring >=0.10 && <0.11,
@@ -52,8 +53,14 @@ library
 
 executable ghc-dump
   main-is:             Main.hs
-  other-modules:       Table, Common, FilterBindings
+  other-modules:       Table,
+                       Common,
+                       FilterBindings,
+                       Modes.Show,
+                       Modes.ListBindings,
+                       Modes.Summarize
   hs-source-dirs:      exe
+  ghc-options:         -Wall
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        ghc-dump-util,
