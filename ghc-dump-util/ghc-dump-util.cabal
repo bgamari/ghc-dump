@@ -46,12 +46,14 @@ library
                        hashable >= 1.2,
                        lucid,
                        text >= 1.0,
-                       prettyprinter,
+                       prettyprinter ^>= 1.7,
                        serialise >=0.2 && <0.3
   default-language:    Haskell2010
 
 executable ghc-dump
   main-is:             Main.hs
+  other-modules:       Table, Common, FilterBindings
+  hs-source-dirs:      exe
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.1 && <0.2,
                        ghc-dump-util,
