@@ -48,7 +48,7 @@ library
     , transformers
   default-language: Haskell2010
 
-executable corediff-exe
+executable ghc-dump-corediff
   main-is: Main.hs
   other-modules:
       Paths_corediff
