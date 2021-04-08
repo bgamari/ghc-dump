@@ -1,3 +1,4 @@
+cabal-version:       3.0
 name:                ghc-dump-util
 version:             0.2.0.0
 synopsis:            Handy tools for working with ghc-dump dumps
@@ -11,15 +12,21 @@ description:
   This package provides the AST and compiler plugin. See the @ghc-dump-util@
   package for a useful command-line tool for working with dumps produced by this
   plugin.
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Ben Gamari
 maintainer:          ben@well-typed.com
 copyright:           (c) 2017 Ben Gamari
 category:            Development
 build-type:          Simple
-tested-with:         GHC==7.10.3, GHC==8.0.2, GHC==8.2.2, GHC==8.4.4, GHC==8.6.5, GHC==8.8.3, GHC==8.10.1
-cabal-version:       >=1.10
+tested-with:         GHC==7.10.3,
+                     GHC==8.0.2,
+                     GHC==8.2.2,
+                     GHC==8.4.4,
+                     GHC==8.6.5,
+                     GHC==8.8.3,
+                     GHC==8.10.4,
+                     GHC==9.0.1
 
 source-repository head
   type: git
