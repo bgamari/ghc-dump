@@ -1,1 +1,1 @@
-packages: ./ghc-dump-core, ./ghc-dump-util
+packages: ./ghc-dump-core, ./ghc-dump-util, ./corediff

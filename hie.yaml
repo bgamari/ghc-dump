@@ -1,0 +1,25 @@
+cradle:
+  cabal:
+    - path: "./corediff/src"
+      component: "lib:corediff"
+
+    - path: "./corediff/app/Main.hs"
+      component: "corediff:exe:ghc-dump-corediff"
+
+    - path: "./corediff/app/Paths_corediff.hs"
+      component: "corediff:exe:ghc-dump-corediff"
+
+    - path: "./ghc-dump-core/./"
+      component: "lib:ghc-dump-core"
+
+    - path: "./ghc-dump-util/src"
+      component: "lib:ghc-dump-util"
+
+    - path: "./ghc-dump-util/exe/Main.hs"
+      component: "ghc-dump-util:exe:ghc-dump"
+
+    - path: "./ghc-dump-util/exe/Table.hs"
+      component: "ghc-dump-util:exe:ghc-dump"
+
+    - path: "./ghc-dump-util/exe/Common.hs"
+      component: "ghc-dump-util:exe:ghc-dump"

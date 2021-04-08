@@ -1,0 +1,2282 @@
+[1 of 1] Compiling T18231           ( T18231.hs, T18231.o )
+
+==================== Desugar (before optimization) ====================
+Result size of Desugar (before optimization)
+  = {terms: 34, types: 39, coercions: 0, joins: 0/1}
+
+Rec {
+-- RHS size: {terms: 3, types: 2, coercions: 0, joins: 0/0}
+$dApplicative_aHR
+  :: Applicative (StateT Int Data.Functor.Identity.Identity)
+[LclId]
+$dApplicative_aHR
+  = Control.Monad.Trans.State.Strict.$fApplicativeStateT
+      @Data.Functor.Identity.Identity @Int $dFunctor_aJ7 $dMonad_aJ8
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$dFunctor_aJ7 :: Functor Data.Functor.Identity.Identity
+[LclId]
+$dFunctor_aJ7 = Data.Functor.Identity.$fFunctorIdentity
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$dMonad_aHZ :: Monad Data.Functor.Identity.Identity
+[LclId]
+$dMonad_aHZ = $dMonad_aJ8
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$dMonad_aJ8 :: Monad Data.Functor.Identity.Identity
+[LclId]
+$dMonad_aJ8 = Data.Functor.Identity.$fMonadIdentity
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$dNum_aIW :: Num Int
+[LclId]
+$dNum_aIW = $dNum_aI4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$dNum_aI4 :: Num Int
+[LclId]
+$dNum_aI4 = GHC.Num.$fNumInt
+
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "T18231"#)
+
+-- RHS size: {terms: 13, types: 19, coercions: 0, joins: 0/1}
+m :: State Int ()
+[LclIdX]
+m = $ @'GHC.Types.LiftedRep
+      @(StateT Int Data.Functor.Identity.Identity ())
+      @(StateT Int Data.Functor.Identity.Identity ())
+      (forever
+         @(StateT Int Data.Functor.Identity.Identity)
+         @()
+         @()
+         $dApplicative_aHR)
+      (modify'
+         @Data.Functor.Identity.Identity
+         @Int
+         $dMonad_aHZ
+         (let {
+            ds_dJN :: Int
+            [LclId]
+            ds_dJN = GHC.Types.I# 1# } in
+          \ (ds_dJM :: Int) -> + @Int $dNum_aI4 ds_dJM ds_dJN))
+end Rec }
+
+
+
+
+==================== Desugar (after optimization) ====================
+Result size of Desugar (after optimization)
+  = {terms: 22, types: 25, coercions: 0, joins: 0/1}
+
+-- RHS size: {terms: 5, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 80 10}]
+T18231.$trModule
+  = GHC.Types.Module
+      (GHC.Types.TrNameS "main"#) (GHC.Types.TrNameS "T18231"#)
+
+-- RHS size: {terms: 15, types: 21, coercions: 0, joins: 0/1}
+m :: State Int ()
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=False, Expandable=False, Guidance=IF_ARGS [] 180 0}]
+m = $ @'GHC.Types.LiftedRep
+      @(StateT Int Data.Functor.Identity.Identity ())
+      @(StateT Int Data.Functor.Identity.Identity ())
+      (forever
+         @(StateT Int Data.Functor.Identity.Identity)
+         @()
+         @()
+         (Control.Monad.Trans.State.Strict.$fApplicativeStateT
+            @Data.Functor.Identity.Identity
+            @Int
+            Data.Functor.Identity.$fFunctorIdentity
+            Data.Functor.Identity.$fMonadIdentity))
+      (modify'
+         @Data.Functor.Identity.Identity
+         @Int
+         Data.Functor.Identity.$fMonadIdentity
+         (let {
+            ds_dJN :: Int
+            [LclId,
+             Unf=Unf{Src=<vanilla>, TopLvl=False, Value=True, ConLike=True,
+                     WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+            ds_dJN = GHC.Types.I# 1# } in
+          \ (ds_dJM :: Int) -> + @Int GHC.Num.$fNumInt ds_dJM ds_dJN))
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = InitialPhase [Gentle],
+             inline,
+             rules,
+             eta-expand,
+             no case-of-case}
+Result size of Simplifier
+  = {terms: 26, types: 16, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Specialise ====================
+Result size of Specialise
+  = {terms: 26, types: 16, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 9, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Levels added: ====================
+<$trModule_sKj,<0,0>>
+<$trModule_sKj,<0,0>> = "main"#
+<$trModule_sKk,<0,0>>
+<$trModule_sKk,<0,0>> = GHC.Types.TrNameS $trModule_sKj
+<$trModule_sKl,<0,0>>
+<$trModule_sKl,<0,0>> = "T18231"#
+<$trModule_sKm,<0,0>>
+<$trModule_sKm,<0,0>> = GHC.Types.TrNameS $trModule_sKl
+<T18231.$trModule,<0,0>>
+<T18231.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_sKk $trModule_sKm
+<a'_sLj,<0,0>>
+<a'_sLj,<0,0>>
+  = \ <eta2_aKN,<1,0>> ->
+      case eta2_aKN of <wild_aL2,<1,2>> { GHC.Types.I# <x_aL3,<1,2>> ->
+      let {
+        <lvl_sLr,F<0,0>>
+        <lvl_sLr,F<0,0>>
+          = \ <x_aL3,<1,0>> ->
+              a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#)) } in
+      lvl_sLr x_aL3
+      };
+<T18231.m,<0,0>>
+<T18231.m,<0,0>> = a'_sLj `cast` <Co:5>
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = False}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = False})
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX, Arity=1, Str=<L,U>b, Cpr=b]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 2 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 1 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = 0 [main],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Called arity analysis ====================
+Result size of Called arity analysis
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ CallArity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-call-arity],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_sLr x_aL3 }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 [Dmd=<B,A>] :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN [Dmd=<B,1*H>] :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLr x_aL3
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Constructed Product Result analysis ====================
+Result size of Constructed Product Result analysis
+  = {terms: 30, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 6, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+lvl_sLr
+  = \ (x_aL3 [Dmd=<B,A>] :: GHC.Prim.Int#) ->
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN [Dmd=<B,1*H>] :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLr x_aL3
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Worker Wrapper binds ====================
+Result size of Worker Wrapper binds
+  = {terms: 38, types: 30, coercions: 5, joins: 0/2}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 10, types: 3, coercions: 0, joins: 0/2}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b]
+$wlvl_sLB
+  = \ (void_0E :: (# #)) ->
+      let {
+        w_sLA [Dmd=<B,A>] :: GHC.Prim.Int#
+        [LclId]
+        w_sLA = 0# } in
+      let {
+        x_aL3 [Dmd=<B,A>] :: GHC.Prim.Int#
+        [LclId]
+        x_aL3 = w_sLA } in
+      a'_sLj (GHC.Types.I# (GHC.Prim.+# x_aL3 1#))
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+lvl_sLr [InlPrag=NOUSERINLINE[2]]
+  :: GHC.Prim.Int# -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,A>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=False)}]
+lvl_sLr
+  = \ (w_sLA [Dmd=<B,A>] :: GHC.Prim.Int#) ->
+      $wlvl_sLB GHC.Prim.void#
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN [Dmd=<B,H>] :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLr x_aL3
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-worker-wrapper],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 28, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 4, types: 1, coercions: 0, joins: 0/0}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+$wlvl_sLB = \ _ [Occ=Dead] -> a'_sLj (GHC.Types.I# 1#)
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      $wlvl_sLB GHC.Prim.(##)
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Exitification transformation ====================
+Result size of Exitification transformation
+  = {terms: 28, types: 22, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 4, types: 1, coercions: 0, joins: 0/0}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+$wlvl_sLB = \ _ [Occ=Dead] -> a'_sLj (GHC.Types.I# 1#)
+
+-- RHS size: {terms: 6, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=NEVER}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      $wlvl_sLB GHC.Prim.(##)
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Levels added: ====================
+<$trModule_sKj,<0,0>>
+<$trModule_sKj,<0,0>> = "main"#
+<$trModule_sKk,<0,0>>
+<$trModule_sKk,<0,0>> = GHC.Types.TrNameS $trModule_sKj
+<$trModule_sKl,<0,0>>
+<$trModule_sKl,<0,0>> = "T18231"#
+<$trModule_sKm,<0,0>>
+<$trModule_sKm,<0,0>> = GHC.Types.TrNameS $trModule_sKl
+<T18231.$trModule,<0,0>>
+<T18231.$trModule,<0,0>>
+  = GHC.Types.Module $trModule_sKk $trModule_sKm
+<$wlvl_sLB,<0,0>>
+<$wlvl_sLB,<0,0>>
+  = \ <void_0E,<1,0>> ->
+      a'_sLj
+        (let {
+           <lvl_sLH,F<0,0>>
+           <lvl_sLH,F<0,0>> = GHC.Types.I# 1# } in
+         lvl_sLH);
+<a'_sLj,<0,0>>
+<a'_sLj,<0,0>>
+  = \ <eta2_aKN,<1,0>> ->
+      case eta2_aKN of <wild_aL2,<1,2>> { GHC.Types.I# <x_aL3,<1,2>> ->
+      let {
+        <lvl_sLI,F<0,0>>
+        <lvl_sLI,F<0,0>> = $wlvl_sLB GHC.Prim.(##) } in
+      lvl_sLI
+      };
+<T18231.m,<0,0>>
+<T18231.m,<0,0>> = a'_sLj `cast` <Co:5>
+
+
+
+==================== Float out(FOS {Lam = Just 0, Consts = True, OverSatApps = True}) ====================
+Result size of Float out(FOS {Lam = Just 0,
+                              Consts = True,
+                              OverSatApps = True})
+  = {terms: 32, types: 27, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLH :: Int
+[LclId]
+lvl_sLH = GHC.Types.I# 1#
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+$wlvl_sLB = \ _ [Occ=Dead] -> a'_sLj lvl_sLH
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI :: Data.Functor.Identity.Identity ((), Int)
+[LclId, Str=b, Cpr=b]
+lvl_sLI = $wlvl_sLB GHC.Prim.(##)
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 32, types: 27, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLH :: Int
+[LclId]
+lvl_sLH = GHC.Types.I# 1#
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+$wlvl_sLB = \ _ [Occ=Dead] -> a'_sLj lvl_sLH
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI :: Data.Functor.Identity.Identity ((), Int)
+[LclId, Str=b, Cpr=b]
+lvl_sLI = $wlvl_sLB GHC.Prim.(##)
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of wild_aL2 [Dmd=<B,A>]
+      { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLI
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Float inwards ====================
+Result size of Float inwards
+  = {terms: 32, types: 27, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLH :: Int
+[LclId]
+lvl_sLH = GHC.Types.I# 1#
+
+-- RHS size: {terms: 3, types: 1, coercions: 0, joins: 0/0}
+$wlvl_sLB [InlPrag=NOUSERINLINE[2]]
+  :: (# #) -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+$wlvl_sLB = \ _ [Occ=Dead] -> a'_sLj lvl_sLH
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI :: Data.Functor.Identity.Identity ((), Int)
+[LclId, Str=b, Cpr=b]
+lvl_sLI = $wlvl_sLB GHC.Prim.(##)
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj [Occ=LoopBreaker]
+  :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of wild_aL2 [Dmd=<B,A>]
+      { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLI
+      }
+end Rec }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [final],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Liberate case ====================
+Result size of Liberate case
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-liberate-case],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== SpecConstr ====================
+Result size of SpecConstr
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId, Str=b, Cpr=b]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-spec-constr],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Common sub-expression ====================
+Result size of Common sub-expression
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId, Str=b, Cpr=b]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId, Arity=1, Str=<L,U>b, Cpr=b]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of wild_aL2 [Dmd=<B,A>]
+      { GHC.Types.I# x_aL3 [Dmd=<B,A>] ->
+      lvl_sLI
+      }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Simplifier ====================
+  Max iterations = 4
+  SimplMode {Phase = FinalPhase [post-final-cse],
+             inline,
+             rules,
+             eta-expand,
+             case-of-case}
+Result size of Simplifier
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<L,U>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Demand analysis ====================
+Result size of Demand analysis
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKj :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+$trModule_sKj = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKk :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKk = GHC.Types.TrNameS $trModule_sKj
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKl :: GHC.Prim.Addr#
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+$trModule_sKl = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+$trModule_sKm :: GHC.Types.TrName
+[LclId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+$trModule_sKm = GHC.Types.TrNameS $trModule_sKl
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[LclIdX,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule = GHC.Types.Module $trModule_sKk $trModule_sKm
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_sLI [Occ=LoopBreaker]
+  :: Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Str=b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=False, ConLike=False,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+lvl_sLI = lvl_sLI
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+a'_sLj :: Int -> Data.Functor.Identity.Identity ((), Int)
+[LclId,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=1,unsat_ok=True,boring_ok=True)}]
+a'_sLj
+  = \ (eta2_aKN [Dmd=<B,1*H>] :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 [Dmd=<B,A>] -> lvl_sLI }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[LclIdX,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = a'_sLj `cast` <Co:5>
+
+
+
+
+==================== Tidy Core ====================
+Result size of Tidy Core
+  = {terms: 24, types: 20, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule4 :: GHC.Prim.Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 20 0}]
+T18231.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule3 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule3 = GHC.Types.TrNameS T18231.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule2 :: GHC.Prim.Addr#
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 30 0}]
+T18231.$trModule2 = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule1 :: GHC.Types.TrName
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule1 = GHC.Types.TrNameS T18231.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[GblId,
+ Unf=Unf{Src=<vanilla>, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True, Guidance=IF_ARGS [] 10 10}]
+T18231.$trModule
+  = GHC.Types.Module T18231.$trModule3 T18231.$trModule1
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_rJn :: Data.Functor.Identity.Identity ((), Int)
+[GblId, Str=b, Cpr=b]
+lvl_rJn = lvl_rJn
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+T18231.m1 :: Int -> Data.Functor.Identity.Identity ((), Int)
+[GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
+T18231.m1
+  = \ (eta2_aKN :: Int) ->
+      case eta2_aKN of { GHC.Types.I# x_aL3 -> lvl_rJn }
+
+-- RHS size: {terms: 1, types: 0, coercions: 5, joins: 0/0}
+m :: State Int ()
+[GblId,
+ Arity=1,
+ Str=<B,1*H>b,
+ Cpr=b,
+ Unf=Unf{Src=InlineStable, TopLvl=True, Value=True, ConLike=True,
+         WorkFree=True, Expandable=True,
+         Guidance=ALWAYS_IF(arity=0,unsat_ok=True,boring_ok=True)}]
+m = T18231.m1 `cast` <Co:5>
+
+
+
+
+==================== CorePrep ====================
+Result size of CorePrep
+  = {terms: 26, types: 21, coercions: 5, joins: 0/0}
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule4 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+T18231.$trModule4 = "main"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule3 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+T18231.$trModule3 = GHC.Types.TrNameS T18231.$trModule4
+
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule2 :: GHC.Prim.Addr#
+[GblId, Unf=OtherCon []]
+T18231.$trModule2 = "T18231"#
+
+-- RHS size: {terms: 2, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule1 :: GHC.Types.TrName
+[GblId, Unf=OtherCon []]
+T18231.$trModule1 = GHC.Types.TrNameS T18231.$trModule2
+
+-- RHS size: {terms: 3, types: 0, coercions: 0, joins: 0/0}
+T18231.$trModule :: GHC.Types.Module
+[GblId, Unf=OtherCon []]
+T18231.$trModule
+  = GHC.Types.Module T18231.$trModule3 T18231.$trModule1
+
+Rec {
+-- RHS size: {terms: 1, types: 0, coercions: 0, joins: 0/0}
+lvl_rJn :: Data.Functor.Identity.Identity ((), GHC.Types.Int)
+[GblId, Str=b, Cpr=b]
+lvl_rJn = lvl_rJn
+end Rec }
+
+-- RHS size: {terms: 5, types: 3, coercions: 0, joins: 0/0}
+T18231.m1
+  :: GHC.Types.Int
+     -> Data.Functor.Identity.Identity ((), GHC.Types.Int)
+[GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
+T18231.m1
+  = \ (eta2_sOe [Occ=Once1!] :: GHC.Types.Int) ->
+      case eta2_sOe of { GHC.Types.I# _ [Occ=Dead] -> lvl_rJn }
+
+-- RHS size: {terms: 3, types: 1, coercions: 5, joins: 0/0}
+T18231.m :: Control.Monad.Trans.State.Strict.State GHC.Types.Int ()
+[GblId, Arity=1, Str=<B,1*H>b, Cpr=b, Unf=OtherCon []]
+T18231.m
+  = (\ (eta_B0 [Occ=Once1] :: GHC.Types.Int) -> T18231.m1 eta_B0)
+    `cast` <Co:5>
+
+
+

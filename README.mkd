@@ -6,6 +6,12 @@ through 9.0, exporting a consistent (albeit somewhat lossy) representation
 across these versions. The AST is encoded as CBOR, which is small and easy to
 deserialise.
 
+`ghc-dump` also includes `ghc-dump-corediff`, a utility for structured diff-ing of
+captured Core implemented by Paul Brinkmeier. The algorithm is described in
+Paul's [master's thesis][thesis].
+
+[thesis]: https://pp.ipd.kit.edu/uploads/publikationen/brinkmeier20bachelorarbeit.pdf
+
 ## Dumping Core from compilation
 
 The GHC plugin `GhcDump.Plugin` provides a Core-to-Core plugin which dumps a
