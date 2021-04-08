@@ -9,6 +9,8 @@ import GhcDump.Ast
 import GhcDump.Util
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Text as T
+import Data.Monoid ((<>))
+import Prelude
 
 topBindingsToHtml :: [TopBinding] -> Html ()
 topBindingsToHtml = foldMap topBindingToHtml

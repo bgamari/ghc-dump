@@ -3,7 +3,6 @@
 import Control.Monad
 import Data.Maybe
 import Data.List (sortBy)
-import Data.Monoid
 import Data.Ord
 import System.IO (stdout)
 
