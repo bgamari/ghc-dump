@@ -2,17 +2,28 @@
 
 module GhcDump.Plugin where
 
-import Data.Maybe
-import qualified Data.ByteString.Lazy as BSL
-import qualified Codec.Serialise as Ser
-import GhcPlugins hiding (TB)
+#if MIN_VERSION_ghc(9,0,0)
+import GHC.Utils.Error (showPass)
+import GHC.Plugins hiding (TB)
+import qualified GHC.Utils.Outputable as Outputable ((<>))
+
+#else
+
 #if !MIN_VERSION_ghc(8,8,0)
 import CoreMonad (pprPassDetails)
 #endif
+import GhcPlugins hiding (TB)
+import qualified GhcPlugins as Outputable ((<>))
 import ErrUtils (showPass)
+#endif
+
+import Data.Maybe
 import Text.Printf
+
 import System.FilePath
 import System.Directory
+import qualified Data.ByteString.Lazy as BSL
+import qualified Codec.Serialise as Ser
 
 import GhcDump.Convert
 
@@ -28,7 +39,7 @@ intersperseDumps :: DynFlags -> [CoreToDo] -> [CoreToDo]
 intersperseDumps dflags = go 0 "desugar"
   where
     go n phase (todo : rest) = pass n phase : todo : go (n+1) phase' rest
-      where phase' = showSDocDump dflags (ppr todo GhcPlugins.<> text ":" <+> pprPassDetails todo)
+      where phase' = showSDocDump dflags (ppr todo Outputable.<> text ":" <+> pprPassDetails todo)
     go n phase [] = [pass n phase]
 
     pass n phase = CoreDoPluginPass "DumpCore" (liftIO . dumpIn dflags n phase)
