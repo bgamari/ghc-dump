@@ -295,10 +295,8 @@ cvtLit l =
           Literal.LitNumInt8 -> Ast.MachInt n
           Literal.LitNumInt16 -> Ast.MachInt n
           Literal.LitNumInt32 -> Ast.MachInt n
-          Literal.LitNumInt32 -> Ast.MachInt n
           Literal.LitNumWord8 -> Ast.MachWord n
           Literal.LitNumWord16 -> Ast.MachWord n
-          Literal.LitNumWord32 -> Ast.MachWord n
           Literal.LitNumWord32 -> Ast.MachWord n
 #endif
 
