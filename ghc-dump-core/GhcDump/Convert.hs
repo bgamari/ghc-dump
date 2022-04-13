@@ -1,5 +1,9 @@
 {-# LANGUAGE CPP #-}
-module GhcDump.Convert where
+{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE NamedFieldPuns #-}
+
+module GhcDump.Convert (cvtModule) where
 
 import Data.Bifunctor
 import qualified Data.Text as T
@@ -26,8 +30,7 @@ import qualified GHC.Core.TyCo.Rep as Type
 import GHC.Core.TyCon as TyCon (TyCon, tyConUnique)
 import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
 import GHC.Types.Unique as Unique (Unique, getUnique, unpkUnique)
-import GHC.Driver.Session (unsafeGlobalDynFlags)
-import GHC.Driver.Session (unsafeGlobalDynFlags)
+import GHC.Driver.Session (DynFlags)
 import qualified GHC.Types.SrcLoc as SrcLoc
 
 #else
@@ -68,15 +71,21 @@ import Type (splitFunTy_maybe)
 import TyCon (TyCon, tyConUnique)
 
 import Outputable (ppr, showSDoc, SDoc)
-import DynFlags (unsafeGlobalDynFlags)
+import DynFlags (DynFlags)
 #endif
 
 import GhcDump.Ast as Ast
 
-cvtSDoc :: SDoc -> T.Text
-cvtSDoc = T.pack . showSDoc unsafeGlobalDynFlags
+import Prelude hiding (span)
 
-fastStringToText :: FastString -> T.Text
+data Env = Env { dflags :: DynFlags }
+
+type HasEnv = (?env :: Env)
+
+cvtSDoc :: HasEnv => SDoc -> T.Text
+cvtSDoc = T.pack . showSDoc (dflags ?env)
+
+fastStringToText :: HasEnv => FastString -> T.Text
 fastStringToText = TE.decodeUtf8
 #if MIN_VERSION_ghc(8,10,0)
   . FastString.bytesFS
@@ -84,7 +93,7 @@ fastStringToText = TE.decodeUtf8
   . FastString.fastStringToByteString
 #endif
 
-occNameToText :: OccName -> T.Text
+occNameToText :: HasEnv => OccName -> T.Text
 occNameToText = fastStringToText . occNameFS
 
 cvtUnique :: Unique.Unique -> Ast.Unique
@@ -95,7 +104,7 @@ cvtUnique u =
 cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . Var.varUnique
 
-cvtBinder :: Var -> SBinder
+cvtBinder :: HasEnv => Var -> SBinder
 cvtBinder v
   | Var.isId v =
     SBndr $ Binder { binderName   = occNameToText $ getOccName v
@@ -110,7 +119,7 @@ cvtBinder v
                      , binderKind   = cvtType $ Var.varType v
                      }
 
-cvtIdInfo :: IdInfo.IdInfo -> Ast.IdInfo SBinder BinderId
+cvtIdInfo :: HasEnv => IdInfo.IdInfo -> Ast.IdInfo SBinder BinderId
 cvtIdInfo i =
     IdInfo { idiArity         = IdInfo.arityInfo i
            , idiIsOneShot     = IdInfo.oneShotInfo i == IdInfo.OneShotLam
@@ -130,7 +139,7 @@ cvtIdInfo i =
            , idiCallArity     = IdInfo.callArityInfo i
            }
 
-cvtUnfolding :: CoreSyn.Unfolding -> Ast.Unfolding SBinder BinderId
+cvtUnfolding :: HasEnv => CoreSyn.Unfolding -> Ast.Unfolding SBinder BinderId
 cvtUnfolding CoreSyn.NoUnfolding = Ast.NoUnfolding
 #if MIN_VERSION_ghc(8,2,0)
 cvtUnfolding CoreSyn.BootUnfolding = Ast.BootUnfolding
@@ -145,7 +154,7 @@ cvtUnfolding u@(CoreSyn.CoreUnfolding{}) =
                       , unfGuidance   = cvtSDoc $ ppr $ CoreSyn.uf_guidance u
                       }
 
-cvtIdDetails :: IdInfo.IdDetails -> Ast.IdDetails
+cvtIdDetails :: HasEnv => IdInfo.IdDetails -> Ast.IdDetails
 cvtIdDetails d =
     case d of
       IdInfo.VanillaId -> Ast.VanillaId
@@ -187,14 +196,14 @@ exprStats = CoreStats.exprStats
 exprStats _ = CoreStats.CS 0 0 0
 #endif
 
-cvtTopBind :: CoreBind -> STopBinding
+cvtTopBind :: HasEnv => CoreBind -> STopBinding
 cvtTopBind (NonRec b e) =
     NonRecTopBinding (cvtBinder b) (cvtCoreStats $ exprStats e) (cvtExpr e)
 cvtTopBind (Rec bs) =
     RecTopBinding $ map to bs
   where to (b, e) = (cvtBinder b, cvtCoreStats $ exprStats e, cvtExpr e)
 
-cvtExpr :: CoreExpr -> Ast.SExpr
+cvtExpr :: HasEnv => CoreExpr -> Ast.SExpr
 cvtExpr expr =
   case expr of
     Var x
@@ -229,15 +238,15 @@ cvtRealSrcSpan span =
               , spanEnd   = LineCol (SrcLoc.srcSpanEndLine span) (SrcLoc.srcSpanEndCol span)
               }
 
-cvtAlt :: CoreAlt -> Ast.SAlt
+cvtAlt :: HasEnv => CoreAlt -> Ast.SAlt
 cvtAlt (con, bs, e) = Alt (cvtAltCon con) (map cvtBinder bs) (cvtExpr e)
 
-cvtAltCon :: CoreSyn.AltCon -> Ast.AltCon
+cvtAltCon :: HasEnv => CoreSyn.AltCon -> Ast.AltCon
 cvtAltCon (DataAlt altcon) = Ast.AltDataCon $ occNameToText $ getOccName altcon
 cvtAltCon (LitAlt l)       = Ast.AltLit $ cvtLit l
 cvtAltCon DEFAULT          = Ast.AltDefault
 
-cvtLit :: Literal -> Ast.Lit
+cvtLit :: HasEnv => Literal -> Ast.Lit
 cvtLit l =
     case l of
 #if MIN_VERSION_ghc(8,8,0)
@@ -277,15 +286,21 @@ cvtLit l =
       Literal.LitInteger x _ -> Ast.LitInteger x
 #endif
 
-cvtModule :: String -> ModGuts -> Ast.SModule
-cvtModule phase guts =
-    Ast.Module name (T.pack phase) (map cvtTopBind $ mg_binds guts)
-  where name = cvtModuleName $ Module.moduleName $ mg_module guts
+cvtModule :: DynFlags -> String -> ModGuts -> Ast.SModule
+cvtModule dflags phase guts =
+    let ?env = Env {dflags}
+    in cvtModule' phase guts
 
-cvtModuleName :: Module.ModuleName -> Ast.ModuleName
+cvtModule' :: HasEnv => String -> ModGuts -> Ast.SModule
+cvtModule' phase guts =
+    Ast.Module name (T.pack phase) (map cvtTopBind $ mg_binds guts)
+  where
+    name = cvtModuleName $ Module.moduleName $ mg_module guts
+
+cvtModuleName :: HasEnv => Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
-cvtType :: Type.Type -> Ast.SType
+cvtType :: HasEnv => Type.Type -> Ast.SType
 #if MIN_VERSION_ghc(9,0,0)
 cvtType (Type.FunTy _flag _ a b) = Ast.FunTy (cvtType a) (cvtType b)
 #elif MIN_VERSION_ghc(8,10,0)
@@ -315,5 +330,5 @@ cvtType (Type.CastTy t _)      = cvtType t
 cvtType (Type.CoercionTy _)    = Ast.CoercionTy
 #endif
 
-cvtTyCon :: TyCon.TyCon -> Ast.TyCon
+cvtTyCon :: HasEnv => TyCon.TyCon -> Ast.TyCon
 cvtTyCon tc = TyCon (occNameToText $ getOccName tc) (cvtUnique $ tyConUnique tc)

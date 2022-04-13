@@ -51,5 +51,5 @@ dumpIn dflags n phase guts = do
     showPass dflags $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
     createDirectoryIfMissing True $ takeDirectory $ in_dump_dir fname
-    BSL.writeFile (in_dump_dir fname) $ Ser.serialise (cvtModule phase guts)
+    BSL.writeFile (in_dump_dir fname) $ Ser.serialise (cvtModule dflags phase guts)
     return guts
