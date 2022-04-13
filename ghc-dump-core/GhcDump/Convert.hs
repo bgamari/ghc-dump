@@ -23,12 +23,19 @@ import qualified GHC.Types.Basic as OccInfo (OccInfo(..), isStrongLoopBreaker)
 import qualified GHC.Core.Stats as CoreStats
 import qualified GHC.Core as CoreSyn
 import GHC.Core (Expr(..), CoreExpr, Bind(..), CoreAlt, CoreBind, AltCon(..))
+#if MIN_VERSION_ghc(9,2,0)
+import GHC.Types.Tickish as CoreSyn (GenTickish(..))
+import GHC.Unit.Module.ModGuts (ModGuts(..))
+import GHC.Utils.Outputable (ppr, SDoc)
+import GHC.Driver.Ppr (showSDoc)
+#else
 import GHC.Driver.Types (ModGuts(..))
+import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
+#endif
 import GHC.Data.FastString (FastString)
 import qualified GHC.Data.FastString as FastString
 import qualified GHC.Core.TyCo.Rep as Type
 import GHC.Core.TyCon as TyCon (TyCon, tyConUnique)
-import GHC.Utils.Outputable (ppr, showSDoc, SDoc)
 import GHC.Types.Unique as Unique (Unique, getUnique, unpkUnique)
 import GHC.Driver.Session (DynFlags)
 import qualified GHC.Types.SrcLoc as SrcLoc
@@ -239,7 +246,12 @@ cvtRealSrcSpan span =
               }
 
 cvtAlt :: HasEnv => CoreAlt -> Ast.SAlt
-cvtAlt (con, bs, e) = Alt (cvtAltCon con) (map cvtBinder bs) (cvtExpr e)
+#if MIN_VERSION_ghc(9,2,0)
+cvtAlt (CoreSyn.Alt con bs e) =
+#else
+cvtAlt (con, bs, e) =
+#endif
+    Alt (cvtAltCon con) (map cvtBinder bs) (cvtExpr e)
 
 cvtAltCon :: HasEnv => CoreSyn.AltCon -> Ast.AltCon
 cvtAltCon (DataAlt altcon) = Ast.AltDataCon $ occNameToText $ getOccName altcon
@@ -256,7 +268,7 @@ cvtLit l =
       Literal.LitFloat x -> Ast.MachFloat x
       Literal.LitDouble x -> Ast.MachDouble x
       Literal.LitLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
-      Literal.LitRubbish -> Ast.LitRubbish
+      Literal.LitRubbish{} -> Ast.LitRubbish
 #else
       Literal.MachChar x -> Ast.MachChar x
       Literal.MachStr x -> Ast.MachStr x
@@ -278,6 +290,18 @@ cvtLit l =
           Literal.LitNumWord64 -> Ast.MachWord64 n
           Literal.LitNumInteger -> Ast.LitInteger n
           Literal.LitNumNatural -> Ast.LitNatural n
+#if MIN_VERSION_ghc(9,2,0)
+          -- Lossy
+          Literal.LitNumInt8 -> Ast.MachInt n
+          Literal.LitNumInt16 -> Ast.MachInt n
+          Literal.LitNumInt32 -> Ast.MachInt n
+          Literal.LitNumInt32 -> Ast.MachInt n
+          Literal.LitNumWord8 -> Ast.MachWord n
+          Literal.LitNumWord16 -> Ast.MachWord n
+          Literal.LitNumWord32 -> Ast.MachWord n
+          Literal.LitNumWord32 -> Ast.MachWord n
+#endif
+
 #else
       Literal.MachInt x -> Ast.MachInt x
       Literal.MachInt64 x -> Ast.MachInt64 x
