@@ -9,7 +9,9 @@ import GHC.Generics
 import Data.Monoid hiding ((<>))
 import Data.Semigroup as Sem
 import qualified Data.ByteString as BS
-import Codec.Serialise
+import qualified Data.ByteString.Lazy as BSL
+import qualified Codec.Compression.Zstd.Lazy as Zstd
+import Codec.Serialise as Ser
 import qualified Data.Text as T
 
 #if MIN_VERSION_ghc(9,0,0)
@@ -257,6 +259,14 @@ instance Sem.Semigroup CoreStats where
 instance Monoid CoreStats where
     mempty = CoreStats 0 0 0 0 0
     mappend = (<>)
+
+writeSModule :: FilePath -> SModule -> IO ()
+writeSModule fname = do
+    BSL.writeFile fname . Zstd.compress 2 . Ser.serialise
+
+readSModule :: FilePath -> IO SModule
+readSModule fname = do
+    Ser.deserialise . Zstd.decompress <$> BSL.readFile fname
 
 {-
 data Rule' bndr var

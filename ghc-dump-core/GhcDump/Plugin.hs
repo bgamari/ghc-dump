@@ -26,9 +26,8 @@ import Text.Printf
 
 import System.FilePath
 import System.Directory
-import qualified Data.ByteString.Lazy as BSL
-import qualified Codec.Serialise as Ser
 
+import GhcDump.Ast (writeSModule)
 import GhcDump.Convert
 
 plugin :: Plugin
@@ -69,9 +68,9 @@ showPass' s = do
 dumpIn :: DynFlags -> Int -> String -> ModGuts -> CoreM ModGuts
 dumpIn dflags n phase guts = do
     let prefix = fromMaybe "dump" $ dumpPrefix dflags
-        fname = printf "%spass-%04u.cbor" prefix n
+        fname = printf "%spass-%04u.cbor.zstd" prefix n
     showPass' $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
     liftIO $ createDirectoryIfMissing True $ takeDirectory $ in_dump_dir fname
-    liftIO $ BSL.writeFile (in_dump_dir fname) $ Ser.serialise (cvtModule dflags phase guts)
+    liftIO $ writeSModule (in_dump_dir fname) (cvtModule dflags phase guts)
     return guts
