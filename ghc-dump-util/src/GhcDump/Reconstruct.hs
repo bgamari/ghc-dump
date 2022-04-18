@@ -55,7 +55,7 @@ reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
 reconExpr bm (ELam b x)       = let b' = reconBinder bm b
                                     bm' = insertBinder b' bm
                                 in ELam b' (reconExpr bm' x)
-reconExpr bm (ELet bs x)      = let bs' = map (bimap (reconBinder bm) (reconExpr bm')) bs
+reconExpr bm (ELet bs x)      = let bs' = map (bimap (reconBinder bm') (reconExpr bm')) bs
                                     bm' = insertBinders (map fst bs') bm
                                 in ELet bs' (reconExpr bm' x)
 reconExpr bm (ECase x b alts) = let b' = reconBinder bm b
