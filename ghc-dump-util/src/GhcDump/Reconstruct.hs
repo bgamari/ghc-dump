@@ -44,9 +44,13 @@ reconModule m = Module (moduleName m) (modulePhase m) binds
     reconTopBinding (RecTopBinding bs) = RecTopBinding bs'
       where bs' = map (\(a,stats,rhs) -> (reconBinder bm a, stats, reconExpr bm rhs)) bs
 
+reconExternalName :: BinderMap -> SExternalName -> ExternalName
+reconExternalName bm (ExternalName {..}) = ExternalName { externalType = reconType bm externalType, ..}
+reconExternalName bm ForeignCall         = ForeignCall
+
 reconExpr :: BinderMap -> SExpr -> Expr
 reconExpr bm (EVar var)       = EVar $ getBinder bm var
-reconExpr _  (EVarGlobal n)   = EVarGlobal n
+reconExpr bm  (EVarGlobal n)  = EVarGlobal (reconExternalName bm n)
 reconExpr _  (ELit l)         = ELit l
 reconExpr bm (EApp x y)       = EApp (reconExpr bm x) (reconExpr bm y)
 reconExpr bm (ETyLam b x)     = let b' = reconBinder bm b
