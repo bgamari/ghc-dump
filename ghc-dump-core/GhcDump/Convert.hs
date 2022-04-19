@@ -221,6 +221,7 @@ cvtExpr expr =
                       -> EVarGlobal $ ExternalName (cvtModuleName $ Module.moduleName m)
                                                    (occNameToText $ getOccName x)
                                                    (cvtUnique $ getUnique x)
+                                                   (cvtType $ Var.varType x)
       | otherwise     -> EVar (cvtVar x)
     Lit l             -> ELit (cvtLit l)
     App x y           -> EApp (cvtExpr x) (cvtExpr y)

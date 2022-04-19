@@ -105,7 +105,7 @@ moduleNameToHtml m =
   divClass "mod" $ toHtml $ getModuleName m
 
 externalNameToHtml :: ExternalName -> Html ()
-externalNameToHtml (ExternalName mod nam _) =
+externalNameToHtml (ExternalName mod nam _ _) =
   divClass "ext-name" $ moduleNameToHtml mod <> "." <> toHtml nam
 externalNameToHtml (ForeignCall) =
   "$foreign-call"

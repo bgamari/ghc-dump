@@ -27,13 +27,18 @@ instance Serialise Unique
 instance Show Unique where
     show (Unique c n) = show $ mkUnique c n
 
-data ExternalName = ExternalName { externalModuleName :: !ModuleName
-                                 , externalName :: !T.Text
-                                 , externalUnique :: !Unique
-                                 }
+data ExternalName' bndr var = ExternalName { externalModuleName :: !ModuleName
+                                           , externalName :: !T.Text
+                                           , externalUnique :: !Unique
+                                           , externalType :: Type' bndr var
+                                           }
                   | ForeignCall
                   deriving (Eq, Ord, Generic, Show)
-instance Serialise ExternalName
+
+type SExternalName = ExternalName' SBinder BinderId 
+type ExternalName = ExternalName' Binder Binder
+
+instance (Serialise bndr, Serialise var) => Serialise (ExternalName' bndr var)
 
 newtype BinderId = BinderId Unique
                  deriving (Eq, Ord, Serialise, Show)
@@ -182,7 +187,7 @@ type Expr = Expr' Binder Binder
 
 data Expr' bndr var
     = EVar var
-    | EVarGlobal ExternalName
+    | EVarGlobal (ExternalName' bndr var)
     | ELit Lit
     | EApp (Expr' bndr var) (Expr' bndr var)
     | ETyLam bndr (Expr' bndr var)
