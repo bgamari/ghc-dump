@@ -1,6 +1,6 @@
 module GhcDump.Util
     ( -- * Convenient IO
-      readDump, readDump'
+      readDump
       -- * Manipulating 'Type's
     , splitFunTys
     , splitForAlls
@@ -18,11 +18,8 @@ import qualified Codec.Serialise as Ser
 import GhcDump.Ast
 import GhcDump.Reconstruct
 
-readDump' :: FilePath -> IO SModule
-readDump' fname = Ser.deserialise <$> BSL.readFile fname
-
 readDump :: FilePath -> IO Module
-readDump fname = reconModule <$> readDump' fname
+readDump fname = reconModule <$> readSModule fname
 
 splitFunTys :: Type' bndr var -> [Type' bndr var]
 splitFunTys = go []
