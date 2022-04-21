@@ -309,14 +309,14 @@ cvtLit l =
       Literal.LitInteger x _ -> Ast.LitInteger x
 #endif
 
-cvtModule :: DynFlags -> String -> ModGuts -> Ast.SModule
-cvtModule dflags phase guts =
+cvtModule :: DynFlags -> Int -> String -> ModGuts -> Ast.SModule
+cvtModule dflags phaseId phase guts =
     let ?env = Env {dflags}
-    in cvtModule' phase guts
+    in cvtModule' phaseId phase guts
 
-cvtModule' :: HasEnv => String -> ModGuts -> Ast.SModule
-cvtModule' phase guts =
-    Ast.Module name (T.pack phase) (map cvtTopBind $ mg_binds guts)
+cvtModule' :: HasEnv => Int -> String -> ModGuts -> Ast.SModule
+cvtModule' phaseId phase guts =
+    Ast.Module name (T.pack phase) phaseId (map cvtTopBind $ mg_binds guts)
   where
     name = cvtModuleName $ Module.moduleName $ mg_module guts
 
