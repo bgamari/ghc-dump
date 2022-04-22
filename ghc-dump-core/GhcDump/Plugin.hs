@@ -72,5 +72,5 @@ dumpIn dflags n phase guts = do
     showPass' $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
     liftIO $ createDirectoryIfMissing True $ takeDirectory $ in_dump_dir fname
-    liftIO $ writeSModule (in_dump_dir fname) (cvtModule dflags phase guts)
+    liftIO $ writeSModule (in_dump_dir fname) (cvtModule dflags n phase guts)
     return guts

@@ -166,6 +166,7 @@ type SModule = Module' SBinder BinderId
 data Module' bndr var
     = Module { moduleName        :: ModuleName
              , modulePhase       :: T.Text
+             , modulePhaseId     :: Int
              , moduleTopBindings :: [TopBinding' bndr var]
              }
     deriving (Generic, Show)
