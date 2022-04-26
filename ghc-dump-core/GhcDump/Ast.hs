@@ -67,6 +67,7 @@ data Binder' bndr var = Binder { binderName   :: !T.Text
                                , binderIdInfo :: IdInfo bndr var
                                , binderIdDetails :: IdDetails
                                , binderType   :: Type' bndr var
+                               , binderSrcSpan :: SrcSpan
                                }
                       | TyBinder { binderName :: !T.Text
                                  , binderId   :: !BinderId
@@ -227,6 +228,7 @@ data SrcSpan = SrcSpan { spanFile  :: !T.Text
                        , spanStart :: !LineCol
                        , spanEnd   :: !LineCol
                        }
+            | NoSpan
                   deriving (Eq, Ord, Generic, Show)
 instance Serialise SrcSpan
 

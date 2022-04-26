@@ -17,7 +17,7 @@ import qualified GHC.Types.Var as Var
 import GHC.Types.Id (isFCallId)
 import GHC.Unit.Module as Module (moduleName)
 import GHC.Unit.Module.Name as Module (ModuleName, moduleNameFS)
-import GHC.Types.Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
+import GHC.Types.Name (getOccName, occNameFS, OccName, getName, nameModule_maybe, getSrcSpan)
 import qualified GHC.Types.Id.Info as IdInfo
 import qualified GHC.Types.Basic as OccInfo (OccInfo(..), isStrongLoopBreaker)
 import qualified GHC.Core.Stats as CoreStats
@@ -51,7 +51,7 @@ import qualified Var
 import Id (isFCallId)
 import Module (ModuleName, moduleNameFS, moduleName)
 import Unique (Unique, getUnique, unpkUnique)
-import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe)
+import Name (getOccName, occNameFS, OccName, getName, nameModule_maybe, getSrcSpan)
 import qualified SrcLoc
 import qualified IdInfo
 import qualified BasicTypes as OccInfo (OccInfo(..), isStrongLoopBreaker)
@@ -119,6 +119,7 @@ cvtBinder v
                    , binderIdInfo = cvtIdInfo $ Var.idInfo v
                    , binderIdDetails = cvtIdDetails $ Var.idDetails v
                    , binderType   = cvtType $ Var.varType v
+                   , binderSrcSpan = cvtSrcSpan $ varSrcSpan v
                    }
   | otherwise =
     SBndr $ TyBinder { binderName   = occNameToText $ getOccName v
@@ -203,12 +204,20 @@ exprStats = CoreStats.exprStats
 exprStats _ = CoreStats.CS 0 0 0
 #endif
 
+varSrcSpan :: Var -> SrcLoc.SrcSpan
+#if MIN_VERSION_ghc(8,6,0)
+varSrcSpan x = getSrcSpan x
+#else
+varSrcSpan _ = SrcLoc.mkGeneralSrcSpan (FastString.mkFastString "SrcSpan not available in GHC version")
+#endif
+
+
 cvtTopBind :: HasEnv => CoreBind -> STopBinding
 cvtTopBind (NonRec b e) =
     NonRecTopBinding (cvtBinder b) (cvtCoreStats $ exprStats e) (cvtExpr e)
 cvtTopBind (Rec bs) =
     RecTopBinding $ map to bs
-  where to (b, e) = (cvtBinder b, cvtCoreStats $ exprStats e, cvtExpr e)
+  where to (b, e) = (cvtBinder b, cvtCoreStats (exprStats e), cvtExpr e)
 
 cvtExpr :: HasEnv => CoreExpr -> Ast.SExpr
 cvtExpr expr =
@@ -245,6 +254,15 @@ cvtRealSrcSpan span =
               , spanStart = LineCol (SrcLoc.srcSpanStartLine span) (SrcLoc.srcSpanStartCol span)
               , spanEnd   = LineCol (SrcLoc.srcSpanEndLine span) (SrcLoc.srcSpanEndCol span)
               }
+
+cvtSrcSpan :: SrcLoc.SrcSpan -> SrcSpan
+#if MIN_VERSION_ghc(9,0,0)
+cvtSrcSpan (SrcLoc.RealSrcSpan r _) = cvtRealSrcSpan r
+#else
+cvtSrcSpan (SrcLoc.RealSrcSpan r) = cvtRealSrcSpan r
+#endif
+cvtSrcSpan (SrcLoc.UnhelpfulSpan _) = NoSpan
+
 
 cvtAlt :: HasEnv => CoreAlt -> Ast.SAlt
 #if MIN_VERSION_ghc(9,2,0)
