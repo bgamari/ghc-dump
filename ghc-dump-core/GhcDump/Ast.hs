@@ -144,6 +144,12 @@ data TyCon = TyCon !T.Text !Unique
            deriving (Eq, Ord, Generic, Show)
 instance Serialise TyCon
 
+data TyLit = NumTyLit Int
+           | StrTyLit T.Text
+           | CharTyLit Char
+            deriving (Eq, Ord, Generic, Show)
+instance Serialise TyLit
+
 type SType = Type' SBinder BinderId
 type Type = Type' Binder Binder
 
@@ -153,7 +159,7 @@ data Type' bndr var
     | TyConApp TyCon [Type' bndr var]
     | AppTy (Type' bndr var) (Type' bndr var)
     | ForAllTy bndr (Type' bndr var)
-    | LitTy
+    | LitTy TyLit
     | CoercionTy
     deriving (Eq, Ord, Generic, Show)
 instance (Serialise bndr, Serialise var) => Serialise (Type' bndr var)
@@ -276,13 +282,3 @@ readSModule :: FilePath -> IO SModule
 readSModule fname = do
     Ser.deserialise . Zstd.decompress <$> BSL.readFile fname
 
-{-
-data Rule' bndr var
-    = Rule { ruleName :: T.Text
-           , ruleActivation :: Activation
-           , ruleFn :: Name
-           , ruleBinders :: [bndr]
-           , ruleRHS :: Expr' bndr var
-           , ruleAuto :: Bool
-           }
--}

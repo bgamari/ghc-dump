@@ -8,6 +8,7 @@ module GhcDump.Convert (cvtModule) where
 import Data.Bifunctor
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
+import GHC.Data.FastString (unpackFS)
 
 #if MIN_VERSION_ghc(9,0,0)
 import GHC.Types.Literal (Literal(..))
@@ -341,6 +342,11 @@ cvtModule' phaseId phase guts =
 cvtModuleName :: HasEnv => Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
+cvtTyLit :: HasEnv => Type.TyLit -> Ast.TyLit
+cvtTyLit (Type.NumTyLit n) = (Ast.NumTyLit (fromIntegral n))
+cvtTyLit (Type.StrTyLit s) = (Ast.StrTyLit (T.pack (unpackFS s)))
+cvtTyLit (Type.CharTyLit c) = (Ast.CharTyLit c)
+
 cvtType :: HasEnv => Type.Type -> Ast.SType
 #if MIN_VERSION_ghc(9,0,0)
 cvtType (Type.FunTy _flag _ a b) = Ast.FunTy (cvtType a) (cvtType b)
@@ -365,7 +371,7 @@ cvtType (Type.ForAllTy (Anon _) t)    = cvtType t
 #else
 cvtType (Type.ForAllTy b t)    = Ast.ForAllTy (cvtBinder b) (cvtType t)
 #endif
-cvtType (Type.LitTy _)         = Ast.LitTy
+cvtType (Type.LitTy tylit)         = Ast.LitTy (cvtTyLit tylit)
 #if MIN_VERSION_ghc(8,0,0)
 cvtType (Type.CastTy t _)      = cvtType t
 cvtType (Type.CoercionTy _)    = Ast.CoercionTy

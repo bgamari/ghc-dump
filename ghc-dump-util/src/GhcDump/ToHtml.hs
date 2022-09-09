@@ -136,7 +136,7 @@ typeToHtml t@(ForAllTy _ _)
     bndrsToHtml bndrs
     ". "
     typeToHtml t
-typeToHtml (LitTy) = "LIT"
+typeToHtml (LitTy litty) = "LIT"
 typeToHtml (CoercionTy) = "COERCION"
 
 tyConToHtml :: TyCon -> Html ()

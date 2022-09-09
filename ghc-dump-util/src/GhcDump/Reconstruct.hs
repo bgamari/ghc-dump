@@ -107,5 +107,5 @@ reconType bm (AppTy x y) = AppTy (reconType bm x) (reconType bm y)
 reconType bm (ForAllTy b x) = let b' = reconBinder bm b
                                   bm' = insertBinder b' bm
                               in ForAllTy b' (reconType bm' x)
-reconType _  LitTy = LitTy
+reconType _  (LitTy litty) = LitTy litty
 reconType _  CoercionTy = CoercionTy

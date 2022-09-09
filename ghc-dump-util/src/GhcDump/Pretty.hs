@@ -142,7 +142,7 @@ pprType' opts p (AppTy a b)       = maybeParens (p >= TyConPrec) $ pprType' opts
 pprType' opts p t@(ForAllTy _ _)  = let (bs, t') = splitForAlls t
                                     in maybeParens (p >= TyOpPrec)
                                        $ "forall" <+> hsep (map (pprBinder opts) bs) <> "." <+> pprType opts t'
-pprType' opts _ LitTy             = "LIT"
+pprType' opts _ (LitTy _)         = "LIT"
 pprType' opts _ CoercionTy        = "Co"
 
 maybeParens :: Bool -> Doc ann -> Doc ann
