@@ -8,7 +8,6 @@ module GhcDump.Convert (cvtModule) where
 import Data.Bifunctor
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
-import GHC.Data.FastString (unpackFS)
 
 #if MIN_VERSION_ghc(9,0,0)
 import GHC.Types.Literal (Literal(..))
@@ -342,10 +341,17 @@ cvtModule' phaseId phase guts =
 cvtModuleName :: HasEnv => Module.ModuleName -> Ast.ModuleName
 cvtModuleName = Ast.ModuleName . fastStringToText . moduleNameFS
 
+#if MIN_VERSION_ghc(9,0,0)
 cvtTyLit :: HasEnv => Type.TyLit -> Ast.TyLit
 cvtTyLit (Type.NumTyLit n) = (Ast.NumTyLit (fromIntegral n))
-cvtTyLit (Type.StrTyLit s) = (Ast.StrTyLit (T.pack (unpackFS s)))
+cvtTyLit (Type.StrTyLit s) = (Ast.StrTyLit (T.pack (FastString.unpackFS s)))
+#if MIN_VERSION_ghc(9,2,0)
 cvtTyLit (Type.CharTyLit c) = (Ast.CharTyLit c)
+#endif
+#else
+cvtTyLit :: HasEnv => a -> Ast.TyLit
+cvtTyLit _ = Ast.UnknownLit
+#endif
 
 cvtType :: HasEnv => Type.Type -> Ast.SType
 #if MIN_VERSION_ghc(9,0,0)

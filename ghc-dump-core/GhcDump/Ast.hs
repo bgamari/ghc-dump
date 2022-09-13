@@ -147,6 +147,9 @@ instance Serialise TyCon
 data TyLit = NumTyLit Int
            | StrTyLit T.Text
            | CharTyLit Char
+           -- TyLit did not always exist, we weaken the definition 
+           -- with this constructor for backwards compatibility.
+           | UnknownLit
             deriving (Eq, Ord, Generic, Show)
 instance Serialise TyLit
 
