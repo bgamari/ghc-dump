@@ -20,14 +20,15 @@ import GHC.Types.Unique (mkUnique)
 import Unique (mkUnique)
 #endif
 import Prelude
+import Data.Word (Word64)
 
-data Unique = Unique !Char !Int
+data Unique = Unique !Char !Word64
             deriving (Eq, Ord, Generic)
 instance Serialise Unique
 
 -- | This is dependent upon GHC
 instance Show Unique where
-    show (Unique c n) = show $ mkUnique c n
+    show (Unique c n) = show $ mkUnique c (fromIntegral n)
 
 data ExternalName' bndr var = ExternalName { externalModuleName :: !ModuleName
                                            , externalName :: !T.Text
@@ -37,7 +38,7 @@ data ExternalName' bndr var = ExternalName { externalModuleName :: !ModuleName
                   | ForeignCall
                   deriving (Eq, Ord, Generic, Show)
 
-type SExternalName = ExternalName' SBinder BinderId 
+type SExternalName = ExternalName' SBinder BinderId
 type ExternalName = ExternalName' Binder Binder
 
 instance (Serialise bndr, Serialise var) => Serialise (ExternalName' bndr var)

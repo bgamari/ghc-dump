@@ -110,7 +110,7 @@ occNameToText = fastStringToText . occNameFS
 cvtUnique :: Unique.Unique -> Ast.Unique
 cvtUnique u =
     let (a,b) = unpkUnique u
-    in Ast.Unique a b
+    in Ast.Unique a (fromIntegral b)
 
 cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . Var.varUnique
@@ -192,6 +192,9 @@ cvtIdDetails d =
       IdInfo.FCallId{} -> error "This shouldn't happen"
       IdInfo.TickBoxOpId{} -> Ast.TickBoxOpId
       IdInfo.DFunId{} -> Ast.DFunId
+#if MIN_VERSION_ghc(9,10,0)
+      IdInfo.RepPolyId{} -> Ast.VanillaId
+#endif
 #if MIN_VERSION_ghc(8,0,0)
       IdInfo.CoVarId{} -> Ast.CoVarId
 #endif
