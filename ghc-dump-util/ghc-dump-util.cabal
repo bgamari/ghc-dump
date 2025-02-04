@@ -19,8 +19,7 @@ maintainer:          ben@well-typed.com
 copyright:           (c) 2017 Ben Gamari
 category:            Development
 build-type:          Simple
-tested-with:         GHC==7.10.3,
-                     GHC==8.0.2,
+tested-with:         GHC==8.0.2,
                      GHC==8.2.2,
                      GHC==8.4.4,
                      GHC==8.6.5,
@@ -28,6 +27,11 @@ tested-with:         GHC==7.10.3,
                      GHC==8.10.4,
                      GHC==9.0.1,
                      GHC==9.2.1,
+                     GHC==9.4.8,
+                     GHC==9.6.6,
+                     GHC==9.8.4,
+                     GHC==9.10.1,
+                     GHC==9.12.1
 
 source-repository head
   type: git
