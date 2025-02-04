@@ -16,7 +16,11 @@ import GHC.Types.Var (Var(..))
 import qualified GHC.Types.Var as Var
 import GHC.Types.Id (isFCallId)
 import GHC.Unit.Module as Module (moduleName)
+#if MIN_VERSION_ghc(9,6,0)
+import Language.Haskell.Syntax.Module.Name as Module (ModuleName, moduleNameFS)
+#else
 import GHC.Unit.Module.Name as Module (ModuleName, moduleNameFS)
+#endif
 import GHC.Types.Name (getOccName, occNameFS, OccName, getName, nameModule_maybe, getSrcSpan)
 import qualified GHC.Types.Id.Info as IdInfo
 import qualified GHC.Types.Basic as OccInfo (OccInfo(..), isStrongLoopBreaker)
@@ -106,7 +110,7 @@ occNameToText = fastStringToText . occNameFS
 cvtUnique :: Unique.Unique -> Ast.Unique
 cvtUnique u =
     let (a,b) = unpkUnique u
-    in Ast.Unique a b
+    in Ast.Unique a (fromIntegral b)
 
 cvtVar :: Var -> BinderId
 cvtVar = BinderId . cvtUnique . Var.varUnique
@@ -142,7 +146,11 @@ cvtIdInfo i =
                                   OccInfo.IAmDead    -> OccDead
                                   OccInfo.OneOcc{}   -> OccOneOcc
                                   oi@OccInfo.IAmALoopBreaker{} -> OccLoopBreaker (OccInfo.isStrongLoopBreaker oi)
+#if MIN_VERSION_ghc(9,4,0)
+           , idiStrictnessSig = cvtSDoc $ ppr $ IdInfo.dmdSigInfo i
+#else
            , idiStrictnessSig = cvtSDoc $ ppr $ IdInfo.strictnessInfo i
+#endif
            , idiDemandSig     = cvtSDoc $ ppr $ IdInfo.demandInfo i
            , idiCallArity     = IdInfo.callArityInfo i
            }
@@ -154,6 +162,15 @@ cvtUnfolding CoreSyn.BootUnfolding = Ast.BootUnfolding
 #endif
 cvtUnfolding (CoreSyn.OtherCon cons) = Ast.OtherCon (map cvtAltCon cons)
 cvtUnfolding (CoreSyn.DFunUnfolding{}) = Ast.DFunUnfolding
+#if MIN_VERSION_ghc(9,6,0)
+cvtUnfolding (CoreSyn.CoreUnfolding{ CoreSyn.uf_tmpl = tmpl, CoreSyn.uf_guidance = guidance, CoreSyn.uf_cache = u}) =
+    Ast.CoreUnfolding { unfTemplate   = cvtExpr $ tmpl
+                      , unfIsValue    = CoreSyn.uf_is_value u
+                      , unfIsConLike  = CoreSyn.uf_is_conlike u
+                      , unfIsWorkFree = CoreSyn.uf_is_work_free u
+                      , unfGuidance   = cvtSDoc $ ppr guidance
+                      }
+#else
 cvtUnfolding u@(CoreSyn.CoreUnfolding{}) =
     Ast.CoreUnfolding { unfTemplate   = cvtExpr $ CoreSyn.uf_tmpl u
                       , unfIsValue    = CoreSyn.uf_is_value u
@@ -161,6 +178,7 @@ cvtUnfolding u@(CoreSyn.CoreUnfolding{}) =
                       , unfIsWorkFree = CoreSyn.uf_is_work_free u
                       , unfGuidance   = cvtSDoc $ ppr $ CoreSyn.uf_guidance u
                       }
+#endif
 
 cvtIdDetails :: HasEnv => IdInfo.IdDetails -> Ast.IdDetails
 cvtIdDetails d =
@@ -174,10 +192,16 @@ cvtIdDetails d =
       IdInfo.FCallId{} -> error "This shouldn't happen"
       IdInfo.TickBoxOpId{} -> Ast.TickBoxOpId
       IdInfo.DFunId{} -> Ast.DFunId
+#if MIN_VERSION_ghc(9,10,0)
+      IdInfo.RepPolyId{} -> Ast.VanillaId
+#endif
 #if MIN_VERSION_ghc(8,0,0)
       IdInfo.CoVarId{} -> Ast.CoVarId
 #endif
-#if MIN_VERSION_ghc(8,2,0)
+#if MIN_VERSION_ghc(9,4,0)
+      IdInfo.WorkerLikeId _ -> Ast.VanillaId
+      IdInfo.JoinId n _ -> Ast.JoinId n
+#elif MIN_VERSION_ghc(8,2,0)
       IdInfo.JoinId n -> Ast.JoinId n
 #endif
 
@@ -286,7 +310,11 @@ cvtLit l =
       Literal.LitNullAddr -> Ast.MachNullAddr
       Literal.LitFloat x -> Ast.MachFloat x
       Literal.LitDouble x -> Ast.MachDouble x
+#if MIN_VERSION_ghc(9,12,0)
+      Literal.LitLabel x _ -> Ast.MachLabel $ fastStringToText  x
+#else
       Literal.LitLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
+#endif
       Literal.LitRubbish{} -> Ast.LitRubbish
 #else
       Literal.MachChar x -> Ast.MachChar x
@@ -307,8 +335,12 @@ cvtLit l =
           Literal.LitNumInt64 -> Ast.MachInt64 n
           Literal.LitNumWord -> Ast.MachWord n
           Literal.LitNumWord64 -> Ast.MachWord64 n
+#if MIN_VERSION_ghc(9,4,0)
+          Literal.LitNumBigNat  -> Ast.LitNatural n
+#else
           Literal.LitNumInteger -> Ast.LitInteger n
           Literal.LitNumNatural -> Ast.LitNatural n
+#endif
 #if MIN_VERSION_ghc(9,2,0)
           -- Lossy
           Literal.LitNumInt8 -> Ast.MachInt n
