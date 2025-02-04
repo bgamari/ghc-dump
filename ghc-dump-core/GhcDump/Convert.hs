@@ -310,7 +310,11 @@ cvtLit l =
       Literal.LitNullAddr -> Ast.MachNullAddr
       Literal.LitFloat x -> Ast.MachFloat x
       Literal.LitDouble x -> Ast.MachDouble x
+#if MIN_VERSION_ghc(9,12,0)
+      Literal.LitLabel x _ -> Ast.MachLabel $ fastStringToText  x
+#else
       Literal.LitLabel x _ _ -> Ast.MachLabel $ fastStringToText  x
+#endif
       Literal.LitRubbish{} -> Ast.LitRubbish
 #else
       Literal.MachChar x -> Ast.MachChar x
