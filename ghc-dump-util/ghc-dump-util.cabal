@@ -42,7 +42,7 @@ library
   hs-source-dirs:      src
   build-depends:       base < 5.0,
                        ghc-dump-core >=0.2 && <0.3,
-                       bytestring >=0.10 && <0.12,
+                       bytestring >=0.10 && <0.13,
                        unordered-containers >= 0.2,
                        hashable >= 1.2,
                        lucid,
