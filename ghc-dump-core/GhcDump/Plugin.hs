@@ -21,7 +21,10 @@ import qualified GhcPlugins as Outputable ((<>))
 import ErrUtils (showPass)
 #endif
 
+#if !MIN_VERSION_ghc(9,4,0)
 import Data.Maybe
+#endif
+
 import Text.Printf
 
 import System.FilePath
@@ -39,7 +42,9 @@ install _opts todo = do
     return (intersperseDumps dflags todo)
 
 showDump :: DynFlags -> SDoc -> String
-#if MIN_VERSION_ghc(9,2,0)
+#if MIN_VERSION_ghc(9,4,0)
+showDump _dflags = renderWithContext defaultSDocContext
+#elif MIN_VERSION_ghc(9,2,0)
 showDump _dflags = showSDocDump defaultSDocContext
 #else
 showDump dflags = showSDocDump dflags
@@ -57,20 +62,29 @@ intersperseDumps dflags = go 0 "desugar"
 -- Compatibility shim
 showPass' :: String -> CoreM ()
 showPass' s = do
+#if MIN_VERSION_ghc(9,4,0)
+    logger <- getLogger
+    liftIO $ showPass logger s
+#elif MIN_VERSION_ghc(9,2,0)
     dflags <- getDynFlags
-#if MIN_VERSION_ghc(9,2,0)
     logger <- getLogger
     liftIO $ showPass logger dflags s
 #else
+    dflags <- getDynFlags
     liftIO $ showPass dflags s
 #endif
 
 dumpIn :: DynFlags -> Int -> String -> ModGuts -> CoreM ModGuts
 dumpIn dflags n phase guts = do
-    let prefix = fromMaybe "dump" $ dumpPrefix dflags
-        fname = printf "%spass-%04u.cbor.zstd" prefix n
     showPass' $ "GhcDump: Dumping core to "++fname
     let in_dump_dir = maybe id (</>) (dumpDir dflags)
     liftIO $ createDirectoryIfMissing True $ takeDirectory $ in_dump_dir fname
     liftIO $ writeSModule (in_dump_dir fname) (cvtModule dflags n phase guts)
     return guts
+  where
+    fname = printf "%spass-%04u.cbor.zstd" prefix n
+#if MIN_VERSION_ghc(9,4,0)
+    prefix = dumpPrefix dflags
+#else
+    prefix = fromMaybe "dump" $ dumpPrefix dflags
+#endif
